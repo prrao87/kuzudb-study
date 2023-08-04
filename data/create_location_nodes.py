@@ -2,7 +2,6 @@
 Generate nodes for cities, states and countries
 """
 import argparse
-from calendar import c
 import unicodedata
 from pathlib import Path
 from typing import Any
@@ -71,7 +70,10 @@ def write_state_nodes(city_nodes: pl.DataFrame) -> None:
     ids = list(range(1, len(state_nodes) + 1))
     state_nodes = state_nodes.with_columns(pl.lit(ids).alias("id"))
     # Write to csv
-    state_nodes.write_csv(Path("output/nodes") / "states.csv", separator="|")
+    state_nodes.select(
+        pl.col("id"),
+        pl.all().exclude("id")
+    ).write_csv(Path("output/nodes") / "states.csv", separator="|")
     print(f"Wrote {state_nodes.shape[0]} states to CSV")
 
 
@@ -82,7 +84,10 @@ def write_country_nodes(city_nodes: pl.DataFrame) -> None:
     ids = list(range(1, len(country_nodes) + 1))
     country_nodes = country_nodes.with_columns(pl.lit(ids).alias("id"))
     # Write to csv
-    country_nodes.write_csv(Path("output/nodes") / "countries.csv", separator="|")
+    country_nodes.select(
+        pl.col("id"),
+        pl.all().exclude("id")
+    ).write_csv(Path("output/nodes") / "countries.csv", separator="|")
     print(f"Wrote {country_nodes.shape[0]} countries to CSV")
 
 
