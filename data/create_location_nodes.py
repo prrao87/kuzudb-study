@@ -6,7 +6,6 @@ import unicodedata
 from pathlib import Path
 from typing import Any
 
-
 import polars as pl
 
 City = dict[str, Any]
@@ -17,17 +16,15 @@ def remove_accents(input_str: str) -> str:
     Normalize unicode data, remove diacritical marks and convert to ASCII
     https://docs.python.org/3/library/unicodedata.html#unicodedata.normalize
     """
-    nfkd_form = unicodedata.normalize('NFKD', input_str)
-    only_ascii = nfkd_form.encode('ASCII', 'ignore').decode("utf-8")
+    nfkd_form = unicodedata.normalize("NFKD", input_str)
+    only_ascii = nfkd_form.encode("ASCII", "ignore").decode("utf-8")
     return only_ascii
 
 
 def get_cities_df(world_cities: pl.DataFrame) -> pl.DataFrame:
     # For simplicity we only extract cities from the following countries
     country_codes = ["US", "GB", "CA"]
-    cities_of_interest = world_cities.filter(
-        pl.col("iso2").is_in(country_codes)
-    )
+    cities_of_interest = world_cities.filter(pl.col("iso2").is_in(country_codes))
     print(f"Obtained {cities_of_interest.shape[0]} cities from countries: {country_codes}")
     return cities_of_interest
 
@@ -38,13 +35,16 @@ def write_city_nodes(cities_of_interest: pl.DataFrame) -> pl.DataFrame:
         pl.col("admin_name").apply(remove_accents)
     ).drop("city")
     # Rename columns
-    cities_of_interest = cities_of_interest.rename(
-        {"city_ascii": "city", "admin_name": "state"}
-    )
+    cities_of_interest = cities_of_interest.rename({"city_ascii": "city", "admin_name": "state"})
     # Isolate just city metadata for city nodes, and remove those with empty state values
     city_nodes = (
         cities_of_interest.select(
-            "city", "state", "country", "lat", "lng", "population",
+            "city",
+            "state",
+            "country",
+            "lat",
+            "lng",
+            "population",
         )
         .filter(pl.col("state") != "")
         .sort(["country", "state", "city"])
@@ -53,27 +53,23 @@ def write_city_nodes(cities_of_interest: pl.DataFrame) -> pl.DataFrame:
     ids = list(range(1, len(city_nodes) + 1))
     city_nodes = city_nodes.with_columns(pl.lit(ids).alias("id"))
     # Write to csv
-    city_nodes.select(
-        pl.col("id"),
-        pl.all().exclude("id")
-    ).write_csv(Path("output/nodes") / "cities.csv", separator="|")
+    city_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
+        Path("output/nodes") / "cities.csv", separator="|"
+    )
     print(f"Wrote {city_nodes.shape[0]} cities to CSV")
     return city_nodes
 
 
 def write_state_nodes(city_nodes: pl.DataFrame) -> None:
     # Obtain unique list of states and countries
-    state_nodes = city_nodes.select(
-        "state", "country"
-    ).unique().sort(["country", "state"])
+    state_nodes = city_nodes.select("state", "country").unique().sort(["country", "state"])
     # Add ID column to function as a primary key
     ids = list(range(1, len(state_nodes) + 1))
     state_nodes = state_nodes.with_columns(pl.lit(ids).alias("id"))
     # Write to csv
-    state_nodes.select(
-        pl.col("id"),
-        pl.all().exclude("id")
-    ).write_csv(Path("output/nodes") / "states.csv", separator="|")
+    state_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
+        Path("output/nodes") / "states.csv", separator="|"
+    )
     print(f"Wrote {state_nodes.shape[0]} states to CSV")
 
 
@@ -84,10 +80,9 @@ def write_country_nodes(city_nodes: pl.DataFrame) -> None:
     ids = list(range(1, len(country_nodes) + 1))
     country_nodes = country_nodes.with_columns(pl.lit(ids).alias("id"))
     # Write to csv
-    country_nodes.select(
-        pl.col("id"),
-        pl.all().exclude("id")
-    ).write_csv(Path("output/nodes") / "countries.csv", separator="|")
+    country_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
+        Path("output/nodes") / "countries.csv", separator="|"
+    )
     print(f"Wrote {country_nodes.shape[0]} countries to CSV")
 
 
