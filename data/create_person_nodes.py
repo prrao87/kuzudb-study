@@ -40,7 +40,7 @@ def create_person_df(male_profiles: list[Profile], female_profiles: list[Profile
     )
     # Add ID column
     ids = list(range(1, len(persons_df) + 1))
-    persons_df = persons_df.with_columns(pl.lit(ids).alias("person_id"))
+    persons_df = persons_df.with_columns(pl.lit(ids).alias("id"))
     return persons_df
 
 
@@ -56,16 +56,19 @@ def main() -> None:
     persons_df = create_person_df(female_profiles, male_profiles)
     # Write nodes
     persons_df.select(
-        pl.col("person_id"),
-        pl.all().exclude("person_id")
+        pl.col("id"),
+        pl.all().exclude("id")
     ).write_csv(Path("output/nodes") / "persons.csv", separator="|")
+    print(f"Wrote {persons_df.shape[0]} person nodes to CSV")
 
 
 if __name__ == "__main__":
+    # fmt: off
     parser = argparse.ArgumentParser()
     parser.add_argument("--num", "-n", type=int, default=10_000, help="Number of fake profiles to generate")
     parser.add_argument("--seed", "-s", type=int, default=0, help="Random seed")
     args = parser.parse_args()
+    # fmt: on
 
     SEED = args.seed
     NUM = args.num
