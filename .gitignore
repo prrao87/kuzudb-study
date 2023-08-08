@@ -130,3 +130,7 @@ dmypy.json
 
 # Mac
 .DS_Store
+
+# Database
+test
+social_network
