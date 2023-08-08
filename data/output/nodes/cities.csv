@@ -17,7 +17,7 @@ id|city|state|country|lat|lng|population
 16|Lacombe|Alberta|Canada|52.4683|-113.7369|13057
 17|Leduc|Alberta|Canada|53.2594|-113.5492|29993
 18|Lethbridge|Alberta|Canada|49.6942|-112.8328|92729
-19|Lloydminster|Alberta|Canada|53.2807|-110.035|19645.00
+19|Lloydminster|Alberta|Canada|53.2807|-110.035|19645
 20|Medicine Hat|Alberta|Canada|50.0417|-110.6775|63260
 21|Morinville|Alberta|Canada|53.8022|-113.6497|9848
 22|Okotoks|Alberta|Canada|50.725|-113.975|28881
@@ -29,7 +29,7 @@ id|city|state|country|lat|lng|population
 28|Strathmore|Alberta|Canada|51.0378|-113.4003|13756
 29|Sylvan Lake|Alberta|Canada|52.3083|-114.0964|14816
 30|Wetaskiwin|Alberta|Canada|52.9694|-113.3769|12655
-31|Wood Buffalo|Alberta|Canada|57.6042|-111.3284|71589.00
+31|Wood Buffalo|Alberta|Canada|57.6042|-111.3284|71589
 32|Abbotsford|British Columbia|Canada|49.05|-122.3167|141397
 33|Burnaby|British Columbia|Canada|49.2667|-122.9667|232755
 34|Campbell River|British Columbia|Canada|50.0244|-125.2475|35138
@@ -60,7 +60,7 @@ id|city|state|country|lat|lng|population
 59|New Westminster|British Columbia|Canada|49.2069|-122.9111|70996
 60|North Cowichan|British Columbia|Canada|48.8236|-123.7192|29676
 61|North Saanich|British Columbia|Canada|48.6142|-123.42|11249
-62|North Vancouver|British Columbia|Canada|49.3641|-123.0066|85935.00
+62|North Vancouver|British Columbia|Canada|49.3641|-123.0066|85935
 63|Oak Bay|British Columbia|Canada|48.4264|-123.3228|18094
 64|Parksville|British Columbia|Canada|49.315|-124.312|12514
 65|Penticton|British Columbia|Canada|49.4911|-119.5886|33761
@@ -100,7 +100,7 @@ id|city|state|country|lat|lng|population
 99|Springfield|Manitoba|Canada|49.9292|-96.6939|15342
 100|St. Andrews|Manitoba|Canada|50.27|-96.9747|11913
 101|St. Clements|Manitoba|Canada|50.2689|-96.6742|10876
-102|Stanley|Manitoba|Canada|49.1331|-98.0656|9038.00
+102|Stanley|Manitoba|Canada|49.1331|-98.0656|9038
 103|Steinbach|Manitoba|Canada|49.5258|-96.6839|15829
 104|Tache|Manitoba|Canada|49.7081|-96.6736|11568
 105|Thompson|Manitoba|Canada|55.7433|-97.8553|13678
@@ -111,22 +111,22 @@ id|city|state|country|lat|lng|population
 110|Dieppe|New Brunswick|Canada|46.0989|-64.7242|107068
 111|Edmundston|New Brunswick|Canada|47.3765|-68.3253|16580
 112|Fredericton|New Brunswick|Canada|45.9636|-66.6431|58220
-113|Miramichi|New Brunswick|Canada|47.0196|-65.5072|17537.00
+113|Miramichi|New Brunswick|Canada|47.0196|-65.5072|17537
 114|Moncton|New Brunswick|Canada|46.1328|-64.7714|108620
 115|Oromocto|New Brunswick|Canada|45.8488|-66.4788|9223
 116|Quispamsis|New Brunswick|Canada|45.4322|-65.9462|18245
 117|Riverview|New Brunswick|Canada|46.0613|-64.8052|19667
 118|Rothesay|New Brunswick|Canada|45.3831|-65.9969|11659
 119|Saint John|New Brunswick|Canada|45.2806|-66.0761|67575
-120|Tracadie|New Brunswick|Canada|47.5124|-64.9101|16114.00
+120|Tracadie|New Brunswick|Canada|47.5124|-64.9101|16114
 121|Conception Bay South|Newfoundland and Labrador|Canada|47.5167|-52.9833|26199
-122|Corner Brook|Newfoundland and Labrador|Canada|48.9287|-57.926|19806.00
+122|Corner Brook|Newfoundland and Labrador|Canada|48.9287|-57.926|19806
 123|Gander|Newfoundland and Labrador|Canada|48.9569|-54.6089|11688
-124|Grand Falls|Newfoundland and Labrador|Canada|48.9578|-55.6633|14171.00
+124|Grand Falls|Newfoundland and Labrador|Canada|48.9578|-55.6633|14171
 125|Mount Pearl Park|Newfoundland and Labrador|Canada|47.5189|-52.8058|22957
 126|Paradise|Newfoundland and Labrador|Canada|47.5333|-52.8667|21389
-127|St. John's|Newfoundland and Labrador|Canada|47.4817|-52.7971|108860.00
-128|Yellowknife|Northwest Territories|Canada|62.4709|-114.4053|19569.00
+127|St. John's|Newfoundland and Labrador|Canada|47.4817|-52.7971|108860
+128|Yellowknife|Northwest Territories|Canada|62.4709|-114.4053|19569
 129|Amherst|Nova Scotia|Canada|45.8167|-64.2167|9550
 130|Bridgewater|Nova Scotia|Canada|44.37|-64.52|8532
 131|Cape Breton|Nova Scotia|Canada|46.1389|-60.1931|94285
@@ -137,7 +137,7 @@ id|city|state|country|lat|lng|population
 136|New Glasgow|Nova Scotia|Canada|45.5926|-62.6455|20609
 137|Queens|Nova Scotia|Canada|44.0333|-64.7167|10307
 138|Truro|Nova Scotia|Canada|45.3647|-63.28|12826
-139|Iqaluit|Nunavut|Canada|63.7598|-68.5107|7740.00
+139|Iqaluit|Nunavut|Canada|63.7598|-68.5107|7740
 140|Adjala-Tosorontio|Ontario|Canada|44.1333|-79.9333|10975
 141|Ajax|Ontario|Canada|43.8583|-79.0364|119677
 142|Alfred and Plantagenet|Ontario|Canada|45.5667|-74.9167|9680
@@ -163,7 +163,7 @@ id|city|state|country|lat|lng|population
 162|Central Elgin|Ontario|Canada|42.7667|-81.1|12607
 163|Centre Wellington|Ontario|Canada|43.7|-80.3667|28191
 164|Champlain|Ontario|Canada|45.5333|-74.65|8706
-165|Chatham|Ontario|Canada|42.4229|-82.1324|101647.00
+165|Chatham|Ontario|Canada|42.4229|-82.1324|101647
 166|Clarence-Rockland|Ontario|Canada|45.4833|-75.2|24512
 167|Clarington|Ontario|Canada|43.935|-78.6083|92013
 168|Clearview|Ontario|Canada|44.3981|-80.0742|14151
@@ -187,7 +187,7 @@ id|city|state|country|lat|lng|population
 186|Guelph/Eramosa|Ontario|Canada|43.63|-80.22|12854
 187|Halton Hills|Ontario|Canada|43.63|-79.95|61161
 188|Hamilton|Ontario|Canada|43.2567|-79.8692|693645
-189|Hamilton Township|Ontario|Canada|44.054|-78.2164|10942.00
+189|Hamilton Township|Ontario|Canada|44.054|-78.2164|10942
 190|Hawkesbury|Ontario|Canada|45.6|-74.6|10263
 191|Huntsville|Ontario|Canada|45.3333|-79.2167|19816
 192|Huron East|Ontario|Canada|43.63|-81.28|9138
@@ -199,7 +199,7 @@ id|city|state|country|lat|lng|population
 198|Kingsville|Ontario|Canada|42.1|-82.7167|21552
 199|Kitchener|Ontario|Canada|43.4186|-80.4728|470015
 200|LaSalle|Ontario|Canada|42.2167|-83.0667|30180
-201|Lakeshore|Ontario|Canada|42.2399|-82.6511|36611.00
+201|Lakeshore|Ontario|Canada|42.2399|-82.6511|36611
 202|Lambton Shores|Ontario|Canada|43.1833|-81.9|10631
 203|Laurentian Valley|Ontario|Canada|45.7681|-77.2239|9387
 204|Leamington|Ontario|Canada|42.0667|-82.5833|32991
@@ -208,7 +208,7 @@ id|city|state|country|lat|lng|population
 207|London|Ontario|Canada|42.9836|-81.2497|383822
 208|Loyalist|Ontario|Canada|44.25|-76.75|16971
 209|Malahide|Ontario|Canada|42.7928|-80.9361|9292
-210|Mapleton|Ontario|Canada|43.7358|-80.6681|10527.00
+210|Mapleton|Ontario|Canada|43.7358|-80.6681|10527
 211|Markham|Ontario|Canada|43.8767|-79.2633|328966
 212|Meaford|Ontario|Canada|44.58|-80.73|10991
 213|Middlesex Centre|Ontario|Canada|43.05|-81.45|17262
@@ -316,10 +316,10 @@ id|city|state|country|lat|lng|population
 315|Candiac|Quebec|Canada|45.38|-73.52|21047
 316|Cantley|Quebec|Canada|45.5667|-75.7833|10699
 317|Carignan|Quebec|Canada|45.45|-73.3|9462
-318|Chambly|Quebec|Canada|45.4311|-73.2873|29120.00
+318|Chambly|Quebec|Canada|45.4311|-73.2873|29120
 319|Chateauguay|Quebec|Canada|45.38|-73.75|70812
 320|Coaticook|Quebec|Canada|45.1333|-71.8|8698
-321|Cote-Saint-Luc|Quebec|Canada|45.4687|-73.6673|32448.00
+321|Cote-Saint-Luc|Quebec|Canada|45.4687|-73.6673|32448
 322|Cowansville|Quebec|Canada|45.2|-72.75|12489
 323|Deux-Montagnes|Quebec|Canada|45.5333|-73.8833|17553
 324|Dollard-des-Ormeaux|Quebec|Canada|45.4833|-73.8167|49637
@@ -334,7 +334,7 @@ id|city|state|country|lat|lng|population
 333|L'Assomption|Quebec|Canada|45.8333|-73.4167|20065
 334|L'Ile-Perrot|Quebec|Canada|45.3833|-73.95|10756
 335|La Prairie|Quebec|Canada|45.42|-73.5|23357
-336|La Tuque|Quebec|Canada|48.0652|-74.0528|11001.00
+336|La Tuque|Quebec|Canada|48.0652|-74.0528|11001
 337|Lac-Brome|Quebec|Canada|45.2167|-72.5167|58889
 338|Lachute|Quebec|Canada|45.65|-74.3333|12551
 339|Laval|Quebec|Canada|45.5833|-73.75|422993
@@ -349,7 +349,7 @@ id|city|state|country|lat|lng|population
 348|Matane|Quebec|Canada|48.85|-67.5333|14462
 349|Mercier|Quebec|Canada|45.32|-73.75|13115
 350|Mirabel|Quebec|Canada|45.65|-74.0833|50513
-351|Mistassini|Quebec|Canada|48.8229|-72.2154|14250.00
+351|Mistassini|Quebec|Canada|48.8229|-72.2154|14250
 352|Mont-Laurier|Quebec|Canada|46.55|-75.5|13779
 353|Mont-Royal|Quebec|Canada|45.5161|-73.6431|19503
 354|Mont-Saint-Hilaire|Quebec|Canada|45.5622|-73.1917|18200
@@ -390,7 +390,7 @@ id|city|state|country|lat|lng|population
 389|Saint-Sauveur|Quebec|Canada|45.9|-74.17|9881
 390|Sainte-Adele|Quebec|Canada|45.95|-74.13|12137
 391|Sainte-Agathe-des-Monts|Quebec|Canada|46.05|-74.28|10223
-392|Sainte-Anne-des-Plaines|Quebec|Canada|45.7617|-73.8204|14421.00
+392|Sainte-Anne-des-Plaines|Quebec|Canada|45.7617|-73.8204|14421
 393|Sainte-Catherine|Quebec|Canada|45.4|-73.58|16762
 394|Sainte-Julie|Quebec|Canada|45.5833|-73.3333|30104
 395|Sainte-Julienne|Quebec|Canada|45.97|-73.72|9331
@@ -412,7 +412,7 @@ id|city|state|country|lat|lng|population
 411|Vaudreuil-Dorion|Quebec|Canada|45.4|-74.0333|38117
 412|Victoriaville|Quebec|Canada|46.05|-71.9667|45309
 413|Westmount|Quebec|Canada|45.4833|-73.6|19931
-414|Corman Park No. 344|Saskatchewan|Canada|52.2291|-106.8002|8568.00
+414|Corman Park No. 344|Saskatchewan|Canada|52.2291|-106.8002|8568
 415|Estevan|Saskatchewan|Canada|49.1392|-102.9861|11258
 416|Lloydminster|Saskatchewan|Canada|53.2783|-110.005|31410
 417|Martensville|Saskatchewan|Canada|52.2897|-106.6667|9645
@@ -425,7 +425,7 @@ id|city|state|country|lat|lng|population
 424|Warman|Saskatchewan|Canada|52.3219|-106.5842|11020
 425|Weyburn|Saskatchewan|Canada|49.6611|-103.8525|10870
 426|Yorkton|Saskatchewan|Canada|51.2139|-102.4628|16343
-427|Whitehorse|Yukon|Canada|60.7029|-135.0691|25085.00
+427|Whitehorse|Yukon|Canada|60.7029|-135.0691|25085
 428|Aberdeen|Aberdeen City|United Kingdom|57.15|-2.11|200680
 429|Bucksburn|Aberdeen City|United Kingdom|57.177|-2.175|8572
 430|Ellon|Aberdeenshire|United Kingdom|57.366|-2.086|10200
@@ -5194,7 +5194,7 @@ id|city|state|country|lat|lng|population
 5193|New Scotland|New York|United States|42.6047|-73.9413|9064
 5194|New Square|New York|United States|41.141|-74.0294|9433
 5195|New Windsor|New York|United States|41.4742|-74.1089|27541
-5196|New York|New York|United States|40.6943|-73.9249|18972871
+5196|New York|New York|United States|40.6943|-73.9249|18972872
 5197|Newark|New York|United States|43.0418|-77.093|9049
 5198|Newburgh|New York|United States|41.5531|-74.0599|31841
 5199|Newfane|New York|United States|43.2818|-78.6932|9341
