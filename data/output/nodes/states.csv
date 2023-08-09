@@ -1,0 +1,274 @@
+id|state|country
+1|Alberta|Canada
+2|British Columbia|Canada
+3|Manitoba|Canada
+4|New Brunswick|Canada
+5|Newfoundland and Labrador|Canada
+6|Northwest Territories|Canada
+7|Nova Scotia|Canada
+8|Nunavut|Canada
+9|Ontario|Canada
+10|Prince Edward Island|Canada
+11|Quebec|Canada
+12|Saskatchewan|Canada
+13|Yukon|Canada
+14|Aberdeen City|United Kingdom
+15|Aberdeenshire|United Kingdom
+16|Angus|United Kingdom
+17|Antrim and Newtownabbey|United Kingdom
+18|Ards and North Down|United Kingdom
+19|Argyll and Bute|United Kingdom
+20|Armagh City, Banbridge and Craigavon|United Kingdom
+21|Barking and Dagenham|United Kingdom
+22|Barnet|United Kingdom
+23|Barnsley|United Kingdom
+24|Bath and North East Somerset|United Kingdom
+25|Bedford|United Kingdom
+26|Belfast|United Kingdom
+27|Bexley|United Kingdom
+28|Birmingham|United Kingdom
+29|Blackburn with Darwen|United Kingdom
+30|Blackpool|United Kingdom
+31|Blaenau Gwent|United Kingdom
+32|Bolton|United Kingdom
+33|Bracknell Forest|United Kingdom
+34|Bradford|United Kingdom
+35|Brent|United Kingdom
+36|Bridgend|United Kingdom
+37|Brighton and Hove|United Kingdom
+38|Bristol, City of|United Kingdom
+39|Bromley|United Kingdom
+40|Buckinghamshire|United Kingdom
+41|Bury|United Kingdom
+42|Caerphilly|United Kingdom
+43|Calderdale|United Kingdom
+44|Cambridgeshire|United Kingdom
+45|Camden|United Kingdom
+46|Cardiff|United Kingdom
+47|Carmarthenshire|United Kingdom
+48|Central Bedfordshire|United Kingdom
+49|Ceredigion|United Kingdom
+50|Cheshire East|United Kingdom
+51|Cheshire West and Chester|United Kingdom
+52|Clackmannanshire|United Kingdom
+53|Conwy|United Kingdom
+54|Cornwall|United Kingdom
+55|Coventry|United Kingdom
+56|Croydon|United Kingdom
+57|Cumbria|United Kingdom
+58|Darlington|United Kingdom
+59|Denbighshire|United Kingdom
+60|Derby|United Kingdom
+61|Derbyshire|United Kingdom
+62|Derry and Strabane|United Kingdom
+63|Devon|United Kingdom
+64|Doncaster|United Kingdom
+65|Dorset|United Kingdom
+66|Dudley|United Kingdom
+67|Dumfries and Galloway|United Kingdom
+68|Dundee City|United Kingdom
+69|Durham|United Kingdom
+70|Ealing|United Kingdom
+71|East Ayrshire|United Kingdom
+72|East Dunbartonshire|United Kingdom
+73|East Lothian|United Kingdom
+74|East Renfrewshire|United Kingdom
+75|East Riding of Yorkshire|United Kingdom
+76|East Sussex|United Kingdom
+77|Edinburgh, City of|United Kingdom
+78|Enfield|United Kingdom
+79|Essex|United Kingdom
+80|Falkirk|United Kingdom
+81|Fermanagh and Omagh|United Kingdom
+82|Fife|United Kingdom
+83|Flintshire|United Kingdom
+84|Gateshead|United Kingdom
+85|Glasgow City|United Kingdom
+86|Gloucestershire|United Kingdom
+87|Greenwich|United Kingdom
+88|Gwynedd|United Kingdom
+89|Hackney|United Kingdom
+90|Halton|United Kingdom
+91|Hammersmith and Fulham|United Kingdom
+92|Hampshire|United Kingdom
+93|Haringey|United Kingdom
+94|Harrow|United Kingdom
+95|Hartlepool|United Kingdom
+96|Havering|United Kingdom
+97|Herefordshire|United Kingdom
+98|Hertfordshire|United Kingdom
+99|Highland|United Kingdom
+100|Hillingdon|United Kingdom
+101|Hounslow|United Kingdom
+102|Inverclyde|United Kingdom
+103|Isle of Anglesey|United Kingdom
+104|Isle of Wight|United Kingdom
+105|Islington|United Kingdom
+106|Kensington and Chelsea|United Kingdom
+107|Kent|United Kingdom
+108|Kingston upon Hull, City of|United Kingdom
+109|Kingston upon Thames|United Kingdom
+110|Kirklees|United Kingdom
+111|Knowsley|United Kingdom
+112|Lambeth|United Kingdom
+113|Lancashire|United Kingdom
+114|Leeds|United Kingdom
+115|Leicester|United Kingdom
+116|Leicestershire|United Kingdom
+117|Lewisham|United Kingdom
+118|Lincolnshire|United Kingdom
+119|Lisburn and Castlereagh|United Kingdom
+120|Liverpool|United Kingdom
+121|London, City of|United Kingdom
+122|Luton|United Kingdom
+123|Manchester|United Kingdom
+124|Medway|United Kingdom
+125|Merthyr Tydfil|United Kingdom
+126|Merton|United Kingdom
+127|Mid-Ulster|United Kingdom
+128|Middlesbrough|United Kingdom
+129|Midlothian|United Kingdom
+130|Milton Keynes|United Kingdom
+131|Monmouthshire|United Kingdom
+132|Moray|United Kingdom
+133|Neath Port Talbot|United Kingdom
+134|Newcastle upon Tyne|United Kingdom
+135|Newham|United Kingdom
+136|Newport|United Kingdom
+137|Norfolk|United Kingdom
+138|North Ayrshire|United Kingdom
+139|North East Lincolnshire|United Kingdom
+140|North Lanarkshire|United Kingdom
+141|North Lincolnshire|United Kingdom
+142|North Somerset|United Kingdom
+143|North Tyneside|United Kingdom
+144|North Yorkshire|United Kingdom
+145|Northamptonshire|United Kingdom
+146|Northumberland|United Kingdom
+147|Nottingham|United Kingdom
+148|Nottinghamshire|United Kingdom
+149|Oldham|United Kingdom
+150|Orkney Islands|United Kingdom
+151|Oxfordshire|United Kingdom
+152|Pembrokeshire|United Kingdom
+153|Perth and Kinross|United Kingdom
+154|Peterborough|United Kingdom
+155|Plymouth|United Kingdom
+156|Portsmouth|United Kingdom
+157|Powys|United Kingdom
+158|Reading|United Kingdom
+159|Redbridge|United Kingdom
+160|Redcar and Cleveland|United Kingdom
+161|Renfrewshire|United Kingdom
+162|Rhondda Cynon Taff|United Kingdom
+163|Richmond upon Thames|United Kingdom
+164|Rochdale|United Kingdom
+165|Rotherham|United Kingdom
+166|Rutland|United Kingdom
+167|Salford|United Kingdom
+168|Sandwell|United Kingdom
+169|Scottish Borders|United Kingdom
+170|Sefton|United Kingdom
+171|Sheffield|United Kingdom
+172|Shetland Islands|United Kingdom
+173|Shropshire|United Kingdom
+174|Slough|United Kingdom
+175|Solihull|United Kingdom
+176|Somerset|United Kingdom
+177|South Ayrshire|United Kingdom
+178|South Gloucestershire|United Kingdom
+179|South Lanarkshire|United Kingdom
+180|South Tyneside|United Kingdom
+181|Southampton|United Kingdom
+182|Southend-on-Sea|United Kingdom
+183|St. Helens|United Kingdom
+184|Staffordshire|United Kingdom
+185|Stirling|United Kingdom
+186|Stockport|United Kingdom
+187|Stockton-on-Tees|United Kingdom
+188|Stoke-on-Trent|United Kingdom
+189|Suffolk|United Kingdom
+190|Sunderland|United Kingdom
+191|Surrey|United Kingdom
+192|Sutton|United Kingdom
+193|Swansea|United Kingdom
+194|Swindon|United Kingdom
+195|Tameside|United Kingdom
+196|Telford and Wrekin|United Kingdom
+197|Thurrock|United Kingdom
+198|Torbay|United Kingdom
+199|Torfaen|United Kingdom
+200|Tower Hamlets|United Kingdom
+201|Trafford|United Kingdom
+202|Vale of Glamorgan, The|United Kingdom
+203|Wakefield|United Kingdom
+204|Walsall|United Kingdom
+205|Waltham Forest|United Kingdom
+206|Wandsworth|United Kingdom
+207|Warrington|United Kingdom
+208|Warwickshire|United Kingdom
+209|West Berkshire|United Kingdom
+210|West Dunbartonshire|United Kingdom
+211|West Lothian|United Kingdom
+212|West Sussex|United Kingdom
+213|Westminster|United Kingdom
+214|Wigan|United Kingdom
+215|Wiltshire|United Kingdom
+216|Windsor and Maidenhead|United Kingdom
+217|Wirral|United Kingdom
+218|Wokingham|United Kingdom
+219|Wolverhampton|United Kingdom
+220|Worcestershire|United Kingdom
+221|Wrexham|United Kingdom
+222|York|United Kingdom
+223|Alabama|United States
+224|Alaska|United States
+225|Arizona|United States
+226|Arkansas|United States
+227|California|United States
+228|Colorado|United States
+229|Connecticut|United States
+230|Delaware|United States
+231|District of Columbia|United States
+232|Florida|United States
+233|Georgia|United States
+234|Hawaii|United States
+235|Idaho|United States
+236|Illinois|United States
+237|Indiana|United States
+238|Iowa|United States
+239|Kansas|United States
+240|Kentucky|United States
+241|Louisiana|United States
+242|Maine|United States
+243|Maryland|United States
+244|Massachusetts|United States
+245|Michigan|United States
+246|Minnesota|United States
+247|Mississippi|United States
+248|Missouri|United States
+249|Montana|United States
+250|Nebraska|United States
+251|Nevada|United States
+252|New Hampshire|United States
+253|New Jersey|United States
+254|New Mexico|United States
+255|New York|United States
+256|North Carolina|United States
+257|North Dakota|United States
+258|Ohio|United States
+259|Oklahoma|United States
+260|Oregon|United States
+261|Pennsylvania|United States
+262|Rhode Island|United States
+263|South Carolina|United States
+264|South Dakota|United States
+265|Tennessee|United States
+266|Texas|United States
+267|Utah|United States
+268|Vermont|United States
+269|Virginia|United States
+270|Washington|United States
+271|West Virginia|United States
+272|Wisconsin|United States
+273|Wyoming|United States
