@@ -23,6 +23,17 @@ pip install -r requirements.txt
 
 An artificial social network dataset is used, generated via the [Faker](https://faker.readthedocs.io/en/master/) Python library.
 
+
+### Generate all data at once
+
+A shell script `generate_data.sh` is provided in the root directory of this repo that sequentially runs the Python scripts, generating the data for the nodes and edges for the social network. This is the recommended way to generate the data. A single positional argument is provided to the shell script: The number of person profiles to generate.
+
+```sh
+bash generate_data.sh 1000
+```
+
+Running this command generates a series of files in the `output` directory, following which we can proceed to ingesting the data into a graph database.
+
 ### Nodes: Persons
 
 First, fake male and female profile information is generated for the number of people required to be in the network.
@@ -30,7 +41,7 @@ First, fake male and female profile information is generated for the number of p
 ```sh
 $ cd data
 # Create a dataset of 1000 fake profiles for men and women with a 50-50 split by gender
-$ python create_persons.py -n 1000
+$ python create_nodes_person.py -n 1000
 ```
 
 The CSV file generated contains a header and fake data as shown below.
@@ -51,7 +62,7 @@ To generate a list of cities that people live in, we use the [world cities datas
 To make this dataset simpler and more realistic, we only consider cities from the following three countries: `US`, `UK` and `CA`. 
 
 ```sh
-$ python create_locations.py
+$ python create_nodes_location.py
 
 Wrote 7117 cities to CSV
 Wrote 273 states to CSV
@@ -88,7 +99,7 @@ id|country
 A static list of interests/hobbies that a person could have is included in `raw/interests.csv`. This is cleaned up and formatted as required by the data generator script.
 
 ```sh
-$ python create_interests.py
+$ python create_nodes_interests.py
 ```
 
 This generates data as shown below.
@@ -99,6 +110,86 @@ id|interest
 2|Art & Painting
 3|Biking
 
-### Edges: Person-person
+### Edges: `Person` follows `Person`
 
-Edges are generated between people in a similar way to the way we might imagine social networks. A `Person` follows another `Person`, with the direction of the edge signifying something meaningful.
+Edges are generated between people in a similar way to the way we might imagine social networks. A `Person` follows another `Person`, with the direction of the edge signifying something meaningful. Rather than just generating a uniform distribution, to make the data more interesting, during generation, a small fraction of the profiles (~0.5%) is chosen to be highly connected. This resembles the role of "influencers" in real-world graphs, and in graph terminology, the nodes representing these persons can be called "hubs". The rest of the nodes are connected via these hubs in a random fashion.
+
+```sh
+python create_edges_follows.py
+```
+
+This generates data as shown below, where the `from` column contains the ID of a person who is following someone, and the `to` column contains the ID of the person being followed.
+
+from|to
+---|---
+50|1
+152|1
+271|1
+
+The "hub" nodes can be connected to anywhere from 0.5-5% of the number of persons in the graph.
+
+### Edges: `Person` lives in `Location`
+
+Edges are generated between people and the cities they live in. This is done by randomly choosing a city for each person from the list of cities generated earlier.
+
+```sh
+$ python create_edges_location.py
+```
+
+The data generated contains the person ID in the `from` column and the city ID in the `to` column.
+
+from|to
+---|---
+1|6015
+2|6296
+3|6657
+
+### Edges: `Person` has `Interest`
+
+Edges are generated between people and the interests they have. This is done by randomly choosing anywhere from 1-5 interests for each person from the list of interests generated earlier for the nodes.
+
+```sh
+python create_edges_interests.py
+```
+
+The data generated contains the person ID in the `from` column and the interest ID in the `to` column.
+
+from|to
+---|---
+1|24
+2|4
+2|8
+
+A person can have multiple interests, so the `from` column can have multiple rows with the same ID.
+
+### Edges: `City` is in `State`
+
+Edges are generated between cities and the states they are in, as per the `cities.csv` file
+
+```sh
+python create_edges_city_state.py
+```
+
+The data generated contains the city ID in the `from` column and the state ID in the `to` column.
+
+from|to
+---|---
+1|1
+2|1
+3|1
+
+### Edges: `State` is in `Country`
+
+Edges are generated between states and the countries they are in, as per the `states.csv` file
+
+```sh
+python create_edges_state_country.py
+```
+
+The data generated contains the state ID in the `from` column and the country ID in the `to` column.
+
+from|to
+---|---
+1|1
+2|1
+3|1
