@@ -103,13 +103,13 @@ def main() -> None:
         pl.concat([edges_df, super_node_edges_df])
         .unique()
         .sort(["to", "from"])
-    )
+    ).select("from", "to")
     # Limit the number of edges
     if NUM < len(edges_df):
         edges_df = edges_df.head(NUM)
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
-    edges_df.write_csv(Path("output/edges") / "followers.csv", separator="|")
+    edges_df.write_csv(Path("output/edges") / "follows.csv", separator="|")
     print(f"Wrote {len(edges_df)} edges for {len(persons_df)} persons")
 
 
