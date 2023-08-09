@@ -1,9 +1,5 @@
 """
-Generate edges between persons and their followers (who are also persons in the same graph).
-
-The aim is to scale up the generation of edges based on the number of nodes in the graph,
-while also keeping edges between nodes in a way that's not a uniform distribution.
-In the real world, some people are way more connected than others.
+Generate edges between persons and their interests
 """
 import argparse
 from pathlib import Path
