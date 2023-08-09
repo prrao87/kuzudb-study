@@ -26,6 +26,10 @@ def get_cities_df(world_cities: pl.DataFrame) -> pl.DataFrame:
     country_codes = ["US", "GB", "CA"]
     cities_of_interest = world_cities.filter(pl.col("iso2").is_in(country_codes))
     print(f"Obtained {cities_of_interest.shape[0]} cities from countries: {country_codes}")
+    # Ensure polulation column is cast to type integer
+    cities_of_interest = cities_of_interest.with_columns(
+        pl.col("population").cast(pl.Float32).cast(pl.Int32)
+    )
     return cities_of_interest
 
 
