@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import polars as pl
+import util
 
 City = dict[str, Any]
 
@@ -56,11 +57,10 @@ def write_city_nodes(cities_of_interest: pl.DataFrame) -> pl.DataFrame:
     # Add ID column to function as a primary key
     ids = list(range(1, len(city_nodes) + 1))
     city_nodes = city_nodes.with_columns(pl.lit(ids).alias("id"))
-    # Write to csv
-    city_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
-        Path("output/nodes") / "cities.csv", separator="|"
-    )
-    print(f"Wrote {city_nodes.shape[0]} cities to CSV")
+    # Write
+    write_df = city_nodes.select(pl.col("id"), pl.all().exclude("id"))
+    util.write_parquet(write_df, f"output/nodes/cities.parquet")
+    print(f"Wrote {city_nodes.shape[0]} cities")
     return city_nodes
 
 
@@ -70,11 +70,10 @@ def write_state_nodes(city_nodes: pl.DataFrame) -> None:
     # Add ID column to function as a primary key
     ids = list(range(1, len(state_nodes) + 1))
     state_nodes = state_nodes.with_columns(pl.lit(ids).alias("id"))
-    # Write to csv
-    state_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
-        Path("output/nodes") / "states.csv", separator="|"
-    )
-    print(f"Wrote {state_nodes.shape[0]} states to CSV")
+    # Write
+    write_df = state_nodes.select(pl.col("id"), pl.all().exclude("id"))
+    util.write_parquet(write_df, f"output/nodes/states.parquet")
+    print(f"Wrote {state_nodes.shape[0]} states")
 
 
 def write_country_nodes(city_nodes: pl.DataFrame) -> None:
@@ -83,11 +82,10 @@ def write_country_nodes(city_nodes: pl.DataFrame) -> None:
     # Add ID column to function as a primary key
     ids = list(range(1, len(country_nodes) + 1))
     country_nodes = country_nodes.with_columns(pl.lit(ids).alias("id"))
-    # Write to csv
-    country_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
-        Path("output/nodes") / "countries.csv", separator="|"
-    )
-    print(f"Wrote {country_nodes.shape[0]} countries to CSV")
+    # Write
+    write_df = country_nodes.select(pl.col("id"), pl.all().exclude("id"))
+    util.write_parquet(write_df, f"output/nodes/countries.parquet")
+    print(f"Wrote {country_nodes.shape[0]} countries")
 
 
 def main(input_file: str) -> None:

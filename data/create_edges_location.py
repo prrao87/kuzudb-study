@@ -6,11 +6,12 @@ from pathlib import Path
 
 import numpy as np
 import polars as pl
+import util
 
 
 def get_persons_df(filepath: Path) -> pl.DataFrame:
     # Read in persons data
-    persons_df = pl.read_csv(filepath, separator="|").select("id")
+    persons_df = pl.read_parquet(filepath).select("id")
     return persons_df
 
 
@@ -19,7 +20,7 @@ def get_cities_df(filepath: Path) -> pl.DataFrame:
     Get only cities with a population of > 1M
     """
     # Read in cities data and rename the ID column to avoid conflicts
-    residence_loc_df = pl.read_csv(filepath, separator="|").filter(
+    residence_loc_df = pl.read_parquet(filepath).filter(
         pl.col("population") >= 1_000_000
     ).rename({"id": "city_id"})
     return residence_loc_df
@@ -27,8 +28,8 @@ def get_cities_df(filepath: Path) -> pl.DataFrame:
 
 def main() -> None:
     np.random.seed(SEED)
-    persons_df = get_persons_df(NODES_PATH / "persons.csv")
-    residence_loc_df = get_cities_df(NODES_PATH / "cities.csv")
+    persons_df = get_persons_df(NODES_PATH / "persons.parquet")
+    residence_loc_df = get_cities_df(NODES_PATH / "cities.parquet")
     # Randomly pick a city ID from the list of all cities with population > 1M
     city_ids = np.random.choice(residence_loc_df["city_id"], size=len(persons_df), replace=True)
     # Obtain top 5 most common cities name via a join
@@ -48,10 +49,8 @@ def main() -> None:
         edges_df = edges_df.head(NUM)
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
-    edges_df = (
-        edges_df.rename({"city_id": "to", "id": "from"})
-        .write_csv(Path("output/edges") / "lives_in.csv", separator="|")
-    )
+    edges_df = edges_df.rename({"city_id": "to", "id": "from"})
+    util.write_parquet(edges_df, f"output/edges/follows.parquet")
     print(
         f"Generated residence cities for persons. Top 5 common cities are: {', '.join(top_5)}"
     )

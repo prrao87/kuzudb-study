@@ -7,10 +7,10 @@ In the real world, some people are way more connected than others.
 """
 import argparse
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import polars as pl
+import util
 
 
 def select_random_ids(df: pl.DataFrame, num: int) -> list[int]:
@@ -21,9 +21,10 @@ def select_random_ids(df: pl.DataFrame, num: int) -> list[int]:
 
 def get_persons_df(filepath: Path) -> pl.DataFrame:
     # Read in person data
-    persons_df = pl.read_csv(filepath, separator="|").with_columns(
-        pl.col("birthday").str.strptime(pl.Date, "%Y-%m-%d")
-    )
+    persons_df = pl.read_parquet(filepath)
+    # .with_columns(
+    #     pl.col("birthday").str.strptime(pl.Date, "%Y-%m-%d")
+    # )
     return persons_df
 
 
@@ -93,7 +94,7 @@ def create_super_node_edges(persons_df: pl.DataFrame) -> pl.DataFrame:
 
 
 def main() -> None:
-    persons_df = get_persons_df(NODES_PATH / "persons.csv")
+    persons_df = get_persons_df(NODES_PATH / "persons.parquet")
     np.random.seed(SEED)
     edges_df = get_initial_person_edges(persons_df)
     # Generate edges from super nodes
@@ -109,7 +110,7 @@ def main() -> None:
         edges_df = edges_df.head(NUM)
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
-    edges_df.write_csv(Path("output/edges") / "follows.csv", separator="|")
+    util.write_parquet(edges_df, f"output/edges/follows.parquet")
     print(f"Wrote {len(edges_df)} edges for {len(persons_df)} persons")
 
 

@@ -3,7 +3,9 @@ Generate nodes for a person's interests
 These are activities or hobbies person in the real world might have
 """
 from pathlib import Path
+
 import polars as pl
+import util
 
 
 def main(filename: str) -> pl.DataFrame:
@@ -17,9 +19,8 @@ def main(filename: str) -> pl.DataFrame:
     ids = list(range(1, len(interests_df) + 1))
     interests_df = interests_df.with_columns(pl.lit(ids).alias("id"))
     # Write to csv
-    interests_df.select(pl.col("id"), pl.all().exclude("id")).write_csv(
-        Path("output/nodes") / "interests.csv", separator="|"
-    )
+    write_df = interests_df.select(pl.col("id"), pl.all().exclude("id"))
+    util.write_parquet(write_df, f"output/nodes/interests.parquet")
     return interests
 
 

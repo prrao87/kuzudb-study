@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import polars as pl
+import util
 
 
 def select_random_ids(df: pl.DataFrame, colname: str, num: int) -> list[int]:
@@ -14,16 +15,13 @@ def select_random_ids(df: pl.DataFrame, colname: str, num: int) -> list[int]:
     return connections
 
 
-
-
-
 def main() -> None:
     interests_df = (
-        pl.read_csv(Path(NODES_PATH) / "interests.csv", separator="|")
+        pl.read_parquet(Path(NODES_PATH) / "interests.parquet")
         .rename({"id": "interest_id"})
     )
     # Read in person IDs
-    persons_df = pl.read_csv(NODES_PATH / "persons.csv", separator="|").select("id")
+    persons_df = pl.read_parquet(NODES_PATH / "persons.parquet").select("id")
     # Set a lower and upper bound on the number of interests per person
     lower_bound, upper_bound = 1, 5
     # Add a column with a random number of interests per person
@@ -57,7 +55,7 @@ def main() -> None:
     edges_df = (
         edges_df.rename({"id": "from", "interests": "to"})
     )
-    edges_df.write_csv(Path("output/edges") / "interests.csv", separator="|")
+    util.write_parquet(edges_df, f"output/edges/interests.parquet")
     print(f"Wrote {len(edges_df)} edges for {len(persons_df)} persons")
 
 
