@@ -24,8 +24,8 @@ def run_query1(session: Session) -> None:
     """
     with Timer(name="query1", text="Query 1 completed in {:.6f}s"):
         response = session.run(query)
+        result = pl.from_dicts(response.data())
     print(f"\nQuery 1:\n {query}")
-    result = pl.from_dicts(response.data())
     print(f"Top 3 most-followed persons:\n{result}")
 
 
@@ -40,8 +40,8 @@ def run_query2(session: Session) -> None:
     """
     with Timer(name="query2", text="Query 2 completed in {:.6f}s"):
         response = session.run(query)
+        result = pl.from_dicts(response.data())
     print(f"\nQuery 2:\n {query}")
-    result = pl.from_dicts(response.data())
     print(f"City in which most-followed person lives:\n{result}")
 
 
@@ -54,8 +54,8 @@ def run_query3(session: Session, country: str) -> None:
     """
     with Timer(name="query3", text="Query 3 completed in {:.6f}s"):
         response = session.run(query, country=country)
+        result = pl.from_dicts(response.data())
     print(f"\nQuery 3:\n {query}")
-    result = pl.from_dicts(response.data())
     print(f"Cities with lowest average age in {country}:\n{result}")
 
 
@@ -69,8 +69,8 @@ def run_query4(session: Session, age_lower: int, age_upper: int) -> None:
     """
     with Timer(name="query4", text="Query 4 completed in {:.6f}s"):
         response = session.run(query, age_lower=age_lower, age_upper=age_upper)
+        result = pl.from_dicts(response.data())
     print(f"\nQuery 4:\n {query}")
-    result = pl.from_dicts(response.data())
     print(f"Persons between ages {age_lower}-{age_upper} in each country:\n{result}")
 
 

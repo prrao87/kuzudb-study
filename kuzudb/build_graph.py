@@ -20,7 +20,7 @@ def create_person_node_table(conn: Connection) -> None:
                 name STRING,
                 gender STRING,
                 birthday DATE,
-                age INT32,
+                age INT64,
                 isMarried BOOLEAN,
                 PRIMARY KEY (id)
             )
