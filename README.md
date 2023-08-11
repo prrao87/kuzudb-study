@@ -33,7 +33,8 @@ An artificial social network dataset is used, generated via the [Faker](https://
 A shell script `generate_data.sh` is provided in the root directory of this repo that sequentially runs the Python scripts, generating the data for the nodes and edges for the social network. This is the recommended way to generate the data. A single positional argument is provided to the shell script: The number of person profiles to generate -- this is specified as an integer, as shown below.
 
 ```sh
-bash generate_data.sh 10000
+# Generate data with 100K persons and ~2.4M edges
+bash generate_data.sh 100000
 ```
 
 Running this command generates a series of files in the `output` directory, following which we can proceed to ingesting the data into a graph database.
@@ -42,7 +43,7 @@ See [./data/README.md](./data/README.md) for more details on each script that is
 
 ## Ingest the data into Neo4j or Kùzu
 
-Navigate to the [neo4j](./neo4j) and the [kuzudb](./kuzudb/) to see the instructions on how to ingest the data into each database.
+Navigate to the [neo4j](./neo4j) and the [kuzudb](./kuzudb/) directories to see the instructions on how to ingest the data into each database.
 
 ## Run the queries
 

@@ -32,6 +32,8 @@ python build_graph.py --batch_size 50000
 
 ### Ingestion performance
 
+The numbers shown below are for when we ingest 100K person nodes, ~10K location nodes and ~2.4M edges into the graph.
+
 As expected, the nodes load much faster than the edges, since there are many more edges than nodes. In addition, the nodes in Neo4j are indexed (via uniqueness constraints), following which the edges are created based on a match on existing nodes. The run times for ingesting nodes and edges are output to the console.
 
 ```
@@ -143,7 +145,7 @@ Query script completed in 2.822013s
 
 ### Query performance
 
-Query times for simple aggregation and path finding are relatively low. More advanced queries involving variable length paths will be studied later.
+The numbers shown below are for when we ingest 100K person nodes, ~10K location nodes and ~2.4M edges into the graph. Query times for simple aggregation and path finding are relatively low. More advanced queries involving variable length paths will be studied later.
 
 Summary of run times:
 
