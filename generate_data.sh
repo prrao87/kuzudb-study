@@ -10,7 +10,7 @@ echo "Generating $1 samples of data";
 # Nodes
 python create_nodes_person.py -n ${1-1000}
 python create_nodes_location.py
-python create_nodes_interest.py
+python create_nodes_interests.py
 
 # Edges
 python create_edges_follows.py
