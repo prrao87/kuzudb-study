@@ -42,20 +42,16 @@ The following questions are asked of the graph:
 * **Query 3**: What are the top 5 cities with the lowest average age of persons?
 * **Query 4**: How many persons between ages 30-40 are there in each country?
 
-## To do
-
-- [ ] Fix and optimize queries 2-4 (currently not working)
-
 #### Output
 
 ```
-Query 1 completed in 0.145473s
+Query 1 completed in 0.471904s
 
 Query 1:
  
         MATCH (follower:Person)-[:Follows]->(person:Person)
-        RETURN person.id AS personID, person.name AS name, count(follower) AS numFollowers
-        ORDER BY numFollowers DESC LIMIT 3
+        RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers
+        ORDER BY numFollowers DESC LIMIT 3;
     
 Top 3 most-followed persons:
 shape: (3, 3)
@@ -68,10 +64,71 @@ shape: (3, 3)
 │ 68753    ┆ Claudia Booker ┆ 4985         │
 │ 54696    ┆ Brian Burgess  ┆ 4976         │
 └──────────┴────────────────┴──────────────┘
-Queries completed in 0.2517s
+Query 2 completed in 0.604744s
+
+Query 2:
+ 
+        MATCH (follower:Person)-[:Follows]->(person:Person)
+        WITH person, count(follower.id) as numFollowers
+        ORDER BY numFollowers DESC LIMIT 1
+        MATCH (person) -[:LivesIn]-> (city:City)
+        RETURN person.name AS name, numFollowers, city.city AS city, city.state AS state, city.country AS country;
+    
+City in which most-followed person lives:
+shape: (1, 5)
+┌────────┬──────────────┬────────┬───────┬───────────────┐
+│ name   ┆ numFollowers ┆ city   ┆ state ┆ country       │
+│ ---    ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
+│ str    ┆ i64          ┆ str    ┆ str   ┆ str           │
+╞════════╪══════════════╪════════╪═══════╪═══════════════╡
+│ Rachel ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
+│ Cooper ┆              ┆        ┆       ┆               │
+└────────┴──────────────┴────────┴───────┴───────────────┘
+Query 3 completed in 0.013838s
+
+Query 3:
+ 
+        MATCH (p:Person) -[:LivesIn]-> (c:City)-[*1..2]-> (co:Country {country: $country})
+        RETURN c.city AS city, avg(p.age) AS averageAge
+        ORDER BY averageAge LIMIT 5;
+    
+Cities with lowest average age in Canada:
+shape: (5, 2)
+┌───────────┬────────────┐
+│ city      ┆ averageAge │
+│ ---       ┆ ---        │
+│ str       ┆ f64        │
+╞═══════════╪════════════╡
+│ Montreal  ┆ 37.310934  │
+│ Calgary   ┆ 37.592098  │
+│ Toronto   ┆ 37.705746  │
+│ Edmonton  ┆ 37.931609  │
+│ Vancouver ┆ 38.011002  │
+└───────────┴────────────┘
+Query 4 completed in 0.017481s
+
+Query 4:
+ 
+        MATCH (p:Person)-[:LivesIn]->(ci:City)-[*1..2]->(country:Country)
+        WHERE p.age > $age_lower AND p.age < $age_upper
+        RETURN country.country AS countries, count(country) AS personCounts
+        ORDER BY personCounts DESC LIMIT 3;
+    
+Persons between ages 30-40 in each country:
+shape: (3, 2)
+┌────────────────┬──────────────┐
+│ countries      ┆ personCounts │
+│ ---            ┆ ---          │
+│ str            ┆ i64          │
+╞════════════════╪══════════════╡
+│ United States  ┆ 24983        │
+│ Canada         ┆ 2514         │
+│ United Kingdom ┆ 1498         │
+└────────────────┴──────────────┘
+Queries completed in 1.1088s
 ```
 
-As can be seen, the results are identical to those obtained from Neo4j.
+As can be seen, Kùzu's results are identical to those obtained from Neo4j, while also being generated more than twice as quick.
 
 ### Query performance
 
@@ -79,9 +136,9 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 
 Summary of run times:
 
-* Query 1: `0.145473s`
-* Query 2: TBD
-* Query 3: TBD
-* Query 4: TBD
+* Query 1: `0.471904s`
+* Query 2: `0.604744s`
+* Query 3: `0.013838s`
+* Query 4: `0.017481s`
 
-> 💡 Query 1 takes the longest to run -- around 150 ms. The timing shown is for queries run on an M2 Macbook Pro with 16 GB of RAM.
+> 💡 All queries (including materializing the results to arrow tables and then polars) take just over 1 sec 🔥 to complete (Neo4j takes around 2x longer). Query 1 takes the longest to run -- around 0.5 sec. Queries 2 takes around 0.6 sec, and queries 3-4 are the fastest at ~0.15 sec. The timing shown is for queries run on an M2 Macbook Pro with 16 GB of RAM.
