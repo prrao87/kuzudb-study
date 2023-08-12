@@ -61,7 +61,7 @@ The following questions are asked of the graph:
 #### Output
 
 ```
-Query 1 completed in 0.016359s
+Query 1 completed in 1.880833s
 
 Query 1:
  
@@ -80,7 +80,7 @@ shape: (3, 3)
 │ 68753    ┆ Claudia Booker ┆ 4985         │
 │ 54696    ┆ Brian Burgess  ┆ 4976         │
 └──────────┴────────────────┴──────────────┘
-Query 2 completed in 0.002067s
+Query 2 completed in 0.601604s
 
 Query 2:
  
@@ -92,18 +92,19 @@ Query 2:
     
 City in which most-followed person lives:
 shape: (1, 5)
-┌───────────────┬──────────────┬────────┬───────┬───────────────┐
-│ name          ┆ numFollowers ┆ city   ┆ state ┆ country       │
-│ ---           ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
-│ str           ┆ i64          ┆ str    ┆ str   ┆ str           │
-╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
-│ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
-└───────────────┴──────────────┴────────┴───────┴───────────────┘
-Query 3 completed in 0.002484s
+┌────────┬──────────────┬────────┬───────┬───────────────┐
+│ name   ┆ numFollowers ┆ city   ┆ state ┆ country       │
+│ ---    ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
+│ str    ┆ i64          ┆ str    ┆ str   ┆ str           │
+╞════════╪══════════════╪════════╪═══════╪═══════════════╡
+│ Rachel ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
+│ Cooper ┆              ┆        ┆       ┆               │
+└────────┴──────────────┴────────┴───────┴───────────────┘
+Query 3 completed in 0.059216s
 
 Query 3:
  
-        MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*..2]-> (co:Country {country: $country})
+        MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*1..2]-> (co:Country {country: $country})
         RETURN c.city AS city, avg(p.age) AS averageAge
         ORDER BY averageAge LIMIT 5
     
@@ -120,11 +121,11 @@ shape: (5, 2)
 │ Edmonton  ┆ 37.931609  │
 │ Vancouver ┆ 38.011002  │
 └───────────┴────────────┘
-Query 4 completed in 0.001473s
+Query 4 completed in 0.085356s
 
 Query 4:
  
-        MATCH (p:Person)-[:LIVES_IN]->(ci:City)-[*..2]->(country:Country)
+        MATCH (p:Person)-[:LIVES_IN]->(ci:City)-[*1..2]->(country:Country)
         WHERE p.age > $age_lower AND p.age < $age_upper
         RETURN country.country AS countries, count(country) AS personCounts
         ORDER BY personCounts DESC LIMIT 3
@@ -140,7 +141,7 @@ shape: (3, 2)
 │ Canada         ┆ 2514         │
 │ United Kingdom ┆ 1498         │
 └────────────────┴──────────────┘
-Query script completed in 2.822013s
+Query script completed in 2.632767s
 ```
 
 ### Query performance
@@ -149,9 +150,9 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 
 Summary of run times:
 
-* Query 1: `0.016359s`
-* Query 2: `0.002067s`
-* Query 3: `0.002484s`
-* Query 4: `0.001473s`
+* Query 1: `1.880833s`
+* Query 2: `0.601604s`
+* Query 3: `0.059216s`
+* Query 4: `0.085356s`
 
-> 💡 Query 1 takes the longest to run -- around 16 ms. Queries 2-4 (excluding data processing in Python after retrieval) takes of the order of 2 ms. The timing shown is for queries run on an M2 Macbook Pro with 16 GB of RAM.
+> 💡 All queries (including materializing the results to dict and then polars) take ~2.6 sec to complete. Query 1 takes the longest to run -- around 1.9 sec. Queries 2-4 take of the order of 0.6-0.8 sec. The timing shown is for queries run on an M2 Macbook Pro with 16 GB of RAM.
