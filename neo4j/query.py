@@ -48,7 +48,7 @@ def run_query2(session: Session) -> None:
 def run_query3(session: Session, country: str) -> None:
     "Which are the top 5 cities in a particular region of the world with the lowest average age in the network?"
     query = """
-        MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*..2]-> (co:Country {country: $country})
+        MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*1..2]-> (co:Country {country: $country})
         RETURN c.city AS city, avg(p.age) AS averageAge
         ORDER BY averageAge LIMIT 5
     """
@@ -62,7 +62,7 @@ def run_query3(session: Session, country: str) -> None:
 def run_query4(session: Session, age_lower: int, age_upper: int) -> None:
     "How many persons between a certain age range are in each country?"
     query = """
-        MATCH (p:Person)-[:LIVES_IN]->(ci:City)-[*..2]->(country:Country)
+        MATCH (p:Person)-[:LIVES_IN]->(ci:City)-[*1..2]->(country:Country)
         WHERE p.age > $age_lower AND p.age < $age_upper
         RETURN country.country AS countries, count(country) AS personCounts
         ORDER BY personCounts DESC LIMIT 3
