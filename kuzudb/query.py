@@ -1,7 +1,6 @@
 """
 Run a series of queries on the Neo4j database
 """
-from pdb import run
 import polars as pl
 import kuzu
 from kuzu import Connection
