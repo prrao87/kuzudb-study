@@ -155,6 +155,7 @@ if __name__ == "__main__":
     DB_NAME = "social_network"
     db = kuzu.Database(f"./{DB_NAME}")
     CONNECTION = kuzu.Connection(db)
+    CONNECTION.set_max_threads_for_exec(1)   # For a fairer comparison with Neo4j, where “Transactions are single-threaded, confined, and independent.”
 
     main(CONNECTION)
 
