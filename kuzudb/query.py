@@ -90,7 +90,7 @@ def run_query6(conn: Connection, params: list[tuple[str, Any]]) -> None:
     query = """
         MATCH (p:Person)-[:HasInterest]->(i:Interest)
         WHERE lower(i.interest) = lower($interest)
-        AND p.gender = $gender
+        AND lower(p.gender) = lower($gender)
         WITH p, i
         MATCH (p)-[:LivesIn]->(c:City)
         RETURN count(p.id) AS numPersons, c.city, c.country

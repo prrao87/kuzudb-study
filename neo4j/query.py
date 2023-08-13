@@ -91,7 +91,7 @@ def run_query6(session: Session, gender: str, interest: str) -> None:
     query = """
         MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
         WHERE tolower(i.interest) = tolower($interest)
-        AND p.gender = $gender
+        AND tolower(p.gender) = tolower($gender)
         WITH p, i
         MATCH (p)-[:LIVES_IN]->(c:City)
         RETURN count(p) AS numPersons, c.city, c.country
