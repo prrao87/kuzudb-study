@@ -55,7 +55,7 @@ def write_city_nodes(cities_of_interest: pl.DataFrame) -> pl.DataFrame:
     )
     # Add ID column to function as a primary key
     ids = list(range(1, len(city_nodes) + 1))
-    city_nodes = city_nodes.with_columns(pl.lit(ids).alias("id"))
+    city_nodes = city_nodes.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
     city_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
         Path("output/nodes") / "cities.csv", separator="|"
@@ -69,7 +69,7 @@ def write_state_nodes(city_nodes: pl.DataFrame) -> None:
     state_nodes = city_nodes.select("state", "country").unique().sort(["country", "state"])
     # Add ID column to function as a primary key
     ids = list(range(1, len(state_nodes) + 1))
-    state_nodes = state_nodes.with_columns(pl.lit(ids).alias("id"))
+    state_nodes = state_nodes.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
     state_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
         Path("output/nodes") / "states.csv", separator="|"
@@ -82,7 +82,7 @@ def write_country_nodes(city_nodes: pl.DataFrame) -> None:
     country_nodes = city_nodes.select("country").unique().sort("country", descending=False)
     # Add ID column to function as a primary key
     ids = list(range(1, len(country_nodes) + 1))
-    country_nodes = country_nodes.with_columns(pl.lit(ids).alias("id"))
+    country_nodes = country_nodes.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
     country_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
         Path("output/nodes") / "countries.csv", separator="|"
