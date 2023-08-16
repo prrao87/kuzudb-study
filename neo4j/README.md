@@ -57,12 +57,14 @@ The following questions are asked of the graph:
 * **Query 2**: In which city does the most-followed person live?
 * **Query 3**: What are the top 5 cities with the lowest average age of persons?
 * **Query 4**: How many persons between ages 30-40 are there in each country?
+* **Query 5**: How many men in London, United Kingdom have an interest in fine dining?
+* **Query 6**: Which city has the maximum number of women that like Tennis?
+* **Query 7**: Which U.S. state has the maximum number of persons between the age 23-30 who enjoy photography?
+* **Query 8**: How many second degree connections are reachable in the graph?
 
 #### Output
 
 ```
-Query 1 completed in 1.880833s
-
 Query 1:
  
         MATCH (follower:Person)-[:FOLLOWS]->(person:Person)
@@ -80,7 +82,7 @@ shape: (3, 3)
 │ 68753    ┆ Claudia Booker ┆ 4985         │
 │ 54696    ┆ Brian Burgess  ┆ 4976         │
 └──────────┴────────────────┴──────────────┘
-Query 2 completed in 0.601604s
+Query 1 completed in 2.019171s
 
 Query 2:
  
@@ -92,15 +94,14 @@ Query 2:
     
 City in which most-followed person lives:
 shape: (1, 5)
-┌────────┬──────────────┬────────┬───────┬───────────────┐
-│ name   ┆ numFollowers ┆ city   ┆ state ┆ country       │
-│ ---    ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
-│ str    ┆ i64          ┆ str    ┆ str   ┆ str           │
-╞════════╪══════════════╪════════╪═══════╪═══════════════╡
-│ Rachel ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
-│ Cooper ┆              ┆        ┆       ┆               │
-└────────┴──────────────┴────────┴───────┴───────────────┘
-Query 3 completed in 0.059216s
+┌───────────────┬──────────────┬────────┬───────┬───────────────┐
+│ name          ┆ numFollowers ┆ city   ┆ state ┆ country       │
+│ ---           ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
+│ str           ┆ i64          ┆ str    ┆ str   ┆ str           │
+╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
+│ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
+└───────────────┴──────────────┴────────┴───────┴───────────────┘
+Query 2 completed in 0.634306s
 
 Query 3:
  
@@ -121,7 +122,7 @@ shape: (5, 2)
 │ Edmonton  ┆ 37.931609  │
 │ Vancouver ┆ 38.011002  │
 └───────────┴────────────┘
-Query 4 completed in 0.085356s
+Query 3 completed in 0.009135s
 
 Query 4:
  
@@ -141,7 +142,94 @@ shape: (3, 2)
 │ Canada         ┆ 2514         │
 │ United Kingdom ┆ 1498         │
 └────────────────┴──────────────┘
-Query script completed in 2.632767s
+Query 4 completed in 0.056189s
+
+Query 5:
+ 
+        MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
+        WHERE tolower(i.interest) = tolower($interest)
+        AND tolower(p.gender) = tolower($gender)
+        WITH p, i
+        MATCH (p)-[:LIVES_IN]->(c:City)
+        WHERE c.city = $city AND c.country = $country
+        RETURN count(p) AS numPersons
+    
+Number of male users in London, United Kingdom who have an interest in fine dining:
+shape: (1, 1)
+┌────────────┐
+│ numPersons │
+│ ---        │
+│ i64        │
+╞════════════╡
+│ 52         │
+└────────────┘
+Query 5 completed in 0.010342s
+
+Query 6:
+ 
+        MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
+        WHERE tolower(i.interest) = tolower($interest)
+        AND p.gender = $gender
+        WITH p, i
+        MATCH (p)-[:LIVES_IN]->(c:City)
+        RETURN count(p) AS numPersons, c.city, c.country
+        ORDER BY numPersons DESC LIMIT 5
+    
+City with the most female users who have an interest in tennis:
+shape: (5, 3)
+┌────────────┬────────────┬────────────────┐
+│ numPersons ┆ c.city     ┆ c.country      │
+│ ---        ┆ ---        ┆ ---            │
+│ i64        ┆ str        ┆ str            │
+╞════════════╪════════════╪════════════════╡
+│ 69         ┆ Houston    ┆ United States  │
+│ 68         ┆ Birmingham ┆ United Kingdom │
+│ 67         ┆ Raleigh    ┆ United States  │
+│ 64         ┆ Montreal   ┆ Canada         │
+│ 63         ┆ Phoenix    ┆ United States  │
+└────────────┴────────────┴────────────────┘
+Query 6 completed in 0.260219s
+
+Query 7:
+ 
+        MATCH (p:Person)-[:LIVES_IN]->(:City)-[:CITY_IN]->(s:State)
+        WHERE p.age >= $age_lower AND p.age <= $age_upper AND s.country = $country
+        WITH p, s
+        MATCH (p)-[:HAS_INTEREST]->(i:Interest)
+        WHERE tolower(i.interest) = tolower($interest)
+        RETURN count(p) AS numPersons, s.state AS state, s.country AS country
+        ORDER BY numPersons DESC LIMIT 1
+    
+
+            State in United States with the most users between ages 23-30 who have an interest in photography:
+shape: (1, 3)
+┌────────────┬────────────┬───────────────┐
+│ numPersons ┆ state      ┆ country       │
+│ ---        ┆ ---        ┆ ---           │
+│ i64        ┆ str        ┆ str           │
+╞════════════╪════════════╪═══════════════╡
+│ 172        ┆ California ┆ United States │
+└────────────┴────────────┴───────────────┘
+            
+Query 7 completed in 0.163613s
+
+Query 8:
+ 
+        MATCH (p1:Person)-[f:FOLLOWS]->(p2:Person)
+        WHERE p1.personID > p2.personID
+        RETURN count(f) as numFollowers
+    
+Number of second degree connections reachable in the graph:
+shape: (1, 1)
+┌──────────────┐
+│ numFollowers │
+│ ---          │
+│ i64          │
+╞══════════════╡
+│ 1219517      │
+└──────────────┘
+Query 8 completed in 0.990533s
+Query script completed in 4.144070s
 ```
 
 ### Query performance
@@ -150,9 +238,13 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 
 Summary of run times:
 
-* Query 1: `1.880833s`
-* Query 2: `0.601604s`
-* Query 3: `0.059216s`
-* Query 4: `0.085356s`
+* Query1 : `2.019171s`
+* Query2 : `0.634306s`
+* Query3 : `0.009135s`
+* Query4 : `0.056189s`
+* Query5 : `0.010342s`
+* Query6 : `0.260219s`
+* Query7 : `0.163613s`
+* Query8 : `0.990533s`
 
-> 💡 All queries (including materializing the results to dict and then polars) take ~2.6 sec to complete. Query 1 takes the longest to run -- around 1.9 sec. Queries 2-4 take of the order of 0.6-0.8 sec. The timing shown is for queries run on an M2 Macbook Pro with 16 GB of RAM.
+> 💡 All queries (including materializing the results to dict and then polars) take more than 4 sec to complete. The timing shown is for queries run on an M2 Macbook Pro with 16 GB of RAM.

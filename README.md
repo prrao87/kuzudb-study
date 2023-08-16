@@ -1,6 +1,6 @@
 # KùzuDB: Benchmark study
 
-[Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS). Because it is written in C++, it is blazing fast, and is optimized for handling complex join-heavy analytical workloads on very large graph databases. The database is under active development, but its philosophy is to become the "DuckDB of graph databases" -- a fast, lightweight, embeddable graph database for analytics use cases, with minimum setup and infrastructure effort.
+[Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS). Because it is written in C++, it is blazing fast, and is optimized for handling complex join-heavy analytical workloads on very large graphs. The database is under active development, but its goal is to become the "DuckDB of graph databases" -- a fast, lightweight, embeddable graph database for analytics use cases, with minimal infrastructure setup effort.
 
 The goal of the code shown in this repo is as follows:
 
@@ -25,7 +25,7 @@ pip install -r requirements.txt
 
 ## Data
 
-An artificial social network dataset is used, generated via the [Faker](https://faker.readthedocs.io/en/master/) Python library.
+An artificial social network dataset is generated specifically for this exercise, via the [Faker](https://faker.readthedocs.io/en/master/) Python library.
 
 
 ### Generate all data at once
