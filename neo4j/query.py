@@ -59,7 +59,7 @@ def run_query3(session: Session, country: str) -> None:
 def run_query4(session: Session, age_lower: int, age_upper: int) -> None:
     query = """
         MATCH (p:Person)-[:LIVES_IN]->(ci:City)-[*1..2]->(country:Country)
-        WHERE p.age > $age_lower AND p.age < $age_upper
+        WHERE p.age => $age_lower AND p.age <= $age_upper
         RETURN country.country AS countries, count(country) AS personCounts
         ORDER BY personCounts DESC LIMIT 3
     """

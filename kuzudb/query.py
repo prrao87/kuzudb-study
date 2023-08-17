@@ -56,7 +56,7 @@ def run_query4(conn: Connection, params: list[tuple[str, Any]]) -> None:
     "How many persons between a certain age range are in each country?"
     query = """
         MATCH (p:Person)-[:LivesIn]->(ci:City)-[*1..2]->(country:Country)
-        WHERE p.age > $age_lower AND p.age < $age_upper
+        WHERE p.age >= $age_lower AND p.age <= $age_upper
         RETURN country.country AS countries, count(country) AS personCounts
         ORDER BY personCounts DESC LIMIT 3;
     """
