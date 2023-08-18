@@ -62,7 +62,10 @@ The following questions are asked of both graphs:
 
 ## Performance comparison
 
-The following queries are run in both Neo4j and KùzuDB, and the run times are compared. **KùzuDB is significantly faster** than Neo4j for most queries, especially for queries that involve aggregating on many-many relationships.
+The run times for both ingestion and queries are compared.
+
+* For ingestion, KùzuDB is consistently faster than Neo4j by a factor of ~18x for a graph size of 100k nodes and ~2.4M edges.
+* For OLAP querying, **KùzuDB is significantly faster** than Neo4j for most types of queries, especially for ones that involve aggregating on many-many relationships.
 
 ### Testing conditions
 
