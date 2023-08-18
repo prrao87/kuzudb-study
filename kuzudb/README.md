@@ -66,7 +66,7 @@ shape: (3, 3)
 │ 68753    ┆ Claudia Booker ┆ 4985         │
 │ 54696    ┆ Brian Burgess  ┆ 4976         │
 └──────────┴────────────────┴──────────────┘
-Query 1 completed in 0.338447s
+Query 1 completed in 0.610037s
 
 Query 2:
  
@@ -78,14 +78,15 @@ Query 2:
     
 City in which most-followed person lives:
 shape: (1, 5)
-┌───────────────┬──────────────┬────────┬───────┬───────────────┐
-│ name          ┆ numFollowers ┆ city   ┆ state ┆ country       │
-│ ---           ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
-│ str           ┆ i64          ┆ str    ┆ str   ┆ str           │
-╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
-│ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
-└───────────────┴──────────────┴────────┴───────┴───────────────┘
-Query 2 completed in 0.754088s
+┌────────┬──────────────┬────────┬───────┬───────────────┐
+│ name   ┆ numFollowers ┆ city   ┆ state ┆ country       │
+│ ---    ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
+│ str    ┆ i64          ┆ str    ┆ str   ┆ str           │
+╞════════╪══════════════╪════════╪═══════╪═══════════════╡
+│ Rachel ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
+│ Cooper ┆              ┆        ┆       ┆               │
+└────────┴──────────────┴────────┴───────┴───────────────┘
+Query 2 completed in 1.092609s
 
 Query 3:
  
@@ -100,18 +101,18 @@ shape: (5, 2)
 │ ---       ┆ ---        │
 │ str       ┆ f64        │
 ╞═══════════╪════════════╡
-│ Montreal  ┆ 37.310934  │
-│ Calgary   ┆ 37.592098  │
-│ Toronto   ┆ 37.705746  │
-│ Edmonton  ┆ 37.931609  │
-│ Vancouver ┆ 38.011002  │
+│ Montreal  ┆ 37.324032  │
+│ Calgary   ┆ 37.6043    │
+│ Toronto   ┆ 37.717934  │
+│ Edmonton  ┆ 37.941379  │
+│ Vancouver ┆ 38.020171  │
 └───────────┴────────────┘
-Query 3 completed in 0.012301s
+Query 3 completed in 0.016775s
 
 Query 4:
  
         MATCH (p:Person)-[:LivesIn]->(ci:City)-[*1..2]->(country:Country)
-        WHERE p.age > $age_lower AND p.age < $age_upper
+        WHERE p.age >= $age_lower AND p.age <= $age_upper
         RETURN country.country AS countries, count(country) AS personCounts
         ORDER BY personCounts DESC LIMIT 3;
     
@@ -122,11 +123,11 @@ shape: (3, 2)
 │ ---            ┆ ---          │
 │ str            ┆ i64          │
 ╞════════════════╪══════════════╡
-│ United States  ┆ 24983        │
-│ Canada         ┆ 2514         │
-│ United Kingdom ┆ 1498         │
+│ United States  ┆ 30477        │
+│ Canada         ┆ 3063         │
+│ United Kingdom ┆ 1874         │
 └────────────────┴──────────────┘
-Query 4 completed in 0.017814s
+Query 4 completed in 0.023837s
 
 Query 5:
  
@@ -147,13 +148,13 @@ shape: (1, 1)
 ╞════════════╡
 │ 52         │
 └────────────┘
-Query 5 completed in 0.012881s
+Query 5 completed in 0.017715s
 
 Query 6:
  
         MATCH (p:Person)-[:HasInterest]->(i:Interest)
         WHERE lower(i.interest) = lower($interest)
-        AND p.gender = $gender
+        AND lower(p.gender) = lower($gender)
         WITH p, i
         MATCH (p)-[:LivesIn]->(c:City)
         RETURN count(p.id) AS numPersons, c.city, c.country
@@ -172,7 +173,7 @@ shape: (5, 3)
 │ 64         ┆ Montreal   ┆ Canada         │
 │ 62         ┆ Phoenix    ┆ United States  │
 └────────────┴────────────┴────────────────┘
-Query 6 completed in 0.035519s
+Query 6 completed in 0.049951s
 
 Query 7:
  
@@ -192,10 +193,10 @@ shape: (1, 3)
 │ ---        ┆ ---        ┆ ---           │
 │ i64        ┆ str        ┆ str           │
 ╞════════════╪════════════╪═══════════════╡
-│ 169        ┆ California ┆ United States │
+│ 170        ┆ California ┆ United States │
 └────────────┴────────────┴───────────────┘
             
-Query 7 completed in 0.014666s
+Query 7 completed in 0.016887s
 
 Query 8:
  
@@ -212,8 +213,8 @@ shape: (1, 1)
 ╞══════════════╡
 │ 1214477      │
 └──────────────┘
-Query 8 completed in 0.103491s
-Queries completed in 1.2895s
+Query 8 completed in 0.166834s
+Queries completed in 1.9953s
 ```
 
 ### Query performance
@@ -222,13 +223,11 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 
 Summary of run times:
 
-* Query 1: `0.338447s`
-* Query 2: `0.754088s`
-* Query 3: `0.012301s`
-* Query 4: `0.017814s`
-* Query 5: `0.012881s`
-* Query 6: `0.035519s`
-* Query 7: `0.014666s`
-* Query 8: `0.103491s`
-
-> 💡 All queries (including materializing the results to arrow tables and then polars) take just over 1 sec 🔥 to complete (Neo4j takes over 4x longer). The timing shown is for queries run in a single execution thread on an M2 Macbook Pro with 16 GB of RAM.
+* Query 1: `0.610037s`
+* Query 2: `1.092609s`
+* Query 3: `0.016775s`
+* Query 4: `0.023837s`
+* Query 5: `0.017715s`
+* Query 6: `0.049951s`
+* Query 7: `0.016887s`
+* Query 8: `0.166834s`
