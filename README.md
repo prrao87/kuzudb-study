@@ -49,6 +49,17 @@ Navigate to the [neo4j](./neo4j) and the [kuzudb](./kuzudb/) directories to see 
 
 Some sample queries are run in each DB to verify that the data is ingested correctly, and that the results are consistent with one another.
 
+The following questions are asked of both graphs:
+
+* **Query 1**: Who are the top 3 most-followed persons?
+* **Query 2**: In which city does the most-followed person live?
+* **Query 3**: What are the top 5 cities with the lowest average age of persons?
+* **Query 4**: How many persons between ages 30-40 are there in each country?
+* **Query 5**: How many men in London, United Kingdom have an interest in fine dining?
+* **Query 6**: Which city has the maximum number of women that like Tennis?
+* **Query 7**: Which U.S. state has the maximum number of persons between the age 23-30 who enjoy photography?
+* **Query 8**: How many second degree connections are reachable in the graph?
+
 ## Performance comparison
 
 The following queries are run in both Neo4j and KùzuDB, and the run times are compared. **KùzuDB is significantly faster** than Neo4j for most queries, especially for queries that involve aggregating on many-many relationships.
