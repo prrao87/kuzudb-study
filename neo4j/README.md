@@ -82,7 +82,7 @@ shape: (3, 3)
 │ 68753    ┆ Claudia Booker ┆ 4985         │
 │ 54696    ┆ Brian Burgess  ┆ 4976         │
 └──────────┴────────────────┴──────────────┘
-Query 1 completed in 2.019171s
+Query 1 completed in 2.712317s
 
 Query 2:
  
@@ -94,14 +94,15 @@ Query 2:
     
 City in which most-followed person lives:
 shape: (1, 5)
-┌───────────────┬──────────────┬────────┬───────┬───────────────┐
-│ name          ┆ numFollowers ┆ city   ┆ state ┆ country       │
-│ ---           ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
-│ str           ┆ i64          ┆ str    ┆ str   ┆ str           │
-╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
-│ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
-└───────────────┴──────────────┴────────┴───────┴───────────────┘
-Query 2 completed in 0.634306s
+┌────────┬──────────────┬────────┬───────┬───────────────┐
+│ name   ┆ numFollowers ┆ city   ┆ state ┆ country       │
+│ ---    ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
+│ str    ┆ i64          ┆ str    ┆ str   ┆ str           │
+╞════════╪══════════════╪════════╪═══════╪═══════════════╡
+│ Rachel ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
+│ Cooper ┆              ┆        ┆       ┆               │
+└────────┴──────────────┴────────┴───────┴───────────────┘
+Query 2 completed in 0.965729s
 
 Query 3:
  
@@ -116,18 +117,18 @@ shape: (5, 2)
 │ ---       ┆ ---        │
 │ str       ┆ f64        │
 ╞═══════════╪════════════╡
-│ Montreal  ┆ 37.310934  │
-│ Calgary   ┆ 37.592098  │
-│ Toronto   ┆ 37.705746  │
-│ Edmonton  ┆ 37.931609  │
-│ Vancouver ┆ 38.011002  │
+│ Montreal  ┆ 37.324032  │
+│ Calgary   ┆ 37.6043    │
+│ Toronto   ┆ 37.717934  │
+│ Edmonton  ┆ 37.941379  │
+│ Vancouver ┆ 38.020171  │
 └───────────┴────────────┘
-Query 3 completed in 0.009135s
+Query 3 completed in 0.011258s
 
 Query 4:
  
         MATCH (p:Person)-[:LIVES_IN]->(ci:City)-[*1..2]->(country:Country)
-        WHERE p.age > $age_lower AND p.age < $age_upper
+        WHERE p.age >= $age_lower AND p.age <= $age_upper
         RETURN country.country AS countries, count(country) AS personCounts
         ORDER BY personCounts DESC LIMIT 3
     
@@ -138,11 +139,11 @@ shape: (3, 2)
 │ ---            ┆ ---          │
 │ str            ┆ i64          │
 ╞════════════════╪══════════════╡
-│ United States  ┆ 24983        │
-│ Canada         ┆ 2514         │
-│ United Kingdom ┆ 1498         │
+│ United States  ┆ 30477        │
+│ Canada         ┆ 3063         │
+│ United Kingdom ┆ 1874         │
 └────────────────┴──────────────┘
-Query 4 completed in 0.056189s
+Query 4 completed in 0.075161s
 
 Query 5:
  
@@ -163,13 +164,13 @@ shape: (1, 1)
 ╞════════════╡
 │ 52         │
 └────────────┘
-Query 5 completed in 0.010342s
+Query 5 completed in 0.014587s
 
 Query 6:
  
         MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
         WHERE tolower(i.interest) = tolower($interest)
-        AND p.gender = $gender
+        AND tolower(p.gender) = tolower($gender)
         WITH p, i
         MATCH (p)-[:LIVES_IN]->(c:City)
         RETURN count(p) AS numPersons, c.city, c.country
@@ -182,13 +183,13 @@ shape: (5, 3)
 │ ---        ┆ ---        ┆ ---            │
 │ i64        ┆ str        ┆ str            │
 ╞════════════╪════════════╪════════════════╡
-│ 69         ┆ Houston    ┆ United States  │
-│ 68         ┆ Birmingham ┆ United Kingdom │
-│ 67         ┆ Raleigh    ┆ United States  │
+│ 66         ┆ Houston    ┆ United States  │
+│ 66         ┆ Birmingham ┆ United Kingdom │
+│ 65         ┆ Raleigh    ┆ United States  │
 │ 64         ┆ Montreal   ┆ Canada         │
-│ 63         ┆ Phoenix    ┆ United States  │
+│ 62         ┆ Phoenix    ┆ United States  │
 └────────────┴────────────┴────────────────┘
-Query 6 completed in 0.260219s
+Query 6 completed in 0.030314s
 
 Query 7:
  
@@ -208,10 +209,10 @@ shape: (1, 3)
 │ ---        ┆ ---        ┆ ---           │
 │ i64        ┆ str        ┆ str           │
 ╞════════════╪════════════╪═══════════════╡
-│ 172        ┆ California ┆ United States │
+│ 170        ┆ California ┆ United States │
 └────────────┴────────────┴───────────────┘
             
-Query 7 completed in 0.163613s
+Query 7 completed in 0.258114s
 
 Query 8:
  
@@ -226,10 +227,10 @@ shape: (1, 1)
 │ ---          │
 │ i64          │
 ╞══════════════╡
-│ 1219517      │
+│ 1214477      │
 └──────────────┘
-Query 8 completed in 0.990533s
-Query script completed in 4.144070s
+Query 8 completed in 1.338543s
+Query script completed in 5.406355s
 ```
 
 ### Query performance
@@ -238,13 +239,11 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 
 Summary of run times:
 
-* Query1 : `2.019171s`
-* Query2 : `0.634306s`
-* Query3 : `0.009135s`
-* Query4 : `0.056189s`
-* Query5 : `0.010342s`
-* Query6 : `0.260219s`
-* Query7 : `0.163613s`
-* Query8 : `0.990533s`
-
-> 💡 All queries (including materializing the results to dict and then polars) take more than 4 sec to complete. The timing shown is for queries run on an M2 Macbook Pro with 16 GB of RAM.
+* Query1 : `2.712317s`
+* Query2 : `0.965729s`
+* Query3 : `0.011258s`
+* Query4 : `0.075161s`
+* Query5 : `0.014587s`
+* Query6 : `0.030314s`
+* Query7 : `0.258114s`
+* Query8 : `1.338543s`
