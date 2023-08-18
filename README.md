@@ -61,29 +61,18 @@ The following queries are run in both Neo4j and KùzuDB, and the run times are c
 * KùzuDB version: `0.7.0`
 * The run times reported are for the 5th run, because we want to allow the cache to warm up before gauging query performance
 
-### Neo4j
 
-* Query1 : `1.617523s`
-* Query2 : `0.592790s`
-* Query3 : `0.009398s`
-* Query4 : `0.047333s`
-* Query5 : `0.011949s`
-* Query6 : `0.024780s`
-* Query7 : `0.160752s`
-* Query8 : `0.845768s`
+### Ingestion performance
 
-### Kùzu
+Case | Neo4j (sec) | Kùzu (sec) | Speedup factor
+--- | --- | --- | ---
+Nodes | 3.6144 | 0.0874 | 41.4
+Edges | 37.5801 | 2.1622 | 17.4
+Total | 41.1945 | 2.2496 | 18.3
 
-* Query 1: `0.311524s`
-* Query 2: `0.791726s`
-* Query 3: `0.012013s`
-* Query 4: `0.015932s`
-* Query 5: `0.012567s`
-* Query 6: `0.033764s`
-* Query 7: `0.012508s`
-* Query 8: `0.103470s`
+In total, ~100K edges and ~2.5 million edges are ingested roughly 18x faster in KùzuDB than in Neo4j. Nodes are ingested significantly faster in Kùzu, and Neo4j's node ingestion remains of the order of seconds despite setting constraints on the ID fields as per their best practices. The speedup factors shown are expected to be even higher as the dataset gets larger and larger.
 
-### Results (Kùzu single-threaded)
+### Query performance: (Kùzu single-threaded)
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | --- | --- | ---
@@ -96,7 +85,7 @@ Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 7 | 0.160752 | 0.012508 | 12.9
 8 | 0.845768 | 0.103470 | 8.2
 
-### Results (Kùzu multi-threaded)
+### Query performance: (Kùzu multi-threaded)
 
 Unlike Neo4j, KùzuDB supports multi-threaded execution of queries. The following results are for the same queries as above, but allowing Kùzu to choose the optimal number of threads for each query.
 

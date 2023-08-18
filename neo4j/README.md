@@ -36,12 +36,17 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 
 As expected, the nodes load much faster than the edges, since there are many more edges than nodes. In addition, the nodes in Neo4j are indexed (via uniqueness constraints), following which the edges are created based on a match on existing nodes. The run times for ingesting nodes and edges are output to the console.
 
+The person nodes and person-person follower edges are ingested in batches, as a best practice -- this is because the number of persons and followers can get very large, causing the number of edges to nonlinearly increase with the size of the dataset. The batch size for ingesting person nodes is 50k, and the batch size for ingesting edges is 100k.
+
 ```
-Nodes loaded in 5.4609s
-Edges loaded in 60.7000s
+Nodes loaded in 3.6144s
+Edges loaded in 37.5801s
 ```
 
-> 💡 Ingesting the nodes/edges with a batch size of 50K takes just over 1 minute in Neo4j. The timing shown is on an M2 Macbook Pro with 16 GB of RAM.
+We could potentially improve performance further by increasing the batch sizes for nodes and edges for persons and followers, but the general trend is that this size of data takes of the order of 1E1 seconds to ingest into Neo4j.
+
+
+> 💡 The timing shown is on an M2 Macbook Pro with 16 GB of RAM.
 
 
 ## Query graph
