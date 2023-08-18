@@ -51,4 +51,66 @@ Some sample queries are run in each DB to verify that the data is ingested corre
 
 ## Performance comparison
 
-🚧 WIP
+The following queries are run in both Neo4j and KùzuDB, and the run times are compared. **KùzuDB is significantly faster** than Neo4j for most queries, especially for queries that involve aggregating on many-many relationships.
+
+### Testing conditions
+
+* Macbook Pro M2, 16 GB RAM
+* All queries are run single-threaded (no parallelism)
+* Neo4j version: `5.10.0`
+* KùzuDB version: `0.7.0`
+* The run times reported are for the 5th run, because we want to allow the cache to warm up before gauging query performance
+
+### Neo4j
+
+* Query1 : `1.617523s`
+* Query2 : `0.592790s`
+* Query3 : `0.009398s`
+* Query4 : `0.047333s`
+* Query5 : `0.011949s`
+* Query6 : `0.024780s`
+* Query7 : `0.160752s`
+* Query8 : `0.845768s`
+
+### Kùzu
+
+* Query 1: `0.311524s`
+* Query 2: `0.791726s`
+* Query 3: `0.012013s`
+* Query 4: `0.015932s`
+* Query 5: `0.012567s`
+* Query 6: `0.033764s`
+* Query 7: `0.012508s`
+* Query 8: `0.103470s`
+
+### Results (Kùzu single-threaded)
+
+Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
+--- | --- | --- | ---
+1 | 1.617523 | 0.311524 | 5.2
+2 | 0.592790 | 0.791726 | 0.7
+3 | 0.009398 | 0.012013 | 0.8
+4 | 0.047333 | 0.015932 | 3.0
+5 | 0.011949 | 0.012567 | 1.0
+6 | 0.024780 | 0.033764 | 0.7
+7 | 0.160752 | 0.012508 | 12.9
+8 | 0.845768 | 0.103470 | 8.2
+
+### Results (Kùzu multi-threaded)
+
+Unlike Neo4j, KùzuDB supports multi-threaded execution of queries. The following results are for the same queries as above, but allowing Kùzu to choose the optimal number of threads for each query.
+
+Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
+--- | --- | --- | ---
+1 | 1.617523 | 0.230980 | 7.0
+2 | 0.592790 | 0.625935 | 0.9
+3 | 0.009398 | 0.011896 | 0.8
+4 | 0.047333 | 0.014518 | 3.3
+5 | 0.011949 | 0.012230 | 1.0
+6 | 0.024780 | 0.015304 | 1.6
+7 | 0.160752 | 0.010679 | 15.1
+8 | 0.845768 | 0.024422 | 34.6
+
+Some queries show as much as a 34x speedup over Neo4j, and the average speedup is 7.5x.
+
+It would be interesting to further study the cases where Kùzu's performance is more in line with Neo4j. More to come soon!
