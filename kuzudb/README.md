@@ -46,8 +46,17 @@ The following questions are asked of the graph:
 * **Query 7**: Which U.S. state has the maximum number of persons between the age 23-30 who enjoy photography?
 * **Query 8**: How many second degree connections are reachable in the graph?
 
-#### Output
+### Case 1: Kùzu single-threaded
 
+As per the [Neo4j docs](https://neo4j.com/docs/java-reference/current/transaction-management/), "transactions are single-threaded, confined, and independent". To keep a fair comparison with Neo4j, we thus limit the number of threads that Kùzu executes queries on to a single thread.
+
+In the Python client, this is done as follows.
+
+```py
+CONNECTION.set_max_threads_for_exec(1)
+```
+
+#### Results 
 ```
 Query 1:
  
@@ -66,7 +75,7 @@ shape: (3, 3)
 │ 68753    ┆ Claudia Booker ┆ 4985         │
 │ 54696    ┆ Brian Burgess  ┆ 4976         │
 └──────────┴────────────────┴──────────────┘
-Query 1 completed in 0.610037s
+Query 1 completed in 0.311524s
 
 Query 2:
  
@@ -78,15 +87,14 @@ Query 2:
     
 City in which most-followed person lives:
 shape: (1, 5)
-┌────────┬──────────────┬────────┬───────┬───────────────┐
-│ name   ┆ numFollowers ┆ city   ┆ state ┆ country       │
-│ ---    ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
-│ str    ┆ i64          ┆ str    ┆ str   ┆ str           │
-╞════════╪══════════════╪════════╪═══════╪═══════════════╡
-│ Rachel ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
-│ Cooper ┆              ┆        ┆       ┆               │
-└────────┴──────────────┴────────┴───────┴───────────────┘
-Query 2 completed in 1.092609s
+┌───────────────┬──────────────┬────────┬───────┬───────────────┐
+│ name          ┆ numFollowers ┆ city   ┆ state ┆ country       │
+│ ---           ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
+│ str           ┆ i64          ┆ str    ┆ str   ┆ str           │
+╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
+│ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
+└───────────────┴──────────────┴────────┴───────┴───────────────┘
+Query 2 completed in 0.791726s
 
 Query 3:
  
@@ -101,13 +109,13 @@ shape: (5, 2)
 │ ---       ┆ ---        │
 │ str       ┆ f64        │
 ╞═══════════╪════════════╡
-│ Montreal  ┆ 37.324032  │
-│ Calgary   ┆ 37.6043    │
-│ Toronto   ┆ 37.717934  │
-│ Edmonton  ┆ 37.941379  │
-│ Vancouver ┆ 38.020171  │
+│ Montreal  ┆ 37.328018  │
+│ Calgary   ┆ 37.607205  │
+│ Toronto   ┆ 37.720255  │
+│ Edmonton  ┆ 37.943678  │
+│ Vancouver ┆ 38.023227  │
 └───────────┴────────────┘
-Query 3 completed in 0.016775s
+Query 3 completed in 0.012013s
 
 Query 4:
  
@@ -123,11 +131,11 @@ shape: (3, 2)
 │ ---            ┆ ---          │
 │ str            ┆ i64          │
 ╞════════════════╪══════════════╡
-│ United States  ┆ 30477        │
-│ Canada         ┆ 3063         │
-│ United Kingdom ┆ 1874         │
+│ United States  ┆ 30473        │
+│ Canada         ┆ 3064         │
+│ United Kingdom ┆ 1873         │
 └────────────────┴──────────────┘
-Query 4 completed in 0.023837s
+Query 4 completed in 0.015932s
 
 Query 5:
  
@@ -148,7 +156,7 @@ shape: (1, 1)
 ╞════════════╡
 │ 52         │
 └────────────┘
-Query 5 completed in 0.017715s
+Query 5 completed in 0.012567s
 
 Query 6:
  
@@ -173,7 +181,7 @@ shape: (5, 3)
 │ 64         ┆ Montreal   ┆ Canada         │
 │ 62         ┆ Phoenix    ┆ United States  │
 └────────────┴────────────┴────────────────┘
-Query 6 completed in 0.049951s
+Query 6 completed in 0.033764s
 
 Query 7:
  
@@ -196,7 +204,7 @@ shape: (1, 3)
 │ 170        ┆ California ┆ United States │
 └────────────┴────────────┴───────────────┘
             
-Query 7 completed in 0.016887s
+Query 7 completed in 0.012508s
 
 Query 8:
  
@@ -213,21 +221,208 @@ shape: (1, 1)
 ╞══════════════╡
 │ 1214477      │
 └──────────────┘
-Query 8 completed in 0.166834s
-Queries completed in 1.9953s
+Query 8 completed in 0.103470s
+Queries completed in 1.2938s
 ```
 
-### Query performance
+#### Query performance (Kùzu single-threaded)
 
 The numbers shown below are for when we ingest 100K person nodes, ~10K location nodes and ~2.4M edges into the graph. Query times for simple aggregation and path finding are relatively low. More advanced queries involving variable length paths will be studied later.
 
 Summary of run times:
 
-* Query 1: `0.610037s`
-* Query 2: `1.092609s`
-* Query 3: `0.016775s`
-* Query 4: `0.023837s`
-* Query 5: `0.017715s`
-* Query 6: `0.049951s`
-* Query 7: `0.016887s`
-* Query 8: `0.166834s`
+* Query 1: `0.311524s`
+* Query 2: `0.791726s`
+* Query 3: `0.012013s`
+* Query 4: `0.015932s`
+* Query 5: `0.012567s`
+* Query 6: `0.033764s`
+* Query 7: `0.012508s`
+* Query 8: `0.103470s`
+
+
+### Case 2: Kùzu multi-threaded
+
+We can also let Kùzu choose the optimal number of threads to run the queries on, in a multi-threaded fashion (this is the default behaviour).
+
+
+#### Results
+
+```
+Query 1:
+ 
+        MATCH (follower:Person)-[:Follows]->(person:Person)
+        RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers
+        ORDER BY numFollowers DESC LIMIT 3;
+    
+Top 3 most-followed persons:
+shape: (3, 3)
+┌──────────┬────────────────┬──────────────┐
+│ personID ┆ name           ┆ numFollowers │
+│ ---      ┆ ---            ┆ ---          │
+│ i64      ┆ str            ┆ i64          │
+╞══════════╪════════════════╪══════════════╡
+│ 85723    ┆ Rachel Cooper  ┆ 4998         │
+│ 68753    ┆ Claudia Booker ┆ 4985         │
+│ 54696    ┆ Brian Burgess  ┆ 4976         │
+└──────────┴────────────────┴──────────────┘
+Query 1 completed in 0.230980s
+
+Query 2:
+ 
+        MATCH (follower:Person)-[:Follows]->(person:Person)
+        WITH person, count(follower.id) as numFollowers
+        ORDER BY numFollowers DESC LIMIT 1
+        MATCH (person) -[:LivesIn]-> (city:City)
+        RETURN person.name AS name, numFollowers, city.city AS city, city.state AS state, city.country AS country;
+    
+City in which most-followed person lives:
+shape: (1, 5)
+┌───────────────┬──────────────┬────────┬───────┬───────────────┐
+│ name          ┆ numFollowers ┆ city   ┆ state ┆ country       │
+│ ---           ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
+│ str           ┆ i64          ┆ str    ┆ str   ┆ str           │
+╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
+│ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
+└───────────────┴──────────────┴────────┴───────┴───────────────┘
+Query 2 completed in 0.625935s
+
+Query 3:
+ 
+        MATCH (p:Person) -[:LivesIn]-> (c:City)-[*1..2]-> (co:Country {country: $country})
+        RETURN c.city AS city, avg(p.age) AS averageAge
+        ORDER BY averageAge LIMIT 5;
+    
+Cities with lowest average age in Canada:
+shape: (5, 2)
+┌───────────┬────────────┐
+│ city      ┆ averageAge │
+│ ---       ┆ ---        │
+│ str       ┆ f64        │
+╞═══════════╪════════════╡
+│ Montreal  ┆ 37.328018  │
+│ Calgary   ┆ 37.607205  │
+│ Toronto   ┆ 37.720255  │
+│ Edmonton  ┆ 37.943678  │
+│ Vancouver ┆ 38.023227  │
+└───────────┴────────────┘
+Query 3 completed in 0.011896s
+
+Query 4:
+ 
+        MATCH (p:Person)-[:LivesIn]->(ci:City)-[*1..2]->(country:Country)
+        WHERE p.age >= $age_lower AND p.age <= $age_upper
+        RETURN country.country AS countries, count(country) AS personCounts
+        ORDER BY personCounts DESC LIMIT 3;
+    
+Persons between ages 30-40 in each country:
+shape: (3, 2)
+┌────────────────┬──────────────┐
+│ countries      ┆ personCounts │
+│ ---            ┆ ---          │
+│ str            ┆ i64          │
+╞════════════════╪══════════════╡
+│ United States  ┆ 30473        │
+│ Canada         ┆ 3064         │
+│ United Kingdom ┆ 1873         │
+└────────────────┴──────────────┘
+Query 4 completed in 0.014518s
+
+Query 5:
+ 
+        MATCH (p:Person)-[:HasInterest]->(i:Interest)
+        WHERE lower(i.interest) = lower($interest)
+        AND lower(p.gender) = lower($gender)
+        WITH p, i
+        MATCH (p)-[:LivesIn]->(c:City)
+        WHERE c.city = $city AND c.country = $country
+        RETURN count(p) AS numPersons
+    
+Number of male users in London, United Kingdom who have an interest in fine dining:
+shape: (1, 1)
+┌────────────┐
+│ numPersons │
+│ ---        │
+│ i64        │
+╞════════════╡
+│ 52         │
+└────────────┘
+Query 5 completed in 0.012230s
+
+Query 6:
+ 
+        MATCH (p:Person)-[:HasInterest]->(i:Interest)
+        WHERE lower(i.interest) = lower($interest)
+        AND lower(p.gender) = lower($gender)
+        WITH p, i
+        MATCH (p)-[:LivesIn]->(c:City)
+        RETURN count(p.id) AS numPersons, c.city, c.country
+        ORDER BY numPersons DESC LIMIT 5
+    
+City with the most female users who have an interest in tennis:
+shape: (5, 3)
+┌────────────┬────────────┬────────────────┐
+│ numPersons ┆ c.city     ┆ c.country      │
+│ ---        ┆ ---        ┆ ---            │
+│ i64        ┆ str        ┆ str            │
+╞════════════╪════════════╪════════════════╡
+│ 66         ┆ Birmingham ┆ United Kingdom │
+│ 66         ┆ Houston    ┆ United States  │
+│ 65         ┆ Raleigh    ┆ United States  │
+│ 64         ┆ Montreal   ┆ Canada         │
+│ 62         ┆ Phoenix    ┆ United States  │
+└────────────┴────────────┴────────────────┘
+Query 6 completed in 0.015304s
+
+Query 7:
+ 
+        MATCH (p:Person)-[:LivesIn]->(:City)-[:CityIn]->(s:State)
+        WHERE p.age >= $age_lower AND p.age <= $age_upper AND s.country = $country
+        WITH p, s
+        MATCH (p)-[:HasInterest]->(i:Interest)
+        WHERE lower(i.interest) = lower($interest)
+        RETURN count(p.id) AS numPersons, s.state AS state, s.country AS country
+        ORDER BY numPersons DESC LIMIT 1
+    
+
+            State in United States with the most users between ages 23-30 who have an interest in photography:
+shape: (1, 3)
+┌────────────┬────────────┬───────────────┐
+│ numPersons ┆ state      ┆ country       │
+│ ---        ┆ ---        ┆ ---           │
+│ i64        ┆ str        ┆ str           │
+╞════════════╪════════════╪═══════════════╡
+│ 170        ┆ California ┆ United States │
+└────────────┴────────────┴───────────────┘
+            
+Query 7 completed in 0.010679s
+
+Query 8:
+ 
+        MATCH (p1:Person)-[f:Follows]->(p2:Person)
+        WHERE p1.id > p2.id
+        RETURN count(f) as numFollowers
+    
+Number of second degree connections reachable in the graph:
+shape: (1, 1)
+┌──────────────┐
+│ numFollowers │
+│ ---          │
+│ i64          │
+╞══════════════╡
+│ 1214477      │
+└──────────────┘
+Query 8 completed in 0.024422s
+Queries completed in 0.9465s
+```
+
+#### Query performance (Kùzu multi-threaded)
+
+* Query 1: `0.230980s`
+* Query 2: `0.625935s`
+* Query 3: `0.011896s`
+* Query 4: `0.014518s`
+* Query 5: `0.012230s`
+* Query 6: `0.015304s`
+* Query 7: `0.010679s`
+* Query 8: `0.024422s`
