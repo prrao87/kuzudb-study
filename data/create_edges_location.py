@@ -19,9 +19,11 @@ def get_cities_df(filepath: Path) -> pl.DataFrame:
     Get only cities with a population of > 1M
     """
     # Read in cities data and rename the ID column to avoid conflicts
-    residence_loc_df = pl.read_parquet(filepath).filter(
-        pl.col("population") >= 1_000_000
-    ).rename({"id": "city_id"})
+    residence_loc_df = (
+        pl.read_parquet(filepath)
+        .filter(pl.col("population") >= 1_000_000)
+        .rename({"id": "city_id"})
+    )
     return residence_loc_df
 
 
@@ -34,13 +36,12 @@ def main() -> None:
     # Obtain top 5 most common cities name via a join
     city_ids_df = pl.DataFrame(city_ids).rename({"column_0": "city_id"})
     # Horizontally stack the person IDs and the residence city IDs to create a list of edges
-    edges_df = pl.concat([persons_df, city_ids_df], how='horizontal')
+    edges_df = pl.concat([persons_df, city_ids_df], how="horizontal")
     city_counts_df = edges_df.groupby("city_id").count().sort("count", descending=True)
     top_cities_df = (
         city_counts_df.join(residence_loc_df, on="city_id", how="left")
         # List top 5 cities
-        .sort("count", descending=True)
-        .head(5)
+        .sort("count", descending=True).head(5)
     )
     top_5 = top_cities_df["city"].to_list()
     # Limit the number of edges
@@ -48,13 +49,10 @@ def main() -> None:
         edges_df = edges_df.head(NUM)
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
-    edges_df = (
-        edges_df.rename({"city_id": "to", "id": "from"})
-        .write_parquet(Path("output/edges") / "lives_in.parquet")
+    edges_df = edges_df.rename({"city_id": "to", "id": "from"}).write_parquet(
+        Path("output/edges") / "lives_in.parquet"
     )
-    print(
-        f"Generated residence cities for persons. Top 5 common cities are: {', '.join(top_5)}"
-    )
+    print(f"Generated residence cities for persons. Top 5 common cities are: {', '.join(top_5)}")
 
 
 if __name__ == "__main__":

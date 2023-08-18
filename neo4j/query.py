@@ -84,7 +84,9 @@ def run_query5(session: Session, gender: str, city: str, country: str, interest:
     with Timer(name="query5", text="Query 5 completed in {:.6f}s"):
         response = session.run(query, gender=gender, city=city, country=country, interest=interest)
         result = pl.from_dicts(response.data())
-        print(f"Number of {gender} users in {city}, {country} who have an interest in {interest}:\n{result}")
+        print(
+            f"Number of {gender} users in {city}, {country} who have an interest in {interest}:\n{result}"
+        )
 
 
 def run_query6(session: Session, gender: str, interest: str) -> None:
@@ -104,7 +106,9 @@ def run_query6(session: Session, gender: str, interest: str) -> None:
         print(f"City with the most {gender} users who have an interest in {interest}:\n{result}")
 
 
-def run_query7(session: Session, country: str, age_lower: int, age_upper: int, interest: str) -> None:
+def run_query7(
+    session: Session, country: str, age_lower: int, age_upper: int, interest: str
+) -> None:
     query = """
         MATCH (p:Person)-[:LIVES_IN]->(:City)-[:CITY_IN]->(s:State)
         WHERE p.age >= $age_lower AND p.age <= $age_upper AND s.country = $country
@@ -116,7 +120,9 @@ def run_query7(session: Session, country: str, age_lower: int, age_upper: int, i
     """
     print(f"\nQuery 7:\n {query}")
     with Timer(name="query7", text="Query 7 completed in {:.6f}s"):
-        response = session.run(query, country=country, age_lower=age_lower, age_upper=age_upper, interest=interest)
+        response = session.run(
+            query, country=country, age_lower=age_lower, age_upper=age_upper, interest=interest
+        )
         result = pl.from_dicts(response.data())
         print(
             f"""
@@ -146,9 +152,21 @@ def main() -> None:
                 run_query2(session)
                 run_query3(session, country="Canada")
                 run_query4(session, age_lower=30, age_upper=40)
-                run_query5(session, gender="male", city="London", country="United Kingdom", interest="fine dining")
+                run_query5(
+                    session,
+                    gender="male",
+                    city="London",
+                    country="United Kingdom",
+                    interest="fine dining",
+                )
                 run_query6(session, gender="female", interest="tennis")
-                run_query7(session, country="United States", age_lower=23, age_upper=30, interest="photography")
+                run_query7(
+                    session,
+                    country="United States",
+                    age_lower=23,
+                    age_upper=30,
+                    interest="photography",
+                )
                 run_query8(session)
 
 

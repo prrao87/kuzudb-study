@@ -3,6 +3,7 @@ Generate nodes for a person's interests
 These are activities or hobbies person in the real world might have
 """
 from pathlib import Path
+
 import polars as pl
 
 

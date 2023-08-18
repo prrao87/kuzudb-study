@@ -14,10 +14,7 @@ def main() -> None:
         .select("state_id", "state", "country")
     )
     # Read data from countries file
-    countries_df = (
-        pl.read_parquet(NODES_PATH / "countries.parquet")
-        .rename({"id": "country_id"})
-    )
+    countries_df = pl.read_parquet(NODES_PATH / "countries.parquet").rename({"id": "country_id"})
     # Join city and state dataframes on name
     edges_df = (
         countries_df.join(states_df, on="country", how="left")

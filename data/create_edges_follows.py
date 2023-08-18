@@ -73,9 +73,7 @@ def create_super_node_edges(persons_df: pl.DataFrame) -> pl.DataFrame:
         )
         # Explode the connections column to create a row for each connection
         .explode("connections")
-        .filter(
-            pl.col("id") != pl.col("connections")
-        )
+        .filter(pl.col("id") != pl.col("connections"))
         .sort(["id", "connections"])
         .select(["id", "connections"])
     )
@@ -91,11 +89,9 @@ def main() -> None:
     # Generate edges from super nodes
     super_node_edges_df = create_super_node_edges(persons_df)
     # Concatenate edges from original edges_df and super_node_edges_df
-    edges_df = (
-        pl.concat([edges_df, super_node_edges_df])
-        .unique()
-        .sort(["to", "from"])
-    ).select("from", "to")
+    edges_df = (pl.concat([edges_df, super_node_edges_df]).unique().sort(["to", "from"])).select(
+        "from", "to"
+    )
     # Limit the number of edges
     if NUM < len(edges_df):
         edges_df = edges_df.head(NUM)

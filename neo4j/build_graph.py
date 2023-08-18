@@ -25,8 +25,8 @@ JsonBlob = dict[str, Any]
 
 
 def chunk_iterable(iterable: Iterator, chunk_size: int):
-  for i in range(0, len(iterable), chunk_size):
-    yield iterable[i: i + chunk_size]
+    for i in range(0, len(iterable), chunk_size):
+        yield iterable[i : i + chunk_size]
 
 
 def merge_nodes_person(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
@@ -79,6 +79,7 @@ def merge_nodes_countries(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
 
 
 # --- Edges ---
+
 
 def merge_edges_person(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
     query = """

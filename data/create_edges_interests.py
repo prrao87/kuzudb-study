@@ -15,9 +15,8 @@ def select_random_ids(df: pl.DataFrame, colname: str, num: int) -> list[int]:
 
 
 def main() -> None:
-    interests_df = (
-        pl.read_parquet(Path(NODES_PATH) / "interests.parquet")
-        .rename({"id": "interest_id"})
+    interests_df = pl.read_parquet(Path(NODES_PATH) / "interests.parquet").rename(
+        {"id": "interest_id"}
     )
     # Read in person IDs
     persons_df = pl.read_parquet(NODES_PATH / "persons.parquet").select("id")
@@ -25,14 +24,14 @@ def main() -> None:
     lower_bound, upper_bound = 1, 5
     # Add a column with a random number of interests per person
     persons_df = persons_df.with_columns(
-            pl.lit(
-                np.random.randint(
-                    lower_bound,
-                    upper_bound,
-                    len(persons_df),
-                )
-            ).alias("num_interests")
-        )
+        pl.lit(
+            np.random.randint(
+                lower_bound,
+                upper_bound,
+                len(persons_df),
+            )
+        ).alias("num_interests")
+    )
     # Add a column of random IDs from the interests_df, and explode it within the DataFrame
     edges_df = (
         # Take in the column val of num_connections and return a list of IDs from persons_df
@@ -51,9 +50,7 @@ def main() -> None:
         edges_df = edges_df.head(NUM)
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
-    edges_df = (
-        edges_df.rename({"id": "from", "interests": "to"})
-    )
+    edges_df = edges_df.rename({"id": "from", "interests": "to"})
     edges_df.write_parquet(Path("output/edges") / "interests.parquet")
     print(f"Wrote {len(edges_df)} edges for {len(persons_df)} persons")
 
