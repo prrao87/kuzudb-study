@@ -1,11 +1,12 @@
 """
 Run a series of queries on the Neo4j database
 """
-import polars as pl
-import kuzu
-from kuzu import Connection
 from typing import Any
+
+import kuzu
+import polars as pl
 from codetiming import Timer
+from kuzu import Connection
 
 
 def run_query1(conn: Connection) -> None:
@@ -82,7 +83,9 @@ def run_query5(conn: Connection, params: list[tuple[str, Any]]) -> None:
     with Timer(name="query5", text="Query 5 completed in {:.6f}s"):
         response = conn.execute(query, parameters=params)
         result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
-        print(f"Number of {params[0][1]} users in {params[1][1]}, {params[2][1]} who have an interest in {params[3][1]}:\n{result}")
+        print(
+            f"Number of {params[0][1]} users in {params[1][1]}, {params[2][1]} who have an interest in {params[3][1]}:\n{result}"
+        )
 
 
 def run_query6(conn: Connection, params: list[tuple[str, Any]]) -> None:
@@ -100,10 +103,12 @@ def run_query6(conn: Connection, params: list[tuple[str, Any]]) -> None:
     with Timer(name="query6", text="Query 6 completed in {:.6f}s"):
         response = conn.execute(query, parameters=params)
         result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
-        print(f"City with the most {params[0][1]} users who have an interest in {params[1][1]}:\n{result}")
+        print(
+            f"City with the most {params[0][1]} users who have an interest in {params[1][1]}:\n{result}"
+        )
 
 
-def run_query7(conn:Connection, params: list[tuple[str, Any]]) -> None:
+def run_query7(conn: Connection, params: list[tuple[str, Any]]) -> None:
     "How many persons between a certain age range are in each country?"
     query = """
         MATCH (p:Person)-[:LivesIn]->(:City)-[:CityIn]->(s:State)
@@ -144,9 +149,25 @@ def main(conn: Connection) -> None:
         run_query2(conn)
         run_query3(conn, params=[("country", "Canada")])
         run_query4(conn, params=[("age_lower", 30), ("age_upper", 40)])
-        run_query5(conn, params=[("gender", "male"), ("city", "London"), ("country", "United Kingdom"), ("interest", "fine dining")])
+        run_query5(
+            conn,
+            params=[
+                ("gender", "male"),
+                ("city", "London"),
+                ("country", "United Kingdom"),
+                ("interest", "fine dining"),
+            ],
+        )
         run_query6(conn, params=[("gender", "female"), ("interest", "tennis")])
-        run_query7(conn, params=[("country", "United States"), ("age_lower", 23), ("age_upper", 30), ("interest", "photography")])
+        run_query7(
+            conn,
+            params=[
+                ("country", "United States"),
+                ("age_lower", 23),
+                ("age_upper", 30),
+                ("interest", "photography"),
+            ],
+        )
         run_query8(conn)
 
 
@@ -154,7 +175,7 @@ if __name__ == "__main__":
     DB_NAME = "social_network"
     db = kuzu.Database(f"./{DB_NAME}")
     CONNECTION = kuzu.Connection(db)
-    CONNECTION.set_max_threads_for_exec(1)   # For a fairer comparison with Neo4j, where “Transactions are single-threaded, confined, and independent.”
+    # For a fairer comparison with Neo4j, where “Transactions are single-threaded, confined, and independent.”
+    CONNECTION.set_max_threads_for_exec(1)
 
     main(CONNECTION)
-

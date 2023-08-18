@@ -1,5 +1,5 @@
 """
-Generate fake person profiles and write to CSV.
+Generate fake person profiles and write to parquet.
 A 50-50% male/female profile distribution is used and names are
 generated using the faker library.
 """
@@ -45,7 +45,7 @@ def create_person_df(male_profiles: list[Profile], female_profiles: list[Profile
     )
     # Add ID column
     ids = list(range(1, len(persons_df) + 1))
-    persons_df = persons_df.with_columns(pl.lit(ids).alias("id"))
+    persons_df = persons_df.with_columns(pl.Series(ids).alias("id"))
     return persons_df
 
 
@@ -60,10 +60,10 @@ def main() -> None:
     # Create person dataframe
     persons_df = create_person_df(female_profiles, male_profiles)
     # Write nodes
-    persons_df.select(pl.col("id"), pl.all().exclude("id")).write_csv(
-        Path("output/nodes") / "persons.csv", separator="|"
+    persons_df.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
+        Path("output/nodes") / "persons.parquet"
     )
-    print(f"Wrote {persons_df.shape[0]} person nodes to CSV")
+    print(f"Wrote {persons_df.shape[0]} person nodes to parquet")
 
 
 if __name__ == "__main__":

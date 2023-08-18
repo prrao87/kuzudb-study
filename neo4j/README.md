@@ -36,12 +36,17 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 
 As expected, the nodes load much faster than the edges, since there are many more edges than nodes. In addition, the nodes in Neo4j are indexed (via uniqueness constraints), following which the edges are created based on a match on existing nodes. The run times for ingesting nodes and edges are output to the console.
 
+The person nodes and person-person follower edges are ingested in batches, as a best practice -- this is because the number of persons and followers can get very large, causing the number of edges to nonlinearly increase with the size of the dataset. The batch size for ingesting person nodes is 50k, and the batch size for ingesting edges is 100k.
+
 ```
-Nodes loaded in 5.4609s
-Edges loaded in 60.7000s
+Nodes loaded in 3.6144s
+Edges loaded in 37.5801s
 ```
 
-> 💡 Ingesting the nodes/edges with a batch size of 50K takes just over 1 minute in Neo4j. The timing shown is on an M2 Macbook Pro with 16 GB of RAM.
+We could potentially improve performance further by increasing the batch sizes for nodes and edges for persons and followers, but the general trend is that this size of data takes of the order of 1E1 seconds to ingest into Neo4j.
+
+
+> 💡 The timing shown is on an M2 Macbook Pro with 16 GB of RAM.
 
 
 ## Query graph
@@ -82,7 +87,7 @@ shape: (3, 3)
 │ 68753    ┆ Claudia Booker ┆ 4985         │
 │ 54696    ┆ Brian Burgess  ┆ 4976         │
 └──────────┴────────────────┴──────────────┘
-Query 1 completed in 2.712317s
+Query 1 completed in 1.617523s
 
 Query 2:
  
@@ -94,15 +99,14 @@ Query 2:
     
 City in which most-followed person lives:
 shape: (1, 5)
-┌────────┬──────────────┬────────┬───────┬───────────────┐
-│ name   ┆ numFollowers ┆ city   ┆ state ┆ country       │
-│ ---    ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
-│ str    ┆ i64          ┆ str    ┆ str   ┆ str           │
-╞════════╪══════════════╪════════╪═══════╪═══════════════╡
-│ Rachel ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
-│ Cooper ┆              ┆        ┆       ┆               │
-└────────┴──────────────┴────────┴───────┴───────────────┘
-Query 2 completed in 0.965729s
+┌───────────────┬──────────────┬────────┬───────┬───────────────┐
+│ name          ┆ numFollowers ┆ city   ┆ state ┆ country       │
+│ ---           ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
+│ str           ┆ i64          ┆ str    ┆ str   ┆ str           │
+╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
+│ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
+└───────────────┴──────────────┴────────┴───────┴───────────────┘
+Query 2 completed in 0.592790s
 
 Query 3:
  
@@ -117,13 +121,13 @@ shape: (5, 2)
 │ ---       ┆ ---        │
 │ str       ┆ f64        │
 ╞═══════════╪════════════╡
-│ Montreal  ┆ 37.324032  │
-│ Calgary   ┆ 37.6043    │
-│ Toronto   ┆ 37.717934  │
-│ Edmonton  ┆ 37.941379  │
-│ Vancouver ┆ 38.020171  │
+│ Montreal  ┆ 37.328018  │
+│ Calgary   ┆ 37.607205  │
+│ Toronto   ┆ 37.720255  │
+│ Edmonton  ┆ 37.943678  │
+│ Vancouver ┆ 38.023227  │
 └───────────┴────────────┘
-Query 3 completed in 0.011258s
+Query 3 completed in 0.009398s
 
 Query 4:
  
@@ -139,11 +143,11 @@ shape: (3, 2)
 │ ---            ┆ ---          │
 │ str            ┆ i64          │
 ╞════════════════╪══════════════╡
-│ United States  ┆ 30477        │
-│ Canada         ┆ 3063         │
-│ United Kingdom ┆ 1874         │
+│ United States  ┆ 30473        │
+│ Canada         ┆ 3064         │
+│ United Kingdom ┆ 1873         │
 └────────────────┴──────────────┘
-Query 4 completed in 0.075161s
+Query 4 completed in 0.047333s
 
 Query 5:
  
@@ -164,7 +168,7 @@ shape: (1, 1)
 ╞════════════╡
 │ 52         │
 └────────────┘
-Query 5 completed in 0.014587s
+Query 5 completed in 0.011949s
 
 Query 6:
  
@@ -189,7 +193,7 @@ shape: (5, 3)
 │ 64         ┆ Montreal   ┆ Canada         │
 │ 62         ┆ Phoenix    ┆ United States  │
 └────────────┴────────────┴────────────────┘
-Query 6 completed in 0.030314s
+Query 6 completed in 0.024780s
 
 Query 7:
  
@@ -212,7 +216,7 @@ shape: (1, 3)
 │ 170        ┆ California ┆ United States │
 └────────────┴────────────┴───────────────┘
             
-Query 7 completed in 0.258114s
+Query 7 completed in 0.160752s
 
 Query 8:
  
@@ -229,8 +233,8 @@ shape: (1, 1)
 ╞══════════════╡
 │ 1214477      │
 └──────────────┘
-Query 8 completed in 1.338543s
-Query script completed in 5.406355s
+Query 8 completed in 0.845768s
+Query script completed in 3.310654s
 ```
 
 ### Query performance
@@ -239,11 +243,11 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 
 Summary of run times:
 
-* Query1 : `2.712317s`
-* Query2 : `0.965729s`
-* Query3 : `0.011258s`
-* Query4 : `0.075161s`
-* Query5 : `0.014587s`
-* Query6 : `0.030314s`
-* Query7 : `0.258114s`
-* Query8 : `1.338543s`
+* Query1 : `1.617523s`
+* Query2 : `0.592790s`
+* Query3 : `0.009398s`
+* Query4 : `0.047333s`
+* Query5 : `0.011949s`
+* Query6 : `0.024780s`
+* Query7 : `0.160752s`
+* Query8 : `0.845768s`

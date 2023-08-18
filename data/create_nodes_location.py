@@ -57,10 +57,10 @@ def write_city_nodes(cities_of_interest: pl.DataFrame) -> pl.DataFrame:
     ids = list(range(1, len(city_nodes) + 1))
     city_nodes = city_nodes.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
-    city_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
-        Path("output/nodes") / "cities.csv", separator="|"
+    city_nodes.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
+        Path("output/nodes") / "cities.parquet"
     )
-    print(f"Wrote {city_nodes.shape[0]} cities to CSV")
+    print(f"Wrote {city_nodes.shape[0]} cities to parquet")
     return city_nodes
 
 
@@ -71,10 +71,10 @@ def write_state_nodes(city_nodes: pl.DataFrame) -> None:
     ids = list(range(1, len(state_nodes) + 1))
     state_nodes = state_nodes.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
-    state_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
-        Path("output/nodes") / "states.csv", separator="|"
+    state_nodes.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
+        Path("output/nodes") / "states.parquet"
     )
-    print(f"Wrote {state_nodes.shape[0]} states to CSV")
+    print(f"Wrote {state_nodes.shape[0]} states to parquet")
 
 
 def write_country_nodes(city_nodes: pl.DataFrame) -> None:
@@ -84,10 +84,10 @@ def write_country_nodes(city_nodes: pl.DataFrame) -> None:
     ids = list(range(1, len(country_nodes) + 1))
     country_nodes = country_nodes.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
-    country_nodes.select(pl.col("id"), pl.all().exclude("id")).write_csv(
-        Path("output/nodes") / "countries.csv", separator="|"
+    country_nodes.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
+        Path("output/nodes") / "countries.parquet"
     )
-    print(f"Wrote {country_nodes.shape[0]} countries to CSV")
+    print(f"Wrote {country_nodes.shape[0]} countries to parquet")
 
 
 def main(input_file: str) -> None:

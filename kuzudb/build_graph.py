@@ -103,20 +103,20 @@ def main(conn: Connection) -> None:
         create_state_node_table(conn)
         create_country_node_table(conn)
         create_interest_node_table(conn)
-        conn.execute(f"COPY Person FROM '{NODES_PATH}/persons.csv' (HEADER=true, DELIM='|');")
-        conn.execute(f"COPY City FROM '{NODES_PATH}/cities.csv' (HEADER=true, DELIM='|');")
-        conn.execute(f"COPY State FROM '{NODES_PATH}/states.csv' (HEADER=true, DELIM='|');")
-        conn.execute(f"COPY Country FROM '{NODES_PATH}/countries.csv' (HEADER=true, DELIM='|');")
-        conn.execute(f"COPY Interest FROM '{NODES_PATH}/interests.csv' (HEADER=true, DELIM='|');")
+        conn.execute(f"COPY Person FROM '{NODES_PATH}/persons.parquet';")
+        conn.execute(f"COPY City FROM '{NODES_PATH}/cities.parquet';")
+        conn.execute(f"COPY State FROM '{NODES_PATH}/states.parquet';")
+        conn.execute(f"COPY Country FROM '{NODES_PATH}/countries.parquet';")
+        conn.execute(f"COPY Interest FROM '{NODES_PATH}/interests.parquet';")
 
     with Timer(name="edges", text="Edges loaded in {:.4f}s"):
         # Edges
         create_edge_tables(conn)
-        conn.execute(f"COPY Follows FROM '{EDGES_PATH}/follows.csv' (HEADER=true, DELIM='|');")
-        conn.execute(f"COPY LivesIn FROM '{EDGES_PATH}/lives_in.csv' (HEADER=true, DELIM='|');")
-        conn.execute(f"COPY HasInterest FROM '{EDGES_PATH}/interests.csv' (HEADER=true, DELIM='|');")
-        conn.execute(f"COPY CityIn FROM '{EDGES_PATH}/city_in.csv' (HEADER=true, DELIM='|');")
-        conn.execute(f"COPY StateIn FROM '{EDGES_PATH}/state_in.csv' (HEADER=true, DELIM='|');")
+        conn.execute(f"COPY Follows FROM '{EDGES_PATH}/follows.parquet';")
+        conn.execute(f"COPY LivesIn FROM '{EDGES_PATH}/lives_in.parquet';")
+        conn.execute(f"COPY HasInterest FROM '{EDGES_PATH}/interests.parquet';")
+        conn.execute(f"COPY CityIn FROM '{EDGES_PATH}/city_in.parquet';")
+        conn.execute(f"COPY StateIn FROM '{EDGES_PATH}/state_in.parquet';")
 
     print(f"Successfully loaded nodes and edges into KùzuDB!")
 

@@ -1,13 +1,12 @@
 import argparse
 import os
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Iterator
 
 import polars as pl
 from codetiming import Timer
 from dotenv import load_dotenv
 from neo4j import GraphDatabase, ManagedTransaction, Session
-from polars.io.csv.batched_reader import BatchedCsvReader
 
 load_dotenv()
 
@@ -25,12 +24,9 @@ JsonBlob = dict[str, Any]
 # --- Nodes ---
 
 
-def read_nodes_person(batch_size: int) -> BatchedCsvReader:
-    """Process person nodes CSV file in batches"""
-    csv_reader = pl.read_csv_batched(
-        f"{NODES_PATH}/persons.csv", separator="|", try_parse_dates=True, batch_size=batch_size
-    )
-    return csv_reader
+def chunk_iterable(iterable: Iterator, chunk_size: int):
+    for i in range(0, len(iterable), chunk_size):
+        yield iterable[i : i + chunk_size]
 
 
 def merge_nodes_person(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
@@ -40,7 +36,6 @@ def merge_nodes_person(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
             SET p += row
     """
     tx.run(query, data=data)
-    print(f"Created {len(data)} person nodes")
 
 
 def merge_nodes_interests(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
@@ -86,41 +81,6 @@ def merge_nodes_countries(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
 # --- Edges ---
 
 
-def read_edges_person(batch_size: int) -> None:
-    csv_reader = pl.read_csv_batched(
-        f"{EDGES_PATH}/follows.csv", separator="|", batch_size=batch_size
-    )
-    return csv_reader
-
-
-def read_edges_interests(batch_size: int) -> None:
-    csv_reader = pl.read_csv_batched(
-        f"{EDGES_PATH}/interests.csv", separator="|", batch_size=batch_size
-    )
-    return csv_reader
-
-
-def read_edges_lives_in(batch_size: int) -> None:
-    csv_reader = pl.read_csv_batched(
-        f"{EDGES_PATH}/lives_in.csv", separator="|", batch_size=batch_size
-    )
-    return csv_reader
-
-
-def read_edges_city_in(batch_size: int) -> None:
-    csv_reader = pl.read_csv_batched(
-        f"{EDGES_PATH}/city_in.csv", separator="|", batch_size=batch_size
-    )
-    return csv_reader
-
-
-def read_edges_state_in(batch_size: int) -> None:
-    csv_reader = pl.read_csv_batched(
-        f"{EDGES_PATH}/state_in.csv", separator="|", batch_size=batch_size
-    )
-    return csv_reader
-
-
 def merge_edges_person(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
     query = """
         UNWIND $data AS row
@@ -129,7 +89,6 @@ def merge_edges_person(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
         MERGE (p1)-[:FOLLOWS]->(p2)
     """
     tx.run(query, data=data)
-    print(f"Created {len(data)} person-follower edges")
 
 
 def merge_edges_interests(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
@@ -179,14 +138,26 @@ def merge_edges_state_in(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
 # --- Run functions ---
 
 
-def ingest_in_batches(session: Session, read_func: Callable, merge_func: Callable) -> None:
-    reader = read_func(batch_size=BATCH_SIZE)
-    batches = reader.next_batches(BATCH_SIZE)
-    for i, batch in enumerate(batches):
-        # Convert DataFrame to a list of dictionaries
-        data = batch.to_dicts()
+def ingest_person_nodes_in_batches(session: Session, merge_func: Callable) -> None:
+    persons = pl.read_parquet(f"{NODES_PATH}/persons.parquet")
+    persons_batches = chunk_iterable(persons.to_dicts(), BATCH_SIZE)
+    for i, batch in enumerate(persons_batches, 1):
         # Create person nodes
-        session.execute_write(merge_func, data=data)
+        session.execute_write(merge_func, data=batch)
+        print(f"Created {len(batch)} person nodes for batch {i}")
+
+
+def ingest_person_edges_in_batches(session: Session, merge_func: Callable) -> None:
+    """
+    Unlike person nodes, edges are just integer pairs, so we can have very large batches
+    without running into memory issues when UNWINDing in Cypher.
+    """
+    follows = pl.read_parquet(f"{EDGES_PATH}/follows.parquet")
+    follows_batches = chunk_iterable(follows.to_dicts(), chunk_size=100_000)
+    for i, batch in enumerate(follows_batches, 1):
+        # Create person-follower edges
+        session.execute_write(merge_func, data=batch)
+        print(f"Created {len(batch)} person-follower edges for batch {i}")
 
 
 def create_indexes_and_constraints(session: Session) -> None:
@@ -203,28 +174,35 @@ def create_indexes_and_constraints(session: Session) -> None:
 
 
 def write_nodes(session: Session) -> None:
-    # Write person nodes in batches
-    ingest_in_batches(session, read_nodes_person, merge_nodes_person)
+    ingest_person_nodes_in_batches(session, merge_nodes_person)
     # Write interest nodes
-    interests = pl.read_csv(f"{NODES_PATH}/interests.csv", separator="|")
+    interests = pl.read_parquet(f"{NODES_PATH}/interests.parquet")
     session.execute_write(merge_nodes_interests, data=interests.to_dicts())
     # Write city nodes
-    cities = pl.read_csv(f"{NODES_PATH}/cities.csv", separator="|")
+    cities = pl.read_parquet(f"{NODES_PATH}/cities.parquet")
     session.execute_write(merge_nodes_cities, data=cities.to_dicts())
     # Write state nodes
-    states = pl.read_csv(f"{NODES_PATH}/states.csv", separator="|")
+    states = pl.read_parquet(f"{NODES_PATH}/states.parquet")
     session.execute_write(merge_nodes_states, data=states.to_dicts())
     # Write country nodes
-    countries = pl.read_csv(f"{NODES_PATH}/countries.csv", separator="|")
+    countries = pl.read_parquet(f"{NODES_PATH}/countries.parquet")
     session.execute_write(merge_nodes_countries, data=countries.to_dicts())
 
 
 def write_edges(session: Session) -> None:
-    ingest_in_batches(session, read_edges_person, merge_edges_person)
-    ingest_in_batches(session, read_edges_interests, merge_edges_interests)
-    ingest_in_batches(session, read_edges_lives_in, merge_edges_lives_in)
-    ingest_in_batches(session, read_edges_city_in, merge_edges_city_in)
-    ingest_in_batches(session, read_edges_state_in, merge_edges_state_in)
+    ingest_person_edges_in_batches(session, merge_edges_person)
+    # Write person-interest edges
+    interests = pl.read_parquet(f"{EDGES_PATH}/interests.parquet")
+    session.execute_write(merge_edges_interests, data=interests.to_dicts())
+    # Write person-city edges
+    cities = pl.read_parquet(f"{EDGES_PATH}/lives_in.parquet")
+    session.execute_write(merge_edges_lives_in, data=cities.to_dicts())
+    # Write city-state edges
+    states = pl.read_parquet(f"{EDGES_PATH}/city_in.parquet")
+    session.execute_write(merge_edges_city_in, data=states.to_dicts())
+    # Write state-country edges
+    countries = pl.read_parquet(f"{EDGES_PATH}/state_in.parquet")
+    session.execute_write(merge_edges_state_in, data=countries.to_dicts())
 
 
 def main() -> None:
@@ -241,11 +219,11 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    # fmt: off
     parser = argparse.ArgumentParser("Build Neo4j graph from files")
-    parser.add_argument(
-        "--batch_size", "-b", type=int, default=50_000, help="Batch size of CSV reader"
-    )
+    parser.add_argument("--batch_size", "-b", type=int, default=50_000, help="Batch size of nodes to ingest at a time")
     args = parser.parse_args()
+    # fmt: on
 
     BATCH_SIZE = args.batch_size
     main()
