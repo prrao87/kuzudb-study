@@ -45,6 +45,7 @@ def merge_nodes_interests(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
             SET i += row
     """
     tx.run(query, data=data)
+    print(f"Created {len(data)} interest nodes")
 
 
 def merge_nodes_cities(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
@@ -87,7 +88,6 @@ def merge_edges_person(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
         MERGE (p1)-[:FOLLOWS]->(p2)
     """
     tx.run(query, data=data)
-    print(f"Created {len(data)} person-follower edges")
 
 
 def merge_edges_interests(tx: ManagedTransaction, data: list[JsonBlob]) -> None:
@@ -147,8 +147,12 @@ def ingest_person_nodes_in_batches(session: Session, merge_func: Callable) -> No
 
 
 def ingest_person_edges_in_batches(session: Session, merge_func: Callable) -> None:
+    """
+    Unlike person nodes, edges are just integer pairs, so we can have very large batches
+    without running into memory issues when UNWINDing in Cypher.
+    """
     follows = pl.read_parquet(f"{EDGES_PATH}/follows.parquet")
-    follows_batches = chunk_iterable(follows.to_dicts(), BATCH_SIZE)
+    follows_batches = chunk_iterable(follows.to_dicts(), chunk_size=100_000)
     for i, batch in enumerate(follows_batches, 1):
         # Create person-follower edges
         session.execute_write(merge_func, data=batch)
@@ -216,7 +220,7 @@ def main() -> None:
 if __name__ == "__main__":
     # fmt: off
     parser = argparse.ArgumentParser("Build Neo4j graph from files")
-    parser.add_argument("--batch_size", "-b", type=int, default=50_000, help="Batch size of iterable")
+    parser.add_argument("--batch_size", "-b", type=int, default=50_000, help="Batch size of nodes to ingest at a time")
     args = parser.parse_args()
     # fmt: on
 
