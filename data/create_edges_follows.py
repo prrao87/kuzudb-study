@@ -19,14 +19,6 @@ def select_random_ids(df: pl.DataFrame, num: int) -> list[int]:
     return connections
 
 
-def get_persons_df(filepath: Path) -> pl.DataFrame:
-    # Read in person data
-    persons_df = pl.read_csv(filepath, separator="|").with_columns(
-        pl.col("birthday").str.strptime(pl.Date, "%Y-%m-%d")
-    )
-    return persons_df
-
-
 def get_initial_person_edges(persons_df: pl.DataFrame) -> pl.DataFrame:
     """
     Produce an initial list of person-person edges.
@@ -53,7 +45,7 @@ def create_super_node_edges(persons_df: pl.DataFrame) -> pl.DataFrame:
       - The aim is to have a select few persons act as as concentration points in the graph
       - The number of super nodes is set as a fraction of the total number of persons in the graph
     """
-    NUM_SUPER_NODES = len(persons_df) * 5 // 1000
+    NUM_SUPER_NODES = len(persons_df) * 5 // 1000 if len(persons_df) > 0 else 1
     super_node_ids = np.random.choice(persons_df["id"], size=NUM_SUPER_NODES, replace=False)
     # Convert to dataframe
     super_nodes_df = pl.DataFrame({"id": super_node_ids}).sort("id")
@@ -93,7 +85,7 @@ def create_super_node_edges(persons_df: pl.DataFrame) -> pl.DataFrame:
 
 
 def main() -> None:
-    persons_df = get_persons_df(NODES_PATH / "persons.csv")
+    persons_df = pl.read_parquet(NODES_PATH / "persons.parquet")
     np.random.seed(SEED)
     edges_df = get_initial_person_edges(persons_df)
     # Generate edges from super nodes
@@ -109,7 +101,7 @@ def main() -> None:
         edges_df = edges_df.head(NUM)
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
-    edges_df.write_csv(Path("output/edges") / "follows.csv", separator="|")
+    edges_df.write_parquet(Path("output/edges") / "follows.parquet")
     print(f"Wrote {len(edges_df)} edges for {len(persons_df)} persons")
 
 

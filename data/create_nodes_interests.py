@@ -15,11 +15,12 @@ def main(filename: str) -> pl.DataFrame:
     interests_df = interests.filter(pl.col("interest") != "").unique().sort("interest")
     # Add ID column to function as a primary key
     ids = list(range(1, len(interests_df) + 1))
-    interests_df = interests_df.with_columns(pl.lit(ids).alias("id"))
+    interests_df = interests_df.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
-    interests_df.select(pl.col("id"), pl.all().exclude("id")).write_csv(
-        Path("output/nodes") / "interests.csv", separator="|"
+    interests_df.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
+        Path("output/nodes") / "interests.parquet"
     )
+    print(f"Wrote {interests_df.shape[0]} interests nodes to parquet")
     return interests
 
 
