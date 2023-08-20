@@ -90,8 +90,7 @@ Nodes are ingested significantly faster in Kùzu (of the order of milliseconds),
 
 ### Query performance benchmark
 
-The full benchmark numbers are in the `README.md` pages for respective directories for `neo4j` and `kuzudb`.
-
+The full benchmark numbers are in the `README.md` pages for respective directories for `neo4j` and `kuzudb`. The benchmarks are run via the `pytest-benchmark` library directly from each directory for the queries on either DB.
 
 #### Neo4j vs. Kùzu single-threaded
 
