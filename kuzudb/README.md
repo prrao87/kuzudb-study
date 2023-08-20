@@ -267,7 +267,6 @@ shape: (3, 3)
 │ 68753    ┆ Claudia Booker ┆ 4985         │
 │ 54696    ┆ Brian Burgess  ┆ 4976         │
 └──────────┴────────────────┴──────────────┘
-Query 1 completed in 0.230980s
 
 Query 2:
  
@@ -286,7 +285,6 @@ shape: (1, 5)
 ╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
 │ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
 └───────────────┴──────────────┴────────┴───────┴───────────────┘
-Query 2 completed in 0.625935s
 
 Query 3:
  
@@ -307,7 +305,6 @@ shape: (5, 2)
 │ Edmonton  ┆ 37.943678  │
 │ Vancouver ┆ 38.023227  │
 └───────────┴────────────┘
-Query 3 completed in 0.011896s
 
 Query 4:
  
@@ -327,7 +324,6 @@ shape: (3, 2)
 │ Canada         ┆ 3064         │
 │ United Kingdom ┆ 1873         │
 └────────────────┴──────────────┘
-Query 4 completed in 0.014518s
 
 Query 5:
  
@@ -348,7 +344,6 @@ shape: (1, 1)
 ╞════════════╡
 │ 52         │
 └────────────┘
-Query 5 completed in 0.012230s
 
 Query 6:
  
@@ -357,13 +352,13 @@ Query 6:
         AND lower(p.gender) = lower($gender)
         WITH p, i
         MATCH (p)-[:LivesIn]->(c:City)
-        RETURN count(p.id) AS numPersons, c.city, c.country
+        RETURN count(p.id) AS numPersons, c.city AS city, c.country AS country
         ORDER BY numPersons DESC LIMIT 5
     
 City with the most female users who have an interest in tennis:
 shape: (5, 3)
 ┌────────────┬────────────┬────────────────┐
-│ numPersons ┆ c.city     ┆ c.country      │
+│ numPersons ┆ city       ┆ country        │
 │ ---        ┆ ---        ┆ ---            │
 │ i64        ┆ str        ┆ str            │
 ╞════════════╪════════════╪════════════════╡
@@ -373,7 +368,6 @@ shape: (5, 3)
 │ 64         ┆ Montreal   ┆ Canada         │
 │ 62         ┆ Phoenix    ┆ United States  │
 └────────────┴────────────┴────────────────┘
-Query 6 completed in 0.015304s
 
 Query 7:
  
@@ -386,7 +380,7 @@ Query 7:
         ORDER BY numPersons DESC LIMIT 1
     
 
-            State in United States with the most users between ages 23-30 who have an interest in photography:
+        State in United States with the most users between ages 23-30 who have an interest in photography:
 shape: (1, 3)
 ┌────────────┬────────────┬───────────────┐
 │ numPersons ┆ state      ┆ country       │
@@ -395,8 +389,7 @@ shape: (1, 3)
 ╞════════════╪════════════╪═══════════════╡
 │ 170        ┆ California ┆ United States │
 └────────────┴────────────┴───────────────┘
-            
-Query 7 completed in 0.010679s
+        
 
 Query 8:
  
@@ -413,17 +406,74 @@ shape: (1, 1)
 ╞══════════════╡
 │ 1214477      │
 └──────────────┘
-Query 8 completed in 0.024422s
-Queries completed in 0.9465s
+Queries completed in 1.2756s
+```
+
+#### Query performance benchmark (Kùzu single-threaded)
+
+The benchmark is run using `pytest-benchmark` package as follows.
+
+```sh
+$ pytest benchmark_query.py --benchmark-min-rounds=5 --benchmark-warmup-iterations=5 --benchmark-disable-gc --benchmark-sort=fullname
+==================================================================================== test session starts =====================================================================================
+platform darwin -- Python 3.11.2, pytest-7.4.0, pluggy-1.2.0
+benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=True min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=5)
+rootdir: /code/kuzudb-study/kuzudb
+plugins: Faker-19.2.0, anyio-3.7.1, benchmark-4.0.0
+collected 8 items
+
+benchmark_query.py ........                                                                                                                                                            [100%]
+
+
+-------------------------------------------------------------------------------------- benchmark: 8 tests --------------------------------------------------------------------------------------
+Name (time in ms)              Min                 Max                Mean             StdDev              Median                IQR            Outliers       OPS            Rounds  Iterations
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_query1     187.4783 (50.09)    208.4892 (45.44)    192.4749 (48.38)     8.9712 (54.05)    188.8628 (47.85)     5.4620 (58.77)         1;1    5.1955 (0.02)          5           1
+test_benchmark_query2     651.9378 (174.18)   727.6718 (158.61)   669.7257 (168.35)   32.5196 (195.93)   656.0755 (166.22)   23.4683 (252.52)        1;1    1.4931 (0.01)          5           1
+test_benchmark_query3       7.1727 (1.92)      16.3433 (3.56)       8.1793 (2.06)      1.1808 (7.11)       7.9322 (2.01)      0.4850 (5.22)          7;7  122.2596 (0.49)         78           1
+test_benchmark_query4       8.5364 (2.28)      11.1066 (2.42)       9.4035 (2.36)      0.8492 (5.12)       8.9223 (2.26)      1.1856 (12.76)        12;0  106.3432 (0.42)         49           1
+test_benchmark_query5       3.7428 (1.0)        4.5879 (1.0)        3.9781 (1.0)       0.1660 (1.0)        3.9471 (1.0)       0.0929 (1.0)           5;4  251.3782 (1.0)          48           1
+test_benchmark_query6      25.9462 (6.93)      33.3162 (7.26)      27.7400 (6.97)      1.2350 (7.44)      27.4689 (6.96)      0.8201 (8.82)          4;4   36.0490 (0.14)         36           1
+test_benchmark_query7       6.9201 (1.85)       8.6525 (1.89)       7.7988 (1.96)      0.3281 (1.98)       7.7646 (1.97)      0.1844 (1.98)        18;16  128.2242 (0.51)         69           1
+test_benchmark_query8      90.1384 (24.08)    108.3035 (23.61)     93.4627 (23.49)     5.1808 (31.21)     91.7108 (23.23)     2.1502 (23.14)         1;1   10.6995 (0.04)         11           1
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+===================================================================================== 8 passed in 11.92s =====================================================================================
 ```
 
 #### Query performance (Kùzu multi-threaded)
 
-* Query 1: `0.230980s`
-* Query 2: `0.625935s`
-* Query 3: `0.011896s`
-* Query 4: `0.014518s`
-* Query 5: `0.012230s`
-* Query 6: `0.015304s`
-* Query 7: `0.010679s`
-* Query 8: `0.024422s`
+```sh
+$ pytest benchmark_query.py --benchmark-min-rounds=5 --benchmark-warmup-iterations=5 --benchmark-disable-gc --benchmark-sort=fullname
+==================================================================================== test session starts =====================================================================================
+platform darwin -- Python 3.11.2, pytest-7.4.0, pluggy-1.2.0
+benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=True min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=5)
+rootdir: /code/kuzudb-study/kuzudb
+plugins: Faker-19.2.0, anyio-3.7.1, benchmark-4.0.0
+collected 8 items
+
+benchmark_query.py ........                                                                                                                                                            [100%]
+
+
+-------------------------------------------------------------------------------------- benchmark: 8 tests --------------------------------------------------------------------------------------
+Name (time in ms)              Min                 Max                Mean             StdDev              Median                IQR            Outliers       OPS            Rounds  Iterations
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_benchmark_query1     112.4209 (29.98)    175.6500 (27.58)    125.5608 (25.69)    28.0081 (63.91)    112.8987 (22.96)    16.8425 (32.06)         1;1    7.9643 (0.04)          5           1
+test_benchmark_query2     571.3696 (152.38)   586.1770 (92.03)    577.8111 (118.23)    5.9532 (13.58)    575.7557 (117.08)    9.1151 (17.35)         2;0    1.7307 (0.01)          5           1
+test_benchmark_query3       6.4611 (1.72)       8.9117 (1.40)       7.4214 (1.52)      0.6558 (1.50)       7.4137 (1.51)      1.3337 (2.54)         48;0  134.7447 (0.66)         98           1
+test_benchmark_query4       6.6348 (1.77)      10.0138 (1.57)       8.5207 (1.74)      0.5462 (1.25)       8.5367 (1.74)      0.5669 (1.08)         13;2  117.3612 (0.57)         67           1
+test_benchmark_query5       3.7497 (1.0)        6.3695 (1.0)        4.8872 (1.0)       0.4716 (1.08)       4.9178 (1.0)       0.6603 (1.26)         21;1  204.6181 (1.0)          70           1
+test_benchmark_query6      11.1365 (2.97)      14.3319 (2.25)      12.4077 (2.54)      0.7140 (1.63)      12.3383 (2.51)      0.7948 (1.51)         15;5   80.5951 (0.39)         61           1
+test_benchmark_query7       5.8870 (1.57)       8.2347 (1.29)       6.8174 (1.39)      0.4641 (1.06)       6.7216 (1.37)      0.6434 (1.22)         32;1  146.6837 (0.72)        103           1
+test_benchmark_query8      20.4635 (5.46)      22.2344 (3.49)      21.1153 (4.32)      0.4383 (1.0)       21.0030 (4.27)      0.5253 (1.0)          10;1   47.3590 (0.23)         36           1
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+===================================================================================== 8 passed in 10.22s =====================================================================================
+```
+
