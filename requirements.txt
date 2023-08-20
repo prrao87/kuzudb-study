@@ -6,3 +6,4 @@ kuzu>=0.0.6
 neo4j~=5.11.0
 python-dotenv>=1.0.0
 codetiming>=1.4.0
+pytest-benchmark>=4.0.0
