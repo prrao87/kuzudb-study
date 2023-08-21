@@ -22,10 +22,11 @@ def run_query1(session: Session) -> None:
         ORDER BY numFollowers DESC LIMIT 3
     """
     print(f"\nQuery 1:\n {query}")
-    with Timer(name="query1", text="Query 1 completed in {:.6f}s"):
-        response = session.run(query)
-        result = pl.from_dicts(response.data())
-        print(f"Top 3 most-followed persons:\n{result}")
+    # with Timer(name="query1", text="Query 1 completed in {:.6f}s"):
+    response = session.run(query)
+    result = pl.from_dicts(response.data())
+    print(f"Top 3 most-followed persons:\n{result}")
+    return result
 
 
 def run_query2(session: Session) -> None:
@@ -37,10 +38,10 @@ def run_query2(session: Session) -> None:
         RETURN person.name AS name, followers AS numFollowers, city.city AS city, city.state AS state, city.country AS country
     """
     print(f"\nQuery 2:\n {query}")
-    with Timer(name="query2", text="Query 2 completed in {:.6f}s"):
-        response = session.run(query)
-        result = pl.from_dicts(response.data())
-        print(f"City in which most-followed person lives:\n{result}")
+    response = session.run(query)
+    result = pl.from_dicts(response.data())
+    print(f"City in which most-followed person lives:\n{result}")
+    return result
 
 
 def run_query3(session: Session, country: str) -> None:
@@ -50,10 +51,10 @@ def run_query3(session: Session, country: str) -> None:
         ORDER BY averageAge LIMIT 5
     """
     print(f"\nQuery 3:\n {query}")
-    with Timer(name="query3", text="Query 3 completed in {:.6f}s"):
-        response = session.run(query, country=country)
-        result = pl.from_dicts(response.data())
-        print(f"Cities with lowest average age in {country}:\n{result}")
+    response = session.run(query, country=country)
+    result = pl.from_dicts(response.data())
+    print(f"Cities with lowest average age in {country}:\n{result}")
+    return result
 
 
 def run_query4(session: Session, age_lower: int, age_upper: int) -> None:
@@ -64,10 +65,10 @@ def run_query4(session: Session, age_lower: int, age_upper: int) -> None:
         ORDER BY personCounts DESC LIMIT 3
     """
     print(f"\nQuery 4:\n {query}")
-    with Timer(name="query4", text="Query 4 completed in {:.6f}s"):
-        response = session.run(query, age_lower=age_lower, age_upper=age_upper)
-        result = pl.from_dicts(response.data())
-        print(f"Persons between ages {age_lower}-{age_upper} in each country:\n{result}")
+    response = session.run(query, age_lower=age_lower, age_upper=age_upper)
+    result = pl.from_dicts(response.data())
+    print(f"Persons between ages {age_lower}-{age_upper} in each country:\n{result}")
+    return result
 
 
 def run_query5(session: Session, gender: str, city: str, country: str, interest: str) -> None:
@@ -81,12 +82,12 @@ def run_query5(session: Session, gender: str, city: str, country: str, interest:
         RETURN count(p) AS numPersons
     """
     print(f"\nQuery 5:\n {query}")
-    with Timer(name="query5", text="Query 5 completed in {:.6f}s"):
-        response = session.run(query, gender=gender, city=city, country=country, interest=interest)
-        result = pl.from_dicts(response.data())
-        print(
-            f"Number of {gender} users in {city}, {country} who have an interest in {interest}:\n{result}"
-        )
+    response = session.run(query, gender=gender, city=city, country=country, interest=interest)
+    result = pl.from_dicts(response.data())
+    print(
+        f"Number of {gender} users in {city}, {country} who have an interest in {interest}:\n{result}"
+    )
+    return result
 
 
 def run_query6(session: Session, gender: str, interest: str) -> None:
@@ -96,14 +97,14 @@ def run_query6(session: Session, gender: str, interest: str) -> None:
         AND tolower(p.gender) = tolower($gender)
         WITH p, i
         MATCH (p)-[:LIVES_IN]->(c:City)
-        RETURN count(p) AS numPersons, c.city, c.country
+        RETURN count(p) AS numPersons, c.city AS city, c.country AS country
         ORDER BY numPersons DESC LIMIT 5
     """
     print(f"\nQuery 6:\n {query}")
-    with Timer(name="query6", text="Query 6 completed in {:.6f}s"):
-        response = session.run(query, gender=gender, interest=interest)
-        result = pl.from_dicts(response.data())
-        print(f"City with the most {gender} users who have an interest in {interest}:\n{result}")
+    response = session.run(query, gender=gender, interest=interest)
+    result = pl.from_dicts(response.data())
+    print(f"Cities with the most {gender} users who have an interest in {interest}:\n{result}")
+    return result
 
 
 def run_query7(
@@ -119,16 +120,16 @@ def run_query7(
         ORDER BY numPersons DESC LIMIT 1
     """
     print(f"\nQuery 7:\n {query}")
-    with Timer(name="query7", text="Query 7 completed in {:.6f}s"):
-        response = session.run(
-            query, country=country, age_lower=age_lower, age_upper=age_upper, interest=interest
-        )
-        result = pl.from_dicts(response.data())
-        print(
-            f"""
-            State in {country} with the most users between ages {age_lower}-{age_upper} who have an interest in {interest}:\n{result}
-            """
-        )
+    response = session.run(
+        query, country=country, age_lower=age_lower, age_upper=age_upper, interest=interest
+    )
+    result = pl.from_dicts(response.data())
+    print(
+        f"""
+        State in {country} with the most users between ages {age_lower}-{age_upper} who have an interest in {interest}:\n{result}
+        """
+    )
+    return result
 
 
 def run_query8(session: Session) -> None:
@@ -138,36 +139,26 @@ def run_query8(session: Session) -> None:
         RETURN count(f) as numFollowers
     """
     print(f"\nQuery 8:\n {query}")
-    with Timer(name="query8", text="Query 8 completed in {:.6f}s"):
-        response = session.run(query)
-        result = pl.from_dicts(response.data())
-        print(f"Number of second degree connections reachable in the graph:\n{result}")
+    response = session.run(query)
+    result = pl.from_dicts(response.data())
+    print(f"Number of second degree connections reachable in the graph:\n{result}")
+    return result
 
 
 def main() -> None:
     with GraphDatabase.driver(URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session(database="neo4j") as session:
-            with Timer(name="queries", text="Query script completed in {:.6f}s"):
-                run_query1(session)
-                run_query2(session)
-                run_query3(session, country="Canada")
-                run_query4(session, age_lower=30, age_upper=40)
-                run_query5(
-                    session,
-                    gender="male",
-                    city="London",
-                    country="United Kingdom",
-                    interest="fine dining",
-                )
-                run_query6(session, gender="female", interest="tennis")
-                run_query7(
-                    session,
-                    country="United States",
-                    age_lower=23,
-                    age_upper=30,
-                    interest="photography",
-                )
-                run_query8(session)
+            with Timer(name="queries", text="Neo4j query script completed in {:.6f}s"):
+                # fmt: off
+                _ = run_query1(session)
+                _ = run_query2(session)
+                _ = run_query3(session, country="Canada")
+                _ = run_query4(session, age_lower=30, age_upper=40)
+                _ = run_query5(session, gender="male", city="London", country="United Kingdom", interest="fine dining")
+                _ = run_query6(session, gender="female", interest="tennis")
+                _ = run_query7(session, country="United States", age_lower=23, age_upper=30, interest="photography")
+                _ = run_query8(session)
+                # fmt: on
 
 
 if __name__ == "__main__":
