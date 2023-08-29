@@ -21,9 +21,10 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 As expected, the nodes load much faster than the edges, since there are many more edges than nodes. The run times for ingesting nodes and edges are output to the console.
 
 ```
-Nodes loaded in 0.0874s
-Edges loaded in 2.1622s
-Successfully loaded nodes and edges into KùzuDB!
+$ python build_graph.py 
+
+Nodes loaded in 0.0578s
+Edges loaded in 2.0335s
 ```
 
 > 💡 The timing shown is on an M2 Macbook Pro with 16 GB of RAM.
