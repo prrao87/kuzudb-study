@@ -98,14 +98,14 @@ The following table shows the average run times for each query, and the speedup 
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.6641 | 0.1924749 | 8.6
-2 | 0.5808 | 0.6697257 | 0.9
-3 | 0.0052 | 0.0081793 | 0.6
-4 | 0.0464 | 0.0940350 | 0.5
-5 | 0.0064 | 0.0039781 | 1.6
-6 | 0.0183 | 0.0277400 | 0.7
-7 | 0.1539 | 0.0077988 | 19.7
-8 | 0.7275 | 0.0934627 | 7.8
+1 | 1.6641 | 0.1936458 | 8.6
+2 | 0.5808 | 0.2199212 | 2.6
+3 | 0.0052 | 0.0078386 | 0.7
+4 | 0.0464 | 0.0090962 | 5.1
+5 | 0.0064 | 0.0046465 | 1.4
+6 | 0.0183 | 0.0289518 | 0.6
+7 | 0.1539 | 0.0075286 | 20.4
+8 | 0.7275 | 0.0966538 | 7.5
 
 #### Neo4j vs. Kùzu multi-threaded
 
@@ -113,15 +113,15 @@ Unlike Neo4j, KùzuDB supports multi-threaded execution of queries. The followin
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.6641 | 0.1255608 | 13.3
-2 | 0.5808 | 0.5778111 | 1.0
-3 | 0.0052 | 0.0074214 | 0.7
-4 | 0.0464 | 0.0085207 | 5.4
-5 | 0.0064 | 0.0048872 | 1.3
-6 | 0.0183 | 0.0124077 | 1.5
-7 | 0.1539 | 0.0068174 | 22.6
-8 | 0.7275 | 0.0211530 | 34.4
+1 | 1.6641 | 0.1254484 | 13.3
+2 | 0.5808 | 0.1240414 | 4.7
+3 | 0.0052 | 0.0071119 | 0.7
+4 | 0.0464 | 0.0079267 | 5.9
+5 | 0.0064 | 0.0048247 | 1.3
+6 | 0.0183 | 0.0129322 | 1.4
+7 | 0.1539 | 0.0068251  | 22.5
+8 | 0.7275 | 0.0272117 | 26.7
 
-> 🔥 The second-degree path finding query (8) shows a **~34x** speedup over Neo4j for the 100K node, 2.4M edge graph, and the average speedup across all queries when using Kùzu is **~8.5x**.
+> 🔥 The second-degree path finding query (8) shows the biggest speedup over Neo4j for the 100K node, 2.4M edge graph, and the average speedup over Neo4j across all queries when using Kùzu in multi-threaded mode is **~10x**. 
 
 It would be interesting to further study the cases where Kùzu's performance is on par with Neo4j. More to come soon!
