@@ -1,8 +1,8 @@
 # KùzuDB: Benchmark study
 
-[Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS). Because it is written in C++, it is blazing fast, and is optimized for handling complex join-heavy analytical workloads on very large graphs. The database is under active development, but its goal is to become the "DuckDB of graph databases" -- a fast, lightweight, embeddable graph database for analytics (OLAP) use cases, with minimal setup time.
+[Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS). Because it is written in C++, it is blazing fast 🔥, and is optimized for handling complex join-heavy analytical workloads on very large graphs. Kùzu is being actively developed, and its [goal](https://kuzudb.com/docusaurus/blog/what-every-gdbms-should-do-and-vision) is to do in the graph data science space what DuckDB did in the world of tabular data science -- that is, to provide a fast, lightweight, embeddable graph database for analytics (OLAP) use cases, with minimal infrastructure setup.
 
-The goal of the code shown in this repo is as follows:
+The code shown in this repo does the following:
 
 * Generate an artificial social network dataset, including persons, interests and locations
   * It's quite easy to scale up the size of the artificial dataset using the scripts provided, so we can test the performance implications on larger graphs
@@ -42,9 +42,25 @@ Running this command generates a series of files in the `output` directory, foll
 
 See [./data/README.md](./data/README.md) for more details on each script that is run sequentially to generate the data.
 
+## Graph schema
+
+The following graph schema is used for the social network dataset.
+
+![](./assets/kuzudb-graph-schema.png)
+
+* `Person` node `FOLLOWS` another `Person` node
+* `Person` node `LIVES_IN` a `City` node
+* `Person` node `HAS_INTEREST` towards an `Interest` node
+* `City` node is `CITY_IN` a `State` node
+* `State` node is `STATE_IN` a `Country` node
+
 ## Ingest the data into Neo4j or Kùzu
 
 Navigate to the [neo4j](./neo4j) and the [kuzudb](./kuzudb/) directories to see the instructions on how to ingest the data into each database.
+
+The generated graph is a well-connected graph, and a sample of `Person`-`Person` connections as visualized in the Neo4j browser is shown below. Certain groups of persons form a clique, and some others are central hubs with many connections, and each person can have many interests, but only one primary residence city.
+
+![](./assets/person-person.png)
 
 ## Run the queries
 
@@ -72,8 +88,8 @@ The run times for both ingestion and queries are compared.
 
 * Macbook Pro M2, 16 GB RAM
 * All Neo4j queries are single-threaded as per their default configuration
-* Neo4j version: `5.10.0`
-* KùzuDB version: `0.7.0`
+* Neo4j version: `5.11.0`
+* KùzuDB version: `0.0.8`
 * The run times reported are for the 5th run, because we want to allow the cache to warm up before gauging query performance
 
 ### Ingestion performance
@@ -82,9 +98,9 @@ In total, ~100K nodes and ~2.5 million edges are ingested **~18x** faster in Kù
 
 Case | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-Nodes | 3.6144 | 0.0874 | 41.4
-Edges | 37.5801 | 2.1622 | 17.4
-Total | 41.1945 | 2.2496 | 18.3
+Nodes | 2.6353 | 0.0578 | 45.6
+Edges | 36.1358 | 2.0335 | 17.8
+Total | 38.7711 | 2.0913 | 18.5
 
 Nodes are ingested significantly faster in Kùzu (of the order of milliseconds), and Neo4j's node ingestion remains of the order of seconds despite setting constraints on the ID fields as per their best practices. The speedup factors shown are expected to be even higher as the dataset gets larger and larger, with Kùzu being around two orders of magnitude faster for inserting nodes.
 
@@ -98,14 +114,14 @@ The following table shows the average run times for each query, and the speedup 
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.6641 | 0.1936458 | 8.6
-2 | 0.5808 | 0.2199212 | 2.6
-3 | 0.0052 | 0.0078386 | 0.7
-4 | 0.0464 | 0.0090962 | 5.1
-5 | 0.0064 | 0.0046465 | 1.4
-6 | 0.0183 | 0.0289518 | 0.6
-7 | 0.1539 | 0.0075286 | 20.4
-8 | 0.7275 | 0.0966538 | 7.5
+1 | 1.7779 | 0.1936458 | 9.2
+2 | 0.6530 | 0.2199212 | 3.0
+3 | 0.0059 | 0.0078386 | 0.8
+4 | 0.0449 | 0.0090962 | 4.9
+5 | 0.0071 | 0.0046465 | 1.5
+6 | 0.0194 | 0.0289518 | 0.7
+7 | 0.1617 | 0.0075286 | 21.5
+8 | 0.9017 | 0.0966538 | 9.3
 
 #### Neo4j vs. Kùzu multi-threaded
 
@@ -113,15 +129,13 @@ Unlike Neo4j, KùzuDB supports multi-threaded execution of queries. The followin
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.6641 | 0.1254484 | 13.3
-2 | 0.5808 | 0.1240414 | 4.7
-3 | 0.0052 | 0.0071119 | 0.7
-4 | 0.0464 | 0.0079267 | 5.9
-5 | 0.0064 | 0.0048247 | 1.3
-6 | 0.0183 | 0.0129322 | 1.4
-7 | 0.1539 | 0.0068251  | 22.5
-8 | 0.7275 | 0.0272117 | 26.7
+1 | 1.7779 | 0.1254484 | 14.2
+2 | 0.6530 | 0.1240414 | 5.3
+3 | 0.0059 | 0.0071119 | 0.8
+4 | 0.0449 | 0.0079267 | 5.7
+5 | 0.0071 | 0.0048247 | 1.5
+6 | 0.0194 | 0.0129322 | 1.5
+7 | 0.1617 | 0.0068251 | 23.7
+8 | 0.9017 | 0.0272117 | 33.1
 
-> 🔥 The second-degree path finding query (8) shows the biggest speedup over Neo4j for the 100K node, 2.4M edge graph, and the average speedup over Neo4j across all queries when using Kùzu in multi-threaded mode is **~10x**. 
-
-It would be interesting to further study the cases where Kùzu's performance is on par with Neo4j. More to come soon!
+> 🔥 The second-degree path finding query (8) shows the biggest speedup over Neo4j for the 100K node, 2.4M edge graph, and the average speedup over Neo4j across all queries when using Kùzu in multi-threaded mode is **~12x**.
