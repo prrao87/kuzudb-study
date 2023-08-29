@@ -32,22 +32,25 @@ python build_graph.py --batch_size 50000
 
 ### Ingestion performance
 
-The numbers shown below are for when we ingest 100K person nodes, ~10K location nodes and ~2.4M edges into the graph.
+The numbers shown below are for when we ingest 100K person nodes, ~10K location nodes and ~2.
+4M edges into the graph. Note the following points:
 
-As expected, the nodes load much faster than the edges, since there are many more edges than nodes. In addition, the nodes in Neo4j are indexed (via uniqueness constraints), following which the edges are created based on a match on existing nodes. The run times for ingesting nodes and edges are output to the console.
+> 💡 The timing numbers shown below are on an M2 Macbook Pro with 16 GB of RAM.
 
-The person nodes and person-person follower edges are ingested in batches, as a best practice -- this is because the number of persons and followers can get very large, causing the number of edges to nonlinearly increase with the size of the dataset. The batch size for ingesting person nodes is 50k, and the batch size for ingesting edges is 100k.
+- **The goal is to perform the entire task in Python**, so we don't want to use other means like `apoc` ot `LOAD CSV` to ingest the data (which may be faster, but would require additional glue code, which defeats the purpose of this exercise)
+- The [async API](https://neo4j.com/docs/api/python-driver/current/async_api.html) of the Neo4j Python client is used, which is observed on this dataset to perform ~40% faster than the sync API
+- The person nodes and person-person follower edges are **ingested in batches**, which is a best practice when passing data to Neo4j via Python -- this is because the number of persons and followers can get very large, causing the number of edges to nonlinearly increase with the size of the dataset.
+- The batch size is set to 500K, which may seem large at first glance, but for the given data, the nodes and edges, even after `UNWIND`ing in Cypher, are small enough to fit in batch memory per transaction -- the memory requirements may be different on more complex datasets
 
+```sh
+# Set large batch size of 500k
+$ python build_graph.py -b 500000
+
+Nodes loaded in 2.6353s
+Edges loaded in 36.1358s
 ```
-Nodes loaded in 3.6144s
-Edges loaded in 37.5801s
-```
 
-We could potentially improve performance further by increasing the batch sizes for nodes and edges for persons and followers, but the general trend is that this size of data takes of the order of 1E1 seconds to ingest into Neo4j.
-
-
-> 💡 The timing shown is on an M2 Macbook Pro with 16 GB of RAM.
-
+As expected, the nodes load much faster than the edges, since there are many more edges than nodes. In addition, the nodes in Neo4j are indexed (via uniqueness constraints), following which the edges are created based on a match on existing nodes, allowing us to achieve this performance.
 
 ## Query graph
 
@@ -235,32 +238,32 @@ The benchmark is run using `pytest-benchmark` package as follows.
 
 ```sh
 $ pytest benchmark_query.py --benchmark-min-rounds=5 --benchmark-warmup-iterations=5 --benchmark-disable-gc --benchmark-sort=fullname
-==================================================================================== test session starts =====================================================================================
+===================================== test session starts ======================================
 platform darwin -- Python 3.11.2, pytest-7.4.0, pluggy-1.2.0
 benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=True min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=5)
 rootdir: /code/kuzudb-study/neo4j
 plugins: Faker-19.2.0, anyio-3.7.1, benchmark-4.0.0
-collected 8 items
+collected 8 items                                                                              
 
-benchmark_query.py ........                                                                                                                                                            [100%]
+benchmark_query.py ........                                                              [100%]
 
 
 --------------------------------------------------------------------------------- benchmark: 8 tests ---------------------------------------------------------------------------------
 Name (time in s)             Min               Max              Mean            StdDev            Median               IQR            Outliers       OPS            Rounds  Iterations
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_query1     1.6268 (389.74)   1.7258 (221.08)   1.6641 (322.43)   0.0378 (117.01)   1.6501 (344.53)   0.0416 (97.74)         1;0    0.6009 (0.00)          5           1
-test_benchmark_query2     0.5706 (136.71)   0.5875 (75.27)    0.5808 (112.54)   0.0074 (22.88)    0.5844 (122.01)   0.0122 (28.67)         1;0    1.7217 (0.01)          5           1
-test_benchmark_query3     0.0042 (1.0)      0.0131 (1.67)     0.0052 (1.0)      0.0015 (4.54)     0.0048 (1.0)      0.0006 (1.40)          6;8  193.7594 (1.0)         106           1
-test_benchmark_query4     0.0395 (9.46)     0.0562 (7.20)     0.0464 (8.99)     0.0056 (17.23)    0.0436 (9.11)     0.0108 (25.24)         9;0   21.5463 (0.11)         21           1
-test_benchmark_query5     0.0058 (1.39)     0.0078 (1.0)      0.0064 (1.24)     0.0003 (1.0)      0.0063 (1.31)     0.0004 (1.0)          25;2  156.8681 (0.81)         97           1
-test_benchmark_query6     0.0155 (3.71)     0.0221 (2.83)     0.0183 (3.55)     0.0015 (4.77)     0.0181 (3.79)     0.0021 (4.89)         11;0   54.6242 (0.28)         46           1
-test_benchmark_query7     0.1512 (36.23)    0.1578 (20.21)    0.1539 (29.83)    0.0022 (6.86)     0.1532 (31.98)    0.0027 (6.37)          2;0    6.4960 (0.03)          7           1
-test_benchmark_query8     0.7210 (172.74)   0.7335 (93.97)    0.7275 (140.95)   0.0046 (14.31)    0.7283 (152.06)   0.0058 (13.65)         2;0    1.3746 (0.01)          5           1
+test_benchmark_query1     1.7486 (402.70)   1.8414 (168.69)   1.7779 (302.77)   0.0375 (66.32)    1.7607 (332.52)   0.0410 (84.09)         1;0    0.5625 (0.00)          5           1
+test_benchmark_query2     0.6279 (144.61)   0.7291 (66.79)    0.6530 (111.21)   0.0429 (75.90)    0.6366 (120.22)   0.0351 (71.89)         1;1    1.5313 (0.01)          5           1
+test_benchmark_query3     0.0043 (1.0)      0.0395 (3.61)     0.0059 (1.0)      0.0038 (6.76)     0.0053 (1.0)      0.0005 (1.06)          2;6  170.2970 (1.0)          91           1
+test_benchmark_query4     0.0422 (9.73)     0.0536 (4.91)     0.0449 (7.65)     0.0029 (5.06)     0.0443 (8.37)     0.0029 (5.97)          3;1   22.2579 (0.13)         21           1
+test_benchmark_query5     0.0065 (1.50)     0.0109 (1.0)      0.0071 (1.21)     0.0006 (1.0)      0.0069 (1.31)     0.0005 (1.0)           9;2  140.2305 (0.82)         84           1
+test_benchmark_query6     0.0171 (3.93)     0.0248 (2.28)     0.0194 (3.30)     0.0017 (3.01)     0.0189 (3.57)     0.0017 (3.52)         10;2   51.6444 (0.30)         42           1
+test_benchmark_query7     0.1590 (36.63)    0.1651 (15.12)    0.1617 (27.54)    0.0019 (3.41)     0.1618 (30.55)    0.0021 (4.35)          2;0    6.1828 (0.04)          7           1
+test_benchmark_query8     0.8814 (202.98)   0.9502 (87.05)    0.9017 (153.55)   0.0279 (49.43)    0.8896 (168.02)   0.0264 (54.21)         1;0    1.1091 (0.01)          5           1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-===================================================================================== 8 passed in 26.73s =====================================================================================
+====================================== 8 passed in 29.32s ======================================
 
 ```
