@@ -70,7 +70,7 @@ The following questions are asked of both graphs:
 
 * **Query 1**: Who are the top 3 most-followed persons?
 * **Query 2**: In which city does the most-followed person live?
-* **Query 3**: What are the top 5 cities with the lowest average age of persons?
+* **Query 3**: Which 5 cities in a particular country have the lowest average age in the network?
 * **Query 4**: How many persons between ages 30-40 are there in each country?
 * **Query 5**: How many men in London, United Kingdom have an interest in fine dining?
 * **Query 6**: Which city has the maximum number of women that like Tennis?
