@@ -40,9 +40,10 @@ def run_query2(conn: Connection) -> None:
 
 
 def run_query3(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "Which are the top 5 cities in a particular region of the world with the lowest average age in the network?"
+    "Which 5 cities in a particular country have the lowest average age in the network?"
     query = """
-        MATCH (p:Person) -[:LivesIn]-> (c:City)-[*1..2]-> (co:Country {country: $country})
+        MATCH (p:Person) -[:LivesIn]-> (c:City)-[:CityIn]-> (:State) -[:StateIn]-> (co:Country)
+        WHERE co.country = $country
         RETURN c.city AS city, avg(p.age) AS averageAge
         ORDER BY averageAge LIMIT 5;
     """
@@ -69,7 +70,7 @@ def run_query4(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query5(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "How many persons between a certain age range are in each country?"
+    "How many men in a particular city have an interest in the same thing?"
     query = """
         MATCH (p:Person)-[:HasInterest]->(i:Interest)
         WHERE lower(i.interest) = lower($interest)
@@ -89,7 +90,7 @@ def run_query5(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query6(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "How many persons between a certain age range are in each country?"
+    "Which city has the maximum number of people of a particular gender that share a particular interest"
     query = """
         MATCH (p:Person)-[:HasInterest]->(i:Interest)
         WHERE lower(i.interest) = lower($interest)
@@ -109,7 +110,7 @@ def run_query6(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query7(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "How many persons between a certain age range are in each country?"
+    "Which U.S. state has the maximum number of persons between a specified age who enjoy a particular interest?"
     query = """
         MATCH (p:Person)-[:LivesIn]->(:City)-[:CityIn]->(s:State)
         WHERE p.age >= $age_lower AND p.age <= $age_upper AND s.country = $country
@@ -131,6 +132,7 @@ def run_query7(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query8(conn: Connection) -> None:
+    "How many second-degree connections of persons are reachable in the graph?"
     query = """
         MATCH (p1:Person)-[f:Follows]->(p2:Person)
         WHERE p1.id > p2.id
@@ -145,7 +147,7 @@ def run_query8(conn: Connection) -> None:
 
 def main(conn: Connection) -> None:
     with Timer(name="queries", text="Queries completed in {:.4f}s"):
-        _ = run_query1(conn)
+        # _ = run_query1(conn)
         _ = run_query2(conn)
         _ = run_query3(conn, params=[("country", "Canada")])
         _ = run_query4(conn, params=[("age_lower", 30), ("age_upper", 40)])
@@ -176,6 +178,6 @@ if __name__ == "__main__":
     db = kuzu.Database(f"./{DB_NAME}")
     CONNECTION = kuzu.Connection(db)
     # For a fairer comparison with Neo4j, where “Transactions are single-threaded, confined, and independent.”
-    CONNECTION.set_max_threads_for_exec(1)
+    # CONNECTION.set_max_threads_for_exec(1)
 
     main(CONNECTION)

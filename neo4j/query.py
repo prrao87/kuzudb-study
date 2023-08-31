@@ -16,6 +16,7 @@ NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD")
 
 
 def run_query1(session: Session) -> None:
+    "Who are the top 3 most-followed persons in the network?"
     query = """
         MATCH (follower:Person)-[:FOLLOWS]->(person:Person)
         RETURN person.personID AS personID, person.name AS name, count(follower) AS numFollowers
@@ -30,6 +31,7 @@ def run_query1(session: Session) -> None:
 
 
 def run_query2(session: Session) -> None:
+    "In which city does the most-followed person in the network live?"
     query = """
         MATCH (follower:Person) -[:FOLLOWS]-> (person:Person)
         WITH person, count(follower) as followers
@@ -45,6 +47,7 @@ def run_query2(session: Session) -> None:
 
 
 def run_query3(session: Session, country: str) -> None:
+    "Which 5 cities in a particular country have the lowest average age in the network?"
     query = """
         MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*1..2]-> (co:Country {country: $country})
         RETURN c.city AS city, avg(p.age) AS averageAge
@@ -58,6 +61,7 @@ def run_query3(session: Session, country: str) -> None:
 
 
 def run_query4(session: Session, age_lower: int, age_upper: int) -> None:
+    "How many persons between a certain age range are in each country?"
     query = """
         MATCH (p:Person)-[:LIVES_IN]->(ci:City)-[*1..2]->(country:Country)
         WHERE p.age >= $age_lower AND p.age <= $age_upper
@@ -72,6 +76,7 @@ def run_query4(session: Session, age_lower: int, age_upper: int) -> None:
 
 
 def run_query5(session: Session, gender: str, city: str, country: str, interest: str) -> None:
+    "How many men in a particular city have an interest in the same thing?"
     query = """
         MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
         WHERE tolower(i.interest) = tolower($interest)
@@ -91,6 +96,7 @@ def run_query5(session: Session, gender: str, city: str, country: str, interest:
 
 
 def run_query6(session: Session, gender: str, interest: str) -> None:
+    "Which city has the maximum number of people of a particular gender that share a particular interest"
     query = """
         MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
         WHERE tolower(i.interest) = tolower($interest)
@@ -110,6 +116,7 @@ def run_query6(session: Session, gender: str, interest: str) -> None:
 def run_query7(
     session: Session, country: str, age_lower: int, age_upper: int, interest: str
 ) -> None:
+    "Which U.S. state has the maximum number of persons between a specified age who enjoy a particular interest?"
     query = """
         MATCH (p:Person)-[:LIVES_IN]->(:City)-[:CITY_IN]->(s:State)
         WHERE p.age >= $age_lower AND p.age <= $age_upper AND s.country = $country
@@ -133,6 +140,7 @@ def run_query7(
 
 
 def run_query8(session: Session) -> None:
+    "How many second-degree connections of persons are reachable in the graph?"
     query = """
         MATCH (p1:Person)-[f:FOLLOWS]->(p2:Person)
         WHERE p1.personID > p2.personID
