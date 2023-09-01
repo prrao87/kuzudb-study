@@ -49,15 +49,15 @@ def test_benchmark_query2(benchmark, session):
 
 
 def test_benchmark_query3(benchmark, session):
-    result = benchmark(query.run_query3, session, "Canada")
+    result = benchmark(query.run_query3, session, "United States")
     result = result.to_dicts()
 
     assert len(result) == 5
-    assert result[0]["city"] == "Montreal"
-    assert result[1]["city"] == "Calgary"
-    assert result[2]["city"] == "Toronto"
-    assert result[3]["city"] == "Edmonton"
-    assert result[4]["city"] == "Vancouver"
+    assert result[0]["city"] == "Louisville"
+    assert result[1]["city"] == "Denver"
+    assert result[2]["city"] == "San Francisco"
+    assert result[3]["city"] == "Tampa"
+    assert result[4]["city"] == "Nashville"
 
 
 def test_benchmark_query4(benchmark, session):

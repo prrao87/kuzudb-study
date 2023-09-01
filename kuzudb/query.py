@@ -42,7 +42,7 @@ def run_query2(conn: Connection) -> None:
 def run_query3(conn: Connection, params: list[tuple[str, Any]]) -> None:
     "Which 5 cities in a particular country have the lowest average age in the network?"
     query = """
-        MATCH (p:Person) -[:LivesIn]-> (c:City)-[:CityIn]-> (:State) -[:StateIn]-> (co:Country)
+        MATCH (p:Person) -[:LivesIn]-> (c:City) -[*1..2]-> (co:Country)
         WHERE co.country = $country
         RETURN c.city AS city, avg(p.age) AS averageAge
         ORDER BY averageAge LIMIT 5;
@@ -146,7 +146,7 @@ def run_query8(conn: Connection) -> None:
 
 
 def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "Which 'influencers' (people with > 3K followers) below a certain age in the network follow the most people?"
+    "Which 'influencers' (people with > 3K followers) below a certain age follow the most people?"
     query = """
         MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(:Person)
         WITH count(r1) AS numFollowers, influencer, id(r2) as r2ID
@@ -167,7 +167,7 @@ def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "How many people in the network are followed by 'influencers' (people with > 3K followers) within a certain age range in the network?"
+    "How many people are followed by 'influencers' (people with > 3K followers) within a certain age range?"
     # TODO: Change the query to avoid having to use id(r1) when the projection pushdown analyzer in Kùzu is implemented, see PR #23 for details
     query = """
         MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(person:Person)
@@ -181,7 +181,7 @@ def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
     print(
         f"""
-        Persons within age range {params[0][1]}-{params[1][1]} who can be considered 'influencers' in the network:\n{result}
+        Number of people followed by influencers in the age range {params[0][1]}-{params[1][1]}:\n{result}
         """
     )
     return result
@@ -191,7 +191,7 @@ def main(conn: Connection) -> None:
     with Timer(name="queries", text="Queries completed in {:.4f}s"):
         _ = run_query1(conn)
         _ = run_query2(conn)
-        _ = run_query3(conn, params=[("country", "Canada")])
+        _ = run_query3(conn, params=[("country", "United States")])
         _ = run_query4(conn, params=[("age_lower", 30), ("age_upper", 40)])
         _ = run_query5(
             conn,
