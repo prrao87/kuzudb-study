@@ -289,23 +289,24 @@ shape: (1, 5)
 
 Query 3:
  
-        MATCH (p:Person) -[:LivesIn]-> (c:City)-[*1..2]-> (co:Country {country: $country})
+        MATCH (p:Person) -[:LivesIn]-> (c:City) -[*1..2]-> (co:Country)
+        WHERE co.country = $country
         RETURN c.city AS city, avg(p.age) AS averageAge
         ORDER BY averageAge LIMIT 5;
     
-Cities with lowest average age in Canada:
+Cities with lowest average age in United States:
 shape: (5, 2)
-┌───────────┬────────────┐
-│ city      ┆ averageAge │
-│ ---       ┆ ---        │
-│ str       ┆ f64        │
-╞═══════════╪════════════╡
-│ Montreal  ┆ 37.328018  │
-│ Calgary   ┆ 37.607205  │
-│ Toronto   ┆ 37.720255  │
-│ Edmonton  ┆ 37.943678  │
-│ Vancouver ┆ 38.023227  │
-└───────────┴────────────┘
+┌───────────────┬────────────┐
+│ city          ┆ averageAge │
+│ ---           ┆ ---        │
+│ str           ┆ f64        │
+╞═══════════════╪════════════╡
+│ Louisville    ┆ 37.099473  │
+│ Denver        ┆ 37.202703  │
+│ San Francisco ┆ 37.26213   │
+│ Tampa         ┆ 37.327765  │
+│ Nashville     ┆ 37.343006  │
+└───────────────┴────────────┘
 
 Query 4:
  
@@ -407,7 +408,51 @@ shape: (1, 1)
 ╞══════════════╡
 │ 1214477      │
 └──────────────┘
-Queries completed in 1.2756s
+
+Query 9:
+ 
+        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(:Person)
+        WITH count(r1) AS numFollowers, influencer, id(r2) as r2ID
+        WHERE influencer.age <= $age_upper AND numFollowers > 3000
+        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2ID) AS numFollows
+        ORDER BY numFollows DESC LIMIT 5;
+    
+
+        Influencers below age 30 who follow the most people:
+shape: (5, 3)
+┌──────────────┬─────────────────┬────────────┐
+│ influencerId ┆ name            ┆ numFollows │
+│ ---          ┆ ---             ┆ ---        │
+│ i64          ┆ str             ┆ i64        │
+╞══════════════╪═════════════════╪════════════╡
+│ 89758        ┆ Joshua Williams ┆ 40         │
+│ 1348         ┆ Brett Wright    ┆ 32         │
+│ 8077         ┆ Ralph Floyd     ┆ 32         │
+│ 85914        ┆ Micheal Holt    ┆ 32         │
+│ 2386         ┆ Robert Graham   ┆ 31         │
+└──────────────┴─────────────────┴────────────┘
+        
+
+Query 10:
+ 
+        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(person:Person)
+        WITH count(id(r1)) AS numFollowers1, person, influencer, id(r2) as r2ID
+        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
+        RETURN count(r2ID) AS numFollowers2
+        ORDER BY numFollowers2 DESC LIMIT 5;
+    
+
+        Number of people followed by influencers in the age range 18-25:
+shape: (1, 1)
+┌───────────────┐
+│ numFollowers2 │
+│ ---           │
+│ i64           │
+╞═══════════════╡
+│ 690           │
+└───────────────┘
+        
+Queries completed in 2.7552s
 ```
 
 #### Query performance benchmark (Kùzu single-threaded)
@@ -416,69 +461,69 @@ The benchmark is run using `pytest-benchmark` package as follows.
 
 ```sh
 $ pytest benchmark_query.py --benchmark-min-rounds=5 --benchmark-warmup-iterations=5 --benchmark-disable-gc --benchmark-sort=fullname
-====================================== test session starts =======================================
+========================================= test session starts ==========================================
 platform darwin -- Python 3.11.2, pytest-7.4.0, pluggy-1.2.0
 benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=True min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=5)
 rootdir: /code/kuzudb-study/kuzudb
 plugins: Faker-19.2.0, anyio-3.7.1, benchmark-4.0.0
-collected 10 items                                                                               
+collected 10 items                                                                                     
 
-benchmark_query.py ..........                                                              [100%]
+benchmark_query.py ..........                                                                    [100%]
 
 
 -------------------------------------------------------------------------------------- benchmark: 10 tests --------------------------------------------------------------------------------------
 Name (time in ms)               Min                 Max                Mean             StdDev              Median                IQR            Outliers       OPS            Rounds  Iterations
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_query1      204.5318 (47.91)    264.5275 (37.83)    227.5650 (47.82)    24.9057 (78.87)    220.8040 (47.48)    39.0229 (167.82)        1;0    4.3943 (0.02)          5           1
-test_benchmark_query10     781.3306 (183.02)   801.5248 (114.61)   789.4154 (165.87)    8.1112 (25.69)    789.5400 (169.76)   11.9668 (51.47)         1;0    1.2668 (0.01)          5           1
-test_benchmark_query2      237.0291 (55.52)    253.8298 (36.30)    243.3142 (51.13)     6.3798 (20.20)    241.2695 (51.88)     6.8318 (29.38)         1;0    4.1099 (0.02)          5           1
-test_benchmark_query3        8.5850 (2.01)      10.6163 (1.52)       9.7056 (2.04)      0.3943 (1.25)       9.7931 (2.11)      0.4372 (1.88)         25;4  103.0336 (0.49)         76           1
-test_benchmark_query4        8.6458 (2.03)      10.8680 (1.55)       9.2325 (1.94)      0.5057 (1.60)       9.0836 (1.95)      0.6175 (2.66)         22;1  108.3130 (0.52)         74           1
-test_benchmark_query5        4.2691 (1.0)        6.9932 (1.0)        4.7592 (1.0)       0.4073 (1.29)       4.6508 (1.0)       0.6067 (2.61)         11;1  210.1198 (1.0)          81           1
-test_benchmark_query6       27.7651 (6.50)      31.7360 (4.54)      29.8077 (6.26)      0.9314 (2.95)      29.8461 (6.42)      1.0849 (4.67)          8;0   33.5484 (0.16)         33           1
-test_benchmark_query7        6.9663 (1.63)       8.5708 (1.23)       7.7759 (1.63)      0.3158 (1.0)        7.7834 (1.67)      0.2325 (1.0)         18;14  128.6021 (0.61)         85           1
-test_benchmark_query8      100.7867 (23.61)    110.9126 (15.86)    103.9609 (21.84)     2.9900 (9.47)     103.4902 (22.25)     1.8488 (7.95)          3;2    9.6190 (0.05)         10           1
-test_benchmark_query9      853.4369 (199.91)   867.1944 (124.00)   859.6641 (180.63)    6.7229 (21.29)    856.5395 (184.17)   12.5563 (54.00)         2;0    1.1632 (0.01)          5           1
+test_benchmark_query1      187.6215 (42.79)    215.1583 (40.93)    201.2965 (41.81)    10.8608 (34.30)    200.3082 (41.39)    17.0231 (62.64)         2;0    4.9678 (0.02)          5           1
+test_benchmark_query10     769.6619 (175.53)   801.6863 (152.51)   781.0308 (162.21)   13.8731 (43.81)    773.9472 (159.92)   21.4789 (79.04)         1;0    1.2804 (0.01)          5           1
+test_benchmark_query2      224.0829 (51.10)    263.8683 (50.20)    249.3954 (51.79)    16.1696 (51.07)    256.7539 (53.05)    22.2899 (82.02)         1;0    4.0097 (0.02)          5           1
+test_benchmark_query3       10.1482 (2.31)      12.0562 (2.29)      10.9885 (2.28)      0.3852 (1.22)      11.0705 (2.29)      0.2835 (1.04)         11;9   91.0040 (0.44)         44           1
+test_benchmark_query4        8.7894 (2.00)      19.4709 (3.70)      10.3636 (2.15)      1.8377 (5.80)       9.7671 (2.02)      1.1838 (4.36)          5;5   96.4919 (0.46)         69           1
+test_benchmark_query5        4.3848 (1.0)        5.2565 (1.0)        4.8151 (1.0)       0.3166 (1.0)        4.8396 (1.0)       0.6334 (2.33)         15;0  207.6812 (1.0)          32           1
+test_benchmark_query6       28.5645 (6.51)      31.3298 (5.96)      29.8180 (6.19)      0.6957 (2.20)      29.9759 (6.19)      1.1007 (4.05)         11;0   33.5368 (0.16)         32           1
+test_benchmark_query7        7.0635 (1.61)       8.9225 (1.70)       7.8995 (1.64)      0.3691 (1.17)       7.8556 (1.62)      0.2718 (1.0)         18;15  126.5904 (0.61)         71           1
+test_benchmark_query8       99.0060 (22.58)    123.4725 (23.49)    108.2653 (22.48)     7.8141 (24.68)    107.2657 (22.16)    12.5305 (46.11)         3;0    9.2366 (0.04)         10           1
+test_benchmark_query9      854.6426 (194.91)   932.6182 (177.42)   889.0417 (184.64)   33.3944 (105.46)   874.2172 (180.64)   55.3503 (203.68)        2;0    1.1248 (0.01)          5           1
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-====================================== 10 passed in 20.95s =======================================
+========================================= 10 passed in 20.84s ==========================================
 ```
 
 #### Query performance (Kùzu multi-threaded)
 
 ```sh
 $ pytest benchmark_query.py --benchmark-min-rounds=5 --benchmark-warmup-iterations=5 --benchmark-disable-gc --benchmark-sort=fullname
-====================================== test session starts =======================================
+========================================= test session starts ==========================================
 platform darwin -- Python 3.11.2, pytest-7.4.0, pluggy-1.2.0
 benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=True min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=5)
 rootdir: /code/kuzudb-study/kuzudb
 plugins: Faker-19.2.0, anyio-3.7.1, benchmark-4.0.0
-collected 10 items                                                                               
+collected 10 items                                                                                     
 
-benchmark_query.py ..........                                                              [100%]
+benchmark_query.py ..........                                                                    [100%]
 
 
 -------------------------------------------------------------------------------------- benchmark: 10 tests --------------------------------------------------------------------------------------
 Name (time in ms)               Min                 Max                Mean             StdDev              Median                IQR            Outliers       OPS            Rounds  Iterations
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_query1      112.0785 (27.29)    217.2179 (36.61)    136.1030 (27.11)    45.5192 (136.94)   115.3392 (23.11)    33.0138 (106.23)        1;1    7.3474 (0.04)          5           1
-test_benchmark_query10     531.5120 (129.40)   557.1382 (93.90)    546.0965 (108.79)   10.4145 (31.33)    547.9619 (109.79)   16.7082 (53.76)         2;0    1.8312 (0.01)          5           1
-test_benchmark_query2      120.3370 (29.30)    132.8606 (22.39)    125.9788 (25.10)     4.2911 (12.91)    125.2396 (25.09)     5.7256 (18.42)         3;0    7.9378 (0.04)          7           1
-test_benchmark_query3        6.4401 (1.57)       8.0799 (1.36)       7.2587 (1.45)      0.3847 (1.16)       7.2864 (1.46)      0.5087 (1.64)         30;0  137.7665 (0.69)         78           1
-test_benchmark_query4        7.0398 (1.71)       9.8535 (1.66)       8.0971 (1.61)      0.4228 (1.27)       8.0239 (1.61)      0.5342 (1.72)         23;1  123.5016 (0.62)         87           1
-test_benchmark_query5        4.1076 (1.0)        5.9335 (1.0)        5.0197 (1.0)       0.3324 (1.0)        4.9908 (1.0)       0.3108 (1.0)          17;9  199.2147 (1.0)          79           1
-test_benchmark_query6       11.4065 (2.78)      13.9336 (2.35)      12.4106 (2.47)      0.5122 (1.54)      12.3276 (2.47)      0.5818 (1.87)         20;2   80.5766 (0.40)         72           1
-test_benchmark_query7        5.9218 (1.44)       9.0174 (1.52)       6.6288 (1.32)      0.4273 (1.29)       6.5931 (1.32)      0.4345 (1.40)         30;1  150.8580 (0.76)        104           1
-test_benchmark_query8       22.5029 (5.48)      27.1075 (4.57)      23.6917 (4.72)      0.9087 (2.73)      23.4097 (4.69)      0.9917 (3.19)         10;1   42.2088 (0.21)         41           1
-test_benchmark_query9      565.3163 (137.63)   578.1635 (97.44)    569.8440 (113.52)    5.5017 (16.55)    567.1719 (113.64)    8.3636 (26.91)         1;0    1.7549 (0.01)          5           1
+test_benchmark_query1      113.0014 (28.40)    245.0873 (44.68)    145.0578 (30.04)    56.2668 (185.80)   123.1903 (25.58)    43.0426 (136.11)        1;1    6.8938 (0.03)          5           1
+test_benchmark_query10     540.2672 (135.81)   627.5628 (114.40)   563.2572 (116.63)   36.4845 (120.48)   550.6263 (114.33)   31.8747 (100.80)        1;1    1.7754 (0.01)          5           1
+test_benchmark_query2      123.9972 (31.17)    132.6335 (24.18)    128.1020 (26.53)     2.8402 (9.38)     127.9745 (26.57)     3.6837 (11.65)         2;0    7.8063 (0.04)          7           1
+test_benchmark_query3        7.3900 (1.86)       9.4403 (1.72)       8.1829 (1.69)      0.4120 (1.36)       8.0602 (1.67)      0.4682 (1.48)         19;1  122.2061 (0.59)         63           1
+test_benchmark_query4        7.1140 (1.79)       9.1029 (1.66)       7.9130 (1.64)      0.3950 (1.30)       7.7692 (1.61)      0.6243 (1.97)         24;0  126.3748 (0.61)         82           1
+test_benchmark_query5        3.9783 (1.0)        5.4857 (1.0)        4.8294 (1.0)       0.3028 (1.0)        4.8161 (1.0)       0.3434 (1.09)         16;2  207.0671 (1.0)          64           1
+test_benchmark_query6       11.2117 (2.82)      13.8597 (2.53)      12.5634 (2.60)      0.5755 (1.90)      12.4724 (2.59)      0.8934 (2.83)         19;0   79.5963 (0.38)         66           1
+test_benchmark_query7        5.8453 (1.47)       7.3942 (1.35)       6.5953 (1.37)      0.3223 (1.06)       6.5524 (1.36)      0.3162 (1.0)          27;6  151.6239 (0.73)         84           1
+test_benchmark_query8       22.7547 (5.72)      30.6260 (5.58)      25.0031 (5.18)      1.7501 (5.78)      24.6404 (5.12)      2.7679 (8.75)         11;1   39.9951 (0.19)         38           1
+test_benchmark_query9      586.4883 (147.42)   605.2226 (110.33)   591.1415 (122.41)    7.9578 (26.28)    587.3650 (121.96)    6.5644 (20.76)         1;1    1.6916 (0.01)          5           1
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-====================================== 10 passed in 15.52s =======================================
+========================================= 10 passed in 15.53s ==========================================
 ```
 

@@ -74,11 +74,11 @@ The following questions are asked of the graph:
 
 ```
 Query 1:
- 
+
         MATCH (follower:Person)-[:FOLLOWS]->(person:Person)
         RETURN person.personID AS personID, person.name AS name, count(follower) AS numFollowers
         ORDER BY numFollowers DESC LIMIT 3
-    
+
 Top 3 most-followed persons:
 shape: (3, 3)
 ┌──────────┬────────────────┬──────────────┐
@@ -92,13 +92,13 @@ shape: (3, 3)
 └──────────┴────────────────┴──────────────┘
 
 Query 2:
- 
+
         MATCH (follower:Person) -[:FOLLOWS]-> (person:Person)
         WITH person, count(follower) as followers
         ORDER BY followers DESC LIMIT 1
         MATCH (person) -[:LIVES_IN]-> (city:City)
         RETURN person.name AS name, followers AS numFollowers, city.city AS city, city.state AS state, city.country AS country
-    
+
 City in which most-followed person lives:
 shape: (1, 5)
 ┌───────────────┬──────────────┬────────┬───────┬───────────────┐
@@ -110,32 +110,33 @@ shape: (1, 5)
 └───────────────┴──────────────┴────────┴───────┴───────────────┘
 
 Query 3:
- 
-        MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*1..2]-> (co:Country {country: $country})
+
+        MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*1..2]-> (co:Country)
+        WHERE co.country = $country
         RETURN c.city AS city, avg(p.age) AS averageAge
         ORDER BY averageAge LIMIT 5
-    
-Cities with lowest average age in Canada:
+
+Cities with lowest average age in United States:
 shape: (5, 2)
-┌───────────┬────────────┐
-│ city      ┆ averageAge │
-│ ---       ┆ ---        │
-│ str       ┆ f64        │
-╞═══════════╪════════════╡
-│ Montreal  ┆ 37.328018  │
-│ Calgary   ┆ 37.607205  │
-│ Toronto   ┆ 37.720255  │
-│ Edmonton  ┆ 37.943678  │
-│ Vancouver ┆ 38.023227  │
-└───────────┴────────────┘
+┌───────────────┬────────────┐
+│ city          ┆ averageAge │
+│ ---           ┆ ---        │
+│ str           ┆ f64        │
+╞═══════════════╪════════════╡
+│ Louisville    ┆ 37.099473  │
+│ Denver        ┆ 37.202703  │
+│ San Francisco ┆ 37.26213   │
+│ Tampa         ┆ 37.327765  │
+│ Nashville     ┆ 37.343006  │
+└───────────────┴────────────┘
 
 Query 4:
- 
+
         MATCH (p:Person)-[:LIVES_IN]->(ci:City)-[*1..2]->(country:Country)
         WHERE p.age >= $age_lower AND p.age <= $age_upper
         RETURN country.country AS countries, count(country) AS personCounts
         ORDER BY personCounts DESC LIMIT 3
-    
+
 Persons between ages 30-40 in each country:
 shape: (3, 2)
 ┌────────────────┬──────────────┐
@@ -149,7 +150,7 @@ shape: (3, 2)
 └────────────────┴──────────────┘
 
 Query 5:
- 
+
         MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
         WHERE tolower(i.interest) = tolower($interest)
         AND tolower(p.gender) = tolower($gender)
@@ -157,7 +158,7 @@ Query 5:
         MATCH (p)-[:LIVES_IN]->(c:City)
         WHERE c.city = $city AND c.country = $country
         RETURN count(p) AS numPersons
-    
+
 Number of male users in London, United Kingdom who have an interest in fine dining:
 shape: (1, 1)
 ┌────────────┐
@@ -169,7 +170,7 @@ shape: (1, 1)
 └────────────┘
 
 Query 6:
- 
+
         MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
         WHERE tolower(i.interest) = tolower($interest)
         AND tolower(p.gender) = tolower($gender)
@@ -177,7 +178,7 @@ Query 6:
         MATCH (p)-[:LIVES_IN]->(c:City)
         RETURN count(p) AS numPersons, c.city AS city, c.country AS country
         ORDER BY numPersons DESC LIMIT 5
-    
+
 Cities with the most female users who have an interest in tennis:
 shape: (5, 3)
 ┌────────────┬────────────┬────────────────┐
@@ -193,7 +194,7 @@ shape: (5, 3)
 └────────────┴────────────┴────────────────┘
 
 Query 7:
- 
+
         MATCH (p:Person)-[:LIVES_IN]->(:City)-[:CITY_IN]->(s:State)
         WHERE p.age >= $age_lower AND p.age <= $age_upper AND s.country = $country
         WITH p, s
@@ -201,7 +202,7 @@ Query 7:
         WHERE tolower(i.interest) = tolower($interest)
         RETURN count(p) AS numPersons, s.state AS state, s.country AS country
         ORDER BY numPersons DESC LIMIT 1
-    
+
 
         State in United States with the most users between ages 23-30 who have an interest in photography:
 shape: (1, 3)
@@ -212,14 +213,14 @@ shape: (1, 3)
 ╞════════════╪════════════╪═══════════════╡
 │ 170        ┆ California ┆ United States │
 └────────────┴────────────┴───────────────┘
-        
+
 
 Query 8:
- 
+
         MATCH (p1:Person)-[f:FOLLOWS]->(p2:Person)
         WHERE p1.personID > p2.personID
         RETURN count(f) as numFollowers
-    
+
 Number of second degree connections reachable in the graph:
 shape: (1, 1)
 ┌──────────────┐
@@ -229,7 +230,51 @@ shape: (1, 1)
 ╞══════════════╡
 │ 1214477      │
 └──────────────┘
-Neo4j query script completed in 3.344930s
+
+Query 9:
+
+        MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(:Person)
+        WITH count(r1) AS numFollowers, influencer, r2
+        WHERE influencer.age <= $age_upper AND numFollowers > 3000
+        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2) AS numFollows
+        ORDER BY numFollows DESC LIMIT 5;
+
+
+        Influencers below age 30 who follow the most people:
+shape: (5, 3)
+┌──────────────┬─────────────────┬────────────┐
+│ influencerId ┆ name            ┆ numFollows │
+│ ---          ┆ ---             ┆ ---        │
+│ i64          ┆ str             ┆ i64        │
+╞══════════════╪═════════════════╪════════════╡
+│ 89758        ┆ Joshua Williams ┆ 40         │
+│ 85914        ┆ Micheal Holt    ┆ 32         │
+│ 8077         ┆ Ralph Floyd     ┆ 32         │
+│ 1348         ┆ Brett Wright    ┆ 32         │
+│ 70809        ┆ David Cooper    ┆ 31         │
+└──────────────┴─────────────────┴────────────┘
+
+
+Query 10:
+
+        MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(person:Person)
+        WITH count(r1) AS numFollowers1, person, influencer, r2
+        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
+        RETURN count(r2) AS numFollowers2
+        ORDER BY numFollowers2 DESC LIMIT 5;
+
+
+        Number of people followed by influencers in the age range 18-25:
+shape: (1, 1)
+┌───────────────┐
+│ numFollowers2 │
+│ ---           │
+│ i64           │
+╞═══════════════╡
+│ 690           │
+└───────────────┘
+
+Neo4j query script completed in 20.313278s
 ```
 
 ### Query performance benchmark
@@ -238,34 +283,34 @@ The benchmark is run using `pytest-benchmark` package as follows.
 
 ```sh
 $ pytest benchmark_query.py --benchmark-min-rounds=5 --benchmark-warmup-iterations=5 --benchmark-disable-gc --benchmark-sort=fullname
-====================================================================================== test session starts ======================================================================================
+================================================= test session starts ==================================================
 platform darwin -- Python 3.11.2, pytest-7.4.0, pluggy-1.2.0
 benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=True min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=5)
 rootdir: /code/kuzudb-study/neo4j
 plugins: Faker-19.2.0, anyio-3.7.1, benchmark-4.0.0
 collected 10 items
 
-benchmark_query.py ..........                                                                                                                                               [100%]
+benchmark_query.py ..........                                                                                    [100%]
 
 
 --------------------------------------------------------------------------------- benchmark: 10 tests ---------------------------------------------------------------------------------
 Name (time in s)              Min               Max              Mean            StdDev            Median               IQR            Outliers       OPS            Rounds  Iterations
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_query1      1.7573 (380.15)   1.9808 (222.81)   1.8677 (331.94)   0.0888 (111.73)   1.8518 (342.74)   0.1397 (203.88)        2;0    0.5354 (0.00)          5           1
-test_benchmark_query10     8.9709 (>1000.0)  9.1463 (>1000.0)  9.0518 (>1000.0)  0.0727 (91.49)    9.0622 (>1000.0)  0.1210 (176.57)        2;0    0.1105 (0.00)          5           1
-test_benchmark_query2      0.6699 (144.90)   0.7536 (84.77)    0.7052 (125.34)   0.0326 (41.00)    0.6946 (128.57)   0.0456 (66.56)         2;0    1.4179 (0.01)          5           1
-test_benchmark_query3      0.0046 (1.0)      0.0089 (1.0)      0.0056 (1.0)      0.0008 (1.0)      0.0054 (1.0)      0.0008 (1.14)         19;6  177.7288 (1.0)         115           1
-test_benchmark_query4      0.0470 (10.16)    0.0714 (8.03)     0.0541 (9.62)     0.0071 (8.94)     0.0504 (9.33)     0.0097 (14.19)         3;0   18.4732 (0.10)         15           1
-test_benchmark_query5      0.0062 (1.35)     0.0118 (1.33)     0.0074 (1.31)     0.0010 (1.29)     0.0070 (1.30)     0.0007 (1.0)          11;8  135.4245 (0.76)         90           1
-test_benchmark_query6      0.0188 (4.06)     0.0395 (4.44)     0.0210 (3.74)     0.0033 (4.11)     0.0203 (3.75)     0.0015 (2.13)          1;5   47.5523 (0.27)         41           1
-test_benchmark_query7      0.1589 (34.38)    0.1659 (18.66)    0.1618 (28.76)    0.0022 (2.76)     0.1614 (29.87)    0.0021 (3.08)          2;0    6.1794 (0.03)          7           1
-test_benchmark_query8      0.8673 (187.61)   0.9557 (107.50)   0.9019 (160.30)   0.0330 (41.50)    0.8978 (166.17)   0.0344 (50.14)         2;0    1.1087 (0.01)          5           1
-test_benchmark_query9      7.0078 (>1000.0)  7.5807 (852.71)   7.1976 (>1000.0)  0.2214 (278.46)   7.1423 (>1000.0)  0.1712 (249.88)        1;1    0.1389 (0.00)          5           1
+test_benchmark_query1      1.7685 (252.71)   2.0853 (145.03)   1.8578 (221.68)   0.1292 (114.35)   1.8186 (224.85)   0.1059 (107.66)        1;1    0.5383 (0.00)          5           1
+test_benchmark_query10     8.6340 (>1000.0)  8.9443 (622.06)   8.7908 (>1000.0)  0.1103 (97.55)    8.7834 (>1000.0)  0.0985 (100.09)        2;0    0.1138 (0.00)          5           1
+test_benchmark_query2      0.6305 (90.09)    0.6483 (45.09)    0.6384 (76.17)    0.0074 (6.57)     0.6386 (78.95)    0.0125 (12.73)         2;0    1.5665 (0.01)          5           1
+test_benchmark_query3      0.0380 (5.43)     0.0480 (3.34)     0.0405 (4.83)     0.0029 (2.52)     0.0395 (4.88)     0.0023 (2.37)          4;4   24.7145 (0.21)         22           1
+test_benchmark_query4      0.0419 (5.98)     0.0624 (4.34)     0.0471 (5.62)     0.0051 (4.54)     0.0453 (5.61)     0.0053 (5.34)          5;2   21.2382 (0.18)         23           1
+test_benchmark_query5      0.0070 (1.0)      0.0144 (1.0)      0.0084 (1.0)      0.0011 (1.0)      0.0081 (1.0)      0.0010 (1.0)          11;6  119.3207 (1.0)          87           1
+test_benchmark_query6      0.0200 (2.86)     0.0268 (1.86)     0.0218 (2.60)     0.0015 (1.32)     0.0214 (2.64)     0.0013 (1.36)          8;5   45.8986 (0.38)         42           1
+test_benchmark_query7      0.1595 (22.79)    0.1753 (12.19)    0.1634 (19.50)    0.0055 (4.85)     0.1613 (19.95)    0.0034 (3.45)          1;1    6.1194 (0.05)          7           1
+test_benchmark_query8      0.8537 (122.00)   0.8821 (61.35)    0.8726 (104.12)   0.0112 (9.92)     0.8737 (108.02)   0.0119 (12.06)         1;0    1.1460 (0.01)          5           1
+test_benchmark_query9      7.5164 (>1000.0)  8.3269 (579.12)   7.9377 (947.13)   0.3325 (294.18)   7.8846 (974.85)   0.5492 (558.27)        2;0    0.1260 (0.00)          5           1
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-========================================================================= 10 passed in 144.49s (0:02:24) ==========================================================================
+============================================ 10 passed in 147.13s (0:02:27) ============================================
 
 ```

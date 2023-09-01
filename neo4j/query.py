@@ -49,7 +49,8 @@ def run_query2(session: Session) -> None:
 def run_query3(session: Session, country: str) -> None:
     "Which 5 cities in a particular country have the lowest average age in the network?"
     query = """
-        MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*1..2]-> (co:Country {country: $country})
+        MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*1..2]-> (co:Country)
+        WHERE co.country = $country
         RETURN c.city AS city, avg(p.age) AS averageAge
         ORDER BY averageAge LIMIT 5
     """
@@ -154,7 +155,7 @@ def run_query8(session: Session) -> None:
 
 
 def run_query9(session: Session, age_upper: int) -> None:
-    "Which 'influencers' (persons followed by more than 3K people) below a certain age in the network follow the most people?"
+    "Which 'influencers' (persons followed by more than 3K people) below a certain age follow the most people?"
     query = """
         MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(:Person)
         WITH count(r1) AS numFollowers, influencer, r2
@@ -175,7 +176,7 @@ def run_query9(session: Session, age_upper: int) -> None:
 
 
 def run_query10(session: Session, age_lower: int, age_upper: int) -> None:
-    "How many people in the network are followed by 'influencers' (people with > 3K followers) within a certain age range in the network?"
+    "How many people are followed by 'influencers' (people with > 3K followers) within a certain age range?"
     query = """
         MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(person:Person)
         WITH count(r1) AS numFollowers1, person, influencer, r2
@@ -189,7 +190,7 @@ def run_query10(session: Session, age_lower: int, age_upper: int) -> None:
     result = pl.from_dicts(response.data())
     print(
         f"""
-        Number of people followed by people who follow influencers between the age of {age_lower}-{age_upper}:\n{result}
+        Number of people followed by influencers in the age range {age_lower}-{age_upper}:\n{result}
         """
     )
     return result
@@ -202,7 +203,7 @@ def main() -> None:
                 # fmt: off
                 _ = run_query1(session)
                 _ = run_query2(session)
-                _ = run_query3(session, country="Canada")
+                _ = run_query3(session, country="United States")
                 _ = run_query4(session, age_lower=30, age_upper=40)
                 _ = run_query5(session, gender="male", city="London", country="United Kingdom", interest="fine dining")
                 _ = run_query6(session, gender="female", interest="tennis")
