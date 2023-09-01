@@ -169,9 +169,10 @@ def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
 def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
     "Which people are followed by persons that can be considered 'influencers' within a certain age range in the network?"
     query = """
-        MATCH (:Person)-[:Follows]->(influencer:Person)-[r:Follows]->(person:Person)
-        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper
-        RETURN person.id AS personId, person.name AS name, count(r) AS numFollowers
+        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(person:Person)
+        WITH count(r1) AS numFollowers, person, influencer, r2
+        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers > 3000
+        RETURN person.id AS personId, person.name AS name, count(r2) AS numFollowers
         ORDER BY numFollowers DESC LIMIT 5;
     """
     print(f"\nQuery 10:\n {query}")
