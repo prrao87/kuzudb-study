@@ -149,9 +149,9 @@ def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
     "Which persons followed by more than 3000 people below a certain age range in the network follow the most people?"
     query = """
         MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(:Person)
-        WITH count(r1) AS numFollowers, influencer, r2
+        WITH count(r1) AS numFollowers, influencer, id(r2) as r2ID
         WHERE influencer.age <= $age_upper AND numFollowers > 3000
-        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2) AS numFollows
+        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2ID) AS numFollows
         ORDER BY numFollows DESC LIMIT 5;
     """
 
@@ -170,10 +170,10 @@ def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
     "Which people are followed by persons that can be considered 'influencers' within a certain age range in the network?"
     query = """
         MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(person:Person)
-        WITH count(r1) AS numFollowers, person, influencer, r2
-        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers > 3000
-        RETURN person.id AS personId, person.name AS name, count(r2) AS numFollowers
-        ORDER BY numFollowers DESC LIMIT 5;
+        WITH count(id(r1)) AS numFollowers1, person, influencer, id(r2) as r2ID
+        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
+        RETURN person.id AS personId, person.name AS name, count(r2ID) AS numFollowers2
+        ORDER BY numFollowers2 DESC, person.id LIMIT 5;
     """
     print(f"\nQuery 10:\n {query}")
     response = conn.execute(query, parameters=params)
