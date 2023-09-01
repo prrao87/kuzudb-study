@@ -181,7 +181,7 @@ def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
     print(
         f"""
-        Persons within age range {params[0][1]}-{params[1][1]} who can be considered 'influencers' in the network:\n{result}
+        Number of people followed by people who follow influencers between the age of {params[0][1]}-{params[1][1]}:\n{result}
         """
     )
     return result

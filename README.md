@@ -76,6 +76,8 @@ The following questions are asked of both graphs:
 * **Query 6**: Which city has the maximum number of women that like Tennis?
 * **Query 7**: Which U.S. state has the maximum number of persons between the age 23-30 who enjoy photography?
 * **Query 8**: How many second-degree connections of persons are reachable in the graph?
+* **Query 9**: Which 'influencers' (people with > 3K followers) below age 30 in the network follow the most people?
+* **Query 10**: How many persons in the network are followed by people that follow influencers in the age range 18-25?
 
 ## Performance comparison
 

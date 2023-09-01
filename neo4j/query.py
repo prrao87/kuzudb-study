@@ -189,7 +189,7 @@ def run_query10(session: Session, age_lower: int, age_upper: int) -> None:
     result = pl.from_dicts(response.data())
     print(
         f"""
-        Influencers below the age of {age_lower}-{age_upper} who can be considered 'influencers' in the network:\n{result}
+        Number of people followed by people who follow influencers between the age of {age_lower}-{age_upper}:\n{result}
         """
     )
     return result
