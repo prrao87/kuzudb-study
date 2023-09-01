@@ -154,7 +154,7 @@ def run_query8(session: Session) -> None:
 
 
 def run_query9(session: Session, age_upper: int) -> None:
-    "Which persons followed by more than 3000 people below a certain age range in the network follow the most people?"
+    "Which 'influencers' (persons followed by more than 3K people) below a certain age in the network follow the most people?"
     query = """
         MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(:Person)
         WITH count(r1) AS numFollowers, influencer, r2
@@ -175,13 +175,13 @@ def run_query9(session: Session, age_upper: int) -> None:
 
 
 def run_query10(session: Session, age_lower: int, age_upper: int) -> None:
-    "Which people are followed by persons that can be considered 'influencers' within a certain age range in the network?"
+    "How many people in the network are followed by 'influencers' (people with > 3K followers) within a certain age range in the network?"
     query = """
         MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(person:Person)
-        WITH count(r1) AS numFollowers, person, influencer, r2
-        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers > 3000
-        RETURN person.id AS personId, person.name AS name, count(r2) AS numFollowers
-        ORDER BY numFollowers DESC LIMIT 5;
+        WITH count(r1) AS numFollowers1, person, influencer, r2
+        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
+        RETURN count(r2) AS numFollowers2
+        ORDER BY numFollowers2 DESC LIMIT 5;
     """
 
     print(f"\nQuery 10:\n {query}")
@@ -200,14 +200,14 @@ def main() -> None:
         with driver.session(database="neo4j") as session:
             with Timer(name="queries", text="Neo4j query script completed in {:.6f}s"):
                 # fmt: off
-                # _ = run_query1(session)
-                # _ = run_query2(session)
-                # _ = run_query3(session, country="Canada")
-                # _ = run_query4(session, age_lower=30, age_upper=40)
-                # _ = run_query5(session, gender="male", city="London", country="United Kingdom", interest="fine dining")
-                # _ = run_query6(session, gender="female", interest="tennis")
-                # _ = run_query7(session, country="United States", age_lower=23, age_upper=30, interest="photography")
-                # _ = run_query8(session)
+                _ = run_query1(session)
+                _ = run_query2(session)
+                _ = run_query3(session, country="Canada")
+                _ = run_query4(session, age_lower=30, age_upper=40)
+                _ = run_query5(session, gender="male", city="London", country="United Kingdom", interest="fine dining")
+                _ = run_query6(session, gender="female", interest="tennis")
+                _ = run_query7(session, country="United States", age_lower=23, age_upper=30, interest="photography")
+                _ = run_query8(session)
                 _ = run_query9(session, age_upper=30)
                 _ = run_query10(session, age_lower=18, age_upper=25)
                 # fmt: on

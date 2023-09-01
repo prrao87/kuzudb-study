@@ -146,7 +146,7 @@ def run_query8(conn: Connection) -> None:
 
 
 def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "Which persons followed by more than 3000 people below a certain age range in the network follow the most people?"
+    "Which 'influencers' (people with > 3K followers) below a certain age in the network follow the most people?"
     query = """
         MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(:Person)
         WITH count(r1) AS numFollowers, influencer, id(r2) as r2ID
@@ -167,13 +167,14 @@ def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "Which people are followed by persons that can be considered 'influencers' within a certain age range in the network?"
+    "How many people in the network are followed by 'influencers' (people with > 3K followers) within a certain age range in the network?"
+    # TODO: Change the query to avoid having to use id(r1) when the projection pushdown analyzer in Kùzu is implemented, see PR #23 for details
     query = """
         MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(person:Person)
         WITH count(id(r1)) AS numFollowers1, person, influencer, id(r2) as r2ID
         WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
-        RETURN person.id AS personId, person.name AS name, count(r2ID) AS numFollowers2
-        ORDER BY numFollowers2 DESC, person.id LIMIT 5;
+        RETURN count(r2ID) AS numFollowers2
+        ORDER BY numFollowers2 DESC LIMIT 5;
     """
     print(f"\nQuery 10:\n {query}")
     response = conn.execute(query, parameters=params)
@@ -188,30 +189,30 @@ def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 def main(conn: Connection) -> None:
     with Timer(name="queries", text="Queries completed in {:.4f}s"):
-        # _ = run_query1(conn)
-        # _ = run_query2(conn)
-        # _ = run_query3(conn, params=[("country", "Canada")])
-        # _ = run_query4(conn, params=[("age_lower", 30), ("age_upper", 40)])
-        # _ = run_query5(
-        #     conn,
-        #     params=[
-        #         ("gender", "male"),
-        #         ("city", "London"),
-        #         ("country", "United Kingdom"),
-        #         ("interest", "fine dining"),
-        #     ],
-        # )
-        # _ = run_query6(conn, params=[("gender", "female"), ("interest", "tennis")])
-        # _ = run_query7(
-        #     conn,
-        #     params=[
-        #         ("country", "United States"),
-        #         ("age_lower", 23),
-        #         ("age_upper", 30),
-        #         ("interest", "photography"),
-        #     ],
-        # )
-        # _ = run_query8(conn)
+        _ = run_query1(conn)
+        _ = run_query2(conn)
+        _ = run_query3(conn, params=[("country", "Canada")])
+        _ = run_query4(conn, params=[("age_lower", 30), ("age_upper", 40)])
+        _ = run_query5(
+            conn,
+            params=[
+                ("gender", "male"),
+                ("city", "London"),
+                ("country", "United Kingdom"),
+                ("interest", "fine dining"),
+            ],
+        )
+        _ = run_query6(conn, params=[("gender", "female"), ("interest", "tennis")])
+        _ = run_query7(
+            conn,
+            params=[
+                ("country", "United States"),
+                ("age_lower", 23),
+                ("age_upper", 30),
+                ("interest", "photography"),
+            ],
+        )
+        _ = run_query8(conn)
         _ = run_query9(conn, params=[("age_upper", 30)])
         _ = run_query10(conn, params=[("age_lower", 18), ("age_upper", 25)])
 
