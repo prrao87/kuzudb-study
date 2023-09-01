@@ -79,6 +79,7 @@ The following questions are asked of both graphs:
 * **Query 9**: Which "influencers" (people with > 3K followers) younger than 30 follow the most people?
 * **Query 10**: How many people are followed by "influencers" (people with > 3K followers) aged 18-25?
 
+
 ## Performance comparison
 
 The run times for both ingestion and queries are compared.
