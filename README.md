@@ -76,6 +76,8 @@ The following questions are asked of both graphs:
 * **Query 6**: Which city has the maximum number of women that like Tennis?
 * **Query 7**: Which U.S. state has the maximum number of persons between the age 23-30 who enjoy photography?
 * **Query 8**: How many second-degree connections of persons are reachable in the graph?
+* **Query 9**: Which "influencers" (people with > 3K followers) younger than 30 follow the most people?
+* **Query 10**: How many people are followed by "influencers" (people with > 3K followers) aged 18-25?
 
 ## Performance comparison
 
@@ -114,16 +116,16 @@ The following table shows the average run times for each query, and the speedup 
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.8677 | 0.2275650 | 8.2
-2 | 0.7052 | 0.2433142 | 2.9
-3 | 0.0056 | 0.0097056 | 0.6
-4 | 0.0541 | 0.0092325 | 5.9
-5 | 0.0074 | 0.0047592 | 1.6
-6 | 0.0210 | 0.0298077 | 0.7
-7 | 0.1618 | 0.0077759 | 20.8
-8 | 0.9019 | 0.1039609 | 8.7
-9 | 7.1976 | 0.8596641 | 8.4
-10 | 9.0518 | 0.7894154 | 11.5
+1 | 1.8578 | 0.2012965 | 9.2
+2 | 0.6384 | 0.2493954 | 2.6
+3 | 0.0405 | 0.0109885 | 3.7
+4 | 0.0471 | 0.0103636 | 4.5
+5 | 0.0084 | 0.0048151 | 1.7
+6 | 0.0218 | 0.0298180 | 0.7
+7 | 0.1634 | 0.0078995 | 20.7
+8 | 0.8726 | 0.1082653 | 8.1
+9 | 7.9377 | 0.8890417 | 8.9
+10 | 8.7908 | 0.7810308 | 11.2
 
 #### Neo4j vs. Kùzu multi-threaded
 
@@ -131,15 +133,15 @@ KùzuDB (by default) supports multi-threaded execution of queries. The following
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.8677 | 0.1361030 | 13.7
-2 | 0.7052 | 0.1259788 | 5.6
-3 | 0.0056 | 0.0072587 | 0.8
-4 | 0.0541 | 0.0080971 | 6.7
-5 | 0.0074 | 0.0050197 | 1.5
-6 | 0.0210 | 0.0124106 | 1.7
-7 | 0.1618 | 0.0066288 | 24.4
-8 | 0.9019 | 0.0236917 | 38.1
-9 | 7.1976 | 0.5698440 | 12.6
-10 | 9.0518 | 0.5460965 | 16.6
+1 | 1.8578 | 0.1450578 | 12.8
+2 | 0.6384 | 0.1281020 | 5.0
+3 | 0.0405 | 0.0081829 | 5.0
+4 | 0.0471 | 0.0079130 | 6.0
+5 | 0.0084 | 0.0048294 | 1.7
+6 | 0.0218 | 0.0125634 | 1.7
+7 | 0.1634 | 0.0065953 | 24.8
+8 | 0.8726 | 0.0250031 | 34.9
+9 | 7.9377 | 0.5911415 | 13.4
+10 | 8.7908 | 0.5632572 | 15.6
 
-> 🔥 The second-degree path finding query (8) shows the biggest speedup over Neo4j for the 100K node, 2.4M edge graph, and the average speedup over Neo4j across all queries when using Kùzu in multi-threaded mode is **~15x**.
+> 🔥 The second-degree path finding query (8) shows the biggest speedup over Neo4j for the 100K node, 2.4M edge graph, and the average speedup over Neo4j across all queries when using Kùzu in multi-threaded mode is **~12x**.
