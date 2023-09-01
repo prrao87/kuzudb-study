@@ -16,6 +16,7 @@ NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD")
 
 
 def run_query1(session: Session) -> None:
+    "Who are the top 3 most-followed persons in the network?"
     query = """
         MATCH (follower:Person)-[:FOLLOWS]->(person:Person)
         RETURN person.personID AS personID, person.name AS name, count(follower) AS numFollowers
@@ -30,6 +31,7 @@ def run_query1(session: Session) -> None:
 
 
 def run_query2(session: Session) -> None:
+    "In which city does the most-followed person in the network live?"
     query = """
         MATCH (follower:Person) -[:FOLLOWS]-> (person:Person)
         WITH person, count(follower) as followers
@@ -45,6 +47,7 @@ def run_query2(session: Session) -> None:
 
 
 def run_query3(session: Session, country: str) -> None:
+    "Which 5 cities in a particular country have the lowest average age in the network?"
     query = """
         MATCH (p:Person) -[:LIVES_IN]-> (c:City) -[*1..2]-> (co:Country {country: $country})
         RETURN c.city AS city, avg(p.age) AS averageAge
@@ -58,6 +61,7 @@ def run_query3(session: Session, country: str) -> None:
 
 
 def run_query4(session: Session, age_lower: int, age_upper: int) -> None:
+    "How many persons between a certain age range are in each country?"
     query = """
         MATCH (p:Person)-[:LIVES_IN]->(ci:City)-[*1..2]->(country:Country)
         WHERE p.age >= $age_lower AND p.age <= $age_upper
@@ -72,6 +76,7 @@ def run_query4(session: Session, age_lower: int, age_upper: int) -> None:
 
 
 def run_query5(session: Session, gender: str, city: str, country: str, interest: str) -> None:
+    "How many men in a particular city have an interest in the same thing?"
     query = """
         MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
         WHERE tolower(i.interest) = tolower($interest)
@@ -91,6 +96,7 @@ def run_query5(session: Session, gender: str, city: str, country: str, interest:
 
 
 def run_query6(session: Session, gender: str, interest: str) -> None:
+    "Which city has the maximum number of people of a particular gender that share a particular interest"
     query = """
         MATCH (p:Person)-[:HAS_INTEREST]->(i:Interest)
         WHERE tolower(i.interest) = tolower($interest)
@@ -110,6 +116,7 @@ def run_query6(session: Session, gender: str, interest: str) -> None:
 def run_query7(
     session: Session, country: str, age_lower: int, age_upper: int, interest: str
 ) -> None:
+    "Which U.S. state has the maximum number of persons between a specified age who enjoy a particular interest?"
     query = """
         MATCH (p:Person)-[:LIVES_IN]->(:City)-[:CITY_IN]->(s:State)
         WHERE p.age >= $age_lower AND p.age <= $age_upper AND s.country = $country
@@ -133,6 +140,7 @@ def run_query7(
 
 
 def run_query8(session: Session) -> None:
+    "How many second-degree connections of persons are reachable in the graph?"
     query = """
         MATCH (p1:Person)-[f:FOLLOWS]->(p2:Person)
         WHERE p1.personID > p2.personID
@@ -142,6 +150,48 @@ def run_query8(session: Session) -> None:
     response = session.run(query)
     result = pl.from_dicts(response.data())
     print(f"Number of second degree connections reachable in the graph:\n{result}")
+    return result
+
+
+def run_query9(session: Session, age_upper: int) -> None:
+    "Which 'influencers' (persons followed by more than 3K people) below a certain age in the network follow the most people?"
+    query = """
+        MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(:Person)
+        WITH count(r1) AS numFollowers, influencer, r2
+        WHERE influencer.age <= $age_upper AND numFollowers > 3000
+        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2) AS numFollows
+        ORDER BY numFollows DESC LIMIT 5;
+    """
+
+    print(f"\nQuery 9:\n {query}")
+    response = session.run(query, age_upper=age_upper)
+    result = pl.from_dicts(response.data())
+    print(
+        f"""
+        Influencers below age {age_upper} who follow the most people:\n{result}
+        """
+    )
+    return result
+
+
+def run_query10(session: Session, age_lower: int, age_upper: int) -> None:
+    "How many people in the network are followed by 'influencers' (people with > 3K followers) within a certain age range in the network?"
+    query = """
+        MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(person:Person)
+        WITH count(r1) AS numFollowers1, person, influencer, r2
+        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
+        RETURN count(r2) AS numFollowers2
+        ORDER BY numFollowers2 DESC LIMIT 5;
+    """
+
+    print(f"\nQuery 10:\n {query}")
+    response = session.run(query, age_lower=age_lower, age_upper=age_upper)
+    result = pl.from_dicts(response.data())
+    print(
+        f"""
+        Influencers below the age of {age_lower}-{age_upper} who can be considered 'influencers' in the network:\n{result}
+        """
+    )
     return result
 
 
@@ -158,6 +208,8 @@ def main() -> None:
                 _ = run_query6(session, gender="female", interest="tennis")
                 _ = run_query7(session, country="United States", age_lower=23, age_upper=30, interest="photography")
                 _ = run_query8(session)
+                _ = run_query9(session, age_upper=30)
+                _ = run_query10(session, age_lower=18, age_upper=25)
                 # fmt: on
 
 

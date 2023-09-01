@@ -107,3 +107,23 @@ def test_benchmark_query8(benchmark, session):
 
     assert len(result) == 1
     assert result[0]["numFollowers"] == 1214477
+
+
+def test_benchmark_query9(benchmark, session):
+    result = benchmark(query.run_query9, session, 30)
+    result = result.to_dicts()
+
+    assert len(result) == 5
+    assert result[0]["numFollows"] == 40
+    assert result[1]["numFollows"] == 32
+    assert result[2]["numFollows"] == 32
+    assert result[3]["numFollows"] == 32
+    assert result[4]["numFollows"] == 31
+
+
+def test_benchmark_query10(benchmark, session):
+    result = benchmark(query.run_query10, session, 18, 25)
+    result = result.to_dicts()
+
+    assert len(result) == 1
+    assert result[0]["numFollowers2"] == 690

@@ -40,9 +40,10 @@ def run_query2(conn: Connection) -> None:
 
 
 def run_query3(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "Which are the top 5 cities in a particular region of the world with the lowest average age in the network?"
+    "Which 5 cities in a particular country have the lowest average age in the network?"
     query = """
-        MATCH (p:Person) -[:LivesIn]-> (c:City)-[*1..2]-> (co:Country {country: $country})
+        MATCH (p:Person) -[:LivesIn]-> (c:City)-[:CityIn]-> (:State) -[:StateIn]-> (co:Country)
+        WHERE co.country = $country
         RETURN c.city AS city, avg(p.age) AS averageAge
         ORDER BY averageAge LIMIT 5;
     """
@@ -69,7 +70,7 @@ def run_query4(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query5(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "How many persons between a certain age range are in each country?"
+    "How many men in a particular city have an interest in the same thing?"
     query = """
         MATCH (p:Person)-[:HasInterest]->(i:Interest)
         WHERE lower(i.interest) = lower($interest)
@@ -89,7 +90,7 @@ def run_query5(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query6(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "How many persons between a certain age range are in each country?"
+    "Which city has the maximum number of people of a particular gender that share a particular interest"
     query = """
         MATCH (p:Person)-[:HasInterest]->(i:Interest)
         WHERE lower(i.interest) = lower($interest)
@@ -109,7 +110,7 @@ def run_query6(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query7(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "How many persons between a certain age range are in each country?"
+    "Which U.S. state has the maximum number of persons between a specified age who enjoy a particular interest?"
     query = """
         MATCH (p:Person)-[:LivesIn]->(:City)-[:CityIn]->(s:State)
         WHERE p.age >= $age_lower AND p.age <= $age_upper AND s.country = $country
@@ -131,6 +132,7 @@ def run_query7(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query8(conn: Connection) -> None:
+    "How many second-degree connections of persons are reachable in the graph?"
     query = """
         MATCH (p1:Person)-[f:Follows]->(p2:Person)
         WHERE p1.id > p2.id
@@ -140,6 +142,48 @@ def run_query8(conn: Connection) -> None:
     response = conn.execute(query)
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
     print(f"Number of second degree connections reachable in the graph:\n{result}")
+    return result
+
+
+def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
+    "Which 'influencers' (people with > 3K followers) below a certain age in the network follow the most people?"
+    query = """
+        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(:Person)
+        WITH count(r1) AS numFollowers, influencer, id(r2) as r2ID
+        WHERE influencer.age <= $age_upper AND numFollowers > 3000
+        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2ID) AS numFollows
+        ORDER BY numFollows DESC LIMIT 5;
+    """
+
+    print(f"\nQuery 9:\n {query}")
+    response = conn.execute(query, parameters=params)
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    print(
+        f"""
+        Influencers below age {params[0][1]} who follow the most people:\n{result}
+        """
+    )
+    return result
+
+
+def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
+    "How many people in the network are followed by 'influencers' (people with > 3K followers) within a certain age range in the network?"
+    # TODO: Change the query to avoid having to use id(r1) when the projection pushdown analyzer in Kùzu is implemented, see PR #23 for details
+    query = """
+        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(person:Person)
+        WITH count(id(r1)) AS numFollowers1, person, influencer, id(r2) as r2ID
+        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
+        RETURN count(r2ID) AS numFollowers2
+        ORDER BY numFollowers2 DESC LIMIT 5;
+    """
+    print(f"\nQuery 10:\n {query}")
+    response = conn.execute(query, parameters=params)
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    print(
+        f"""
+        Persons within age range {params[0][1]}-{params[1][1]} who can be considered 'influencers' in the network:\n{result}
+        """
+    )
     return result
 
 
@@ -169,6 +213,8 @@ def main(conn: Connection) -> None:
             ],
         )
         _ = run_query8(conn)
+        _ = run_query9(conn, params=[("age_upper", 30)])
+        _ = run_query10(conn, params=[("age_lower", 18), ("age_upper", 25)])
 
 
 if __name__ == "__main__":

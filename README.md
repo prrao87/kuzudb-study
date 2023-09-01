@@ -70,7 +70,7 @@ The following questions are asked of both graphs:
 
 * **Query 1**: Who are the top 3 most-followed persons?
 * **Query 2**: In which city does the most-followed person live?
-* **Query 3**: What are the top 5 cities with the lowest average age of persons?
+* **Query 3**: Which 5 cities in a particular country have the lowest average age in the network?
 * **Query 4**: How many persons between ages 30-40 are there in each country?
 * **Query 5**: How many men in London, United Kingdom have an interest in fine dining?
 * **Query 6**: Which city has the maximum number of women that like Tennis?
@@ -110,32 +110,36 @@ The full benchmark numbers are in the `README.md` pages for respective directori
 
 #### Neo4j vs. Kùzu single-threaded
 
-The following table shows the average run times for each query, and the speedup factor of Kùzu over Neo4j.
+The following table shows the average run times for each query, and the speedup factor of Kùzu over Neo4j when Kùzu is **forced to run on a single thread**.
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.7779 | 0.1936458 | 9.2
-2 | 0.6530 | 0.2199212 | 3.0
-3 | 0.0059 | 0.0078386 | 0.8
-4 | 0.0449 | 0.0090962 | 4.9
-5 | 0.0071 | 0.0046465 | 1.5
-6 | 0.0194 | 0.0289518 | 0.7
-7 | 0.1617 | 0.0075286 | 21.5
-8 | 0.9017 | 0.0966538 | 9.3
+1 | 1.8677 | 0.2275650 | 8.2
+2 | 0.7052 | 0.2433142 | 2.9
+3 | 0.0056 | 0.0097056 | 0.6
+4 | 0.0541 | 0.0092325 | 5.9
+5 | 0.0074 | 0.0047592 | 1.6
+6 | 0.0210 | 0.0298077 | 0.7
+7 | 0.1618 | 0.0077759 | 20.8
+8 | 0.9019 | 0.1039609 | 8.7
+9 | 7.1976 | 0.8596641 | 8.4
+10 | 9.0518 | 0.7894154 | 11.5
 
 #### Neo4j vs. Kùzu multi-threaded
 
-Unlike Neo4j, KùzuDB supports multi-threaded execution of queries. The following results are for the same queries as above, but allowing Kùzu to choose the optimal number of threads for each query.
+KùzuDB (by default) supports multi-threaded execution of queries. The following results are for the same queries as above, but allowing Kùzu to choose the optimal number of threads for each query.
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.7779 | 0.1254484 | 14.2
-2 | 0.6530 | 0.1240414 | 5.3
-3 | 0.0059 | 0.0071119 | 0.8
-4 | 0.0449 | 0.0079267 | 5.7
-5 | 0.0071 | 0.0048247 | 1.5
-6 | 0.0194 | 0.0129322 | 1.5
-7 | 0.1617 | 0.0068251 | 23.7
-8 | 0.9017 | 0.0272117 | 33.1
+1 | 1.8677 | 0.1361030 | 13.7
+2 | 0.7052 | 0.1259788 | 5.6
+3 | 0.0056 | 0.0072587 | 0.8
+4 | 0.0541 | 0.0080971 | 6.7
+5 | 0.0074 | 0.0050197 | 1.5
+6 | 0.0210 | 0.0124106 | 1.7
+7 | 0.1618 | 0.0066288 | 24.4
+8 | 0.9019 | 0.0236917 | 38.1
+9 | 7.1976 | 0.5698440 | 12.6
+10 | 9.0518 | 0.5460965 | 16.6
 
-> 🔥 The second-degree path finding query (8) shows the biggest speedup over Neo4j for the 100K node, 2.4M edge graph, and the average speedup over Neo4j across all queries when using Kùzu in multi-threaded mode is **~12x**.
+> 🔥 The second-degree path finding query (8) shows the biggest speedup over Neo4j for the 100K node, 2.4M edge graph, and the average speedup over Neo4j across all queries when using Kùzu in multi-threaded mode is **~15x**.
