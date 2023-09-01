@@ -145,32 +145,74 @@ def run_query8(conn: Connection) -> None:
     return result
 
 
+def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
+    "Which persons followed by more than 3000 people below a certain age range in the network follow the most people?"
+    query = """
+        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(:Person)
+        WITH count(r1) AS numFollowers, influencer, r2
+        WHERE influencer.age <= $age_upper AND numFollowers > 3000
+        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2) AS numFollows
+        ORDER BY numFollows DESC LIMIT 5;
+    """
+
+    print(f"\nQuery 9:\n {query}")
+    response = conn.execute(query, parameters=params)
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    print(
+        f"""
+        Influencers below age {params[0][1]} who follow the most people:\n{result}
+        """
+    )
+    return result
+
+
+def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
+    "Which people are followed by persons that can be considered 'influencers' within a certain age range in the network?"
+    query = """
+        MATCH (:Person)-[:Follows]->(influencer:Person)-[r:Follows]->(person:Person)
+        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper
+        RETURN person.id AS personId, person.name AS name, count(r) AS numFollowers
+        ORDER BY numFollowers DESC LIMIT 5;
+    """
+    print(f"\nQuery 10:\n {query}")
+    response = conn.execute(query, parameters=params)
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    print(
+        f"""
+        Persons within age range {params[0][1]}-{params[1][1]} who can be considered 'influencers' in the network:\n{result}
+        """
+    )
+    return result
+
+
 def main(conn: Connection) -> None:
     with Timer(name="queries", text="Queries completed in {:.4f}s"):
         # _ = run_query1(conn)
-        _ = run_query2(conn)
-        _ = run_query3(conn, params=[("country", "Canada")])
-        _ = run_query4(conn, params=[("age_lower", 30), ("age_upper", 40)])
-        _ = run_query5(
-            conn,
-            params=[
-                ("gender", "male"),
-                ("city", "London"),
-                ("country", "United Kingdom"),
-                ("interest", "fine dining"),
-            ],
-        )
-        _ = run_query6(conn, params=[("gender", "female"), ("interest", "tennis")])
-        _ = run_query7(
-            conn,
-            params=[
-                ("country", "United States"),
-                ("age_lower", 23),
-                ("age_upper", 30),
-                ("interest", "photography"),
-            ],
-        )
-        _ = run_query8(conn)
+        # _ = run_query2(conn)
+        # _ = run_query3(conn, params=[("country", "Canada")])
+        # _ = run_query4(conn, params=[("age_lower", 30), ("age_upper", 40)])
+        # _ = run_query5(
+        #     conn,
+        #     params=[
+        #         ("gender", "male"),
+        #         ("city", "London"),
+        #         ("country", "United Kingdom"),
+        #         ("interest", "fine dining"),
+        #     ],
+        # )
+        # _ = run_query6(conn, params=[("gender", "female"), ("interest", "tennis")])
+        # _ = run_query7(
+        #     conn,
+        #     params=[
+        #         ("country", "United States"),
+        #         ("age_lower", 23),
+        #         ("age_upper", 30),
+        #         ("interest", "photography"),
+        #     ],
+        # )
+        # _ = run_query8(conn)
+        _ = run_query9(conn, params=[("age_upper", 30)])
+        _ = run_query10(conn, params=[("age_lower", 18), ("age_upper", 25)])
 
 
 if __name__ == "__main__":
