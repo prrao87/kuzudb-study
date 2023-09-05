@@ -141,7 +141,7 @@ def run_query7(
 
 
 def run_query8(session: Session) -> None:
-    "How many second-degree connections of persons are reachable in the graph?"
+    "How many first degree connections of persons are reachable in the graph?"
     query = """
         MATCH (p1:Person)-[f:FOLLOWS]->(p2:Person)
         WHERE p1.personID > p2.personID
@@ -150,7 +150,7 @@ def run_query8(session: Session) -> None:
     print(f"\nQuery 8:\n {query}")
     response = session.run(query)
     result = pl.from_dicts(response.data())
-    print(f"Number of second degree connections reachable in the graph:\n{result}")
+    print(f"Number of first degree connections reachable in the graph:\n{result}")
     return result
 
 

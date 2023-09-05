@@ -141,7 +141,7 @@ def run_query8(conn: Connection) -> None:
     print(f"\nQuery 8:\n {query}")
     response = conn.execute(query)
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
-    print(f"Number of second degree connections reachable in the graph:\n{result}")
+    print(f"Number of first degree connections reachable in the graph:\n{result}")
     return result
 
 

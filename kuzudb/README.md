@@ -66,7 +66,6 @@ shape: (3, 3)
 │ 68753    ┆ Claudia Booker ┆ 4985         │
 │ 54696    ┆ Brian Burgess  ┆ 4976         │
 └──────────┴────────────────┴──────────────┘
-Query 1 completed in 0.311524s
 
 Query 2:
  
@@ -85,28 +84,27 @@ shape: (1, 5)
 ╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
 │ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
 └───────────────┴──────────────┴────────┴───────┴───────────────┘
-Query 2 completed in 0.791726s
 
 Query 3:
  
-        MATCH (p:Person) -[:LivesIn]-> (c:City)-[*1..2]-> (co:Country {country: $country})
+        MATCH (p:Person) -[:LivesIn]-> (c:City) -[*1..2]-> (co:Country)
+        WHERE co.country = $country
         RETURN c.city AS city, avg(p.age) AS averageAge
         ORDER BY averageAge LIMIT 5;
     
-Cities with lowest average age in Canada:
+Cities with lowest average age in United States:
 shape: (5, 2)
-┌───────────┬────────────┐
-│ city      ┆ averageAge │
-│ ---       ┆ ---        │
-│ str       ┆ f64        │
-╞═══════════╪════════════╡
-│ Montreal  ┆ 37.328018  │
-│ Calgary   ┆ 37.607205  │
-│ Toronto   ┆ 37.720255  │
-│ Edmonton  ┆ 37.943678  │
-│ Vancouver ┆ 38.023227  │
-└───────────┴────────────┘
-Query 3 completed in 0.012013s
+┌───────────────┬────────────┐
+│ city          ┆ averageAge │
+│ ---           ┆ ---        │
+│ str           ┆ f64        │
+╞═══════════════╪════════════╡
+│ Louisville    ┆ 37.099473  │
+│ Denver        ┆ 37.202703  │
+│ San Francisco ┆ 37.26213   │
+│ Tampa         ┆ 37.327765  │
+│ Nashville     ┆ 37.343006  │
+└───────────────┴────────────┘
 
 Query 4:
  
@@ -126,7 +124,6 @@ shape: (3, 2)
 │ Canada         ┆ 3064         │
 │ United Kingdom ┆ 1873         │
 └────────────────┴──────────────┘
-Query 4 completed in 0.015932s
 
 Query 5:
  
@@ -147,7 +144,6 @@ shape: (1, 1)
 ╞════════════╡
 │ 52         │
 └────────────┘
-Query 5 completed in 0.012567s
 
 Query 6:
  
@@ -156,13 +152,13 @@ Query 6:
         AND lower(p.gender) = lower($gender)
         WITH p, i
         MATCH (p)-[:LivesIn]->(c:City)
-        RETURN count(p.id) AS numPersons, c.city, c.country
+        RETURN count(p.id) AS numPersons, c.city AS city, c.country AS country
         ORDER BY numPersons DESC LIMIT 5
     
 City with the most female users who have an interest in tennis:
 shape: (5, 3)
 ┌────────────┬────────────┬────────────────┐
-│ numPersons ┆ c.city     ┆ c.country      │
+│ numPersons ┆ city       ┆ country        │
 │ ---        ┆ ---        ┆ ---            │
 │ i64        ┆ str        ┆ str            │
 ╞════════════╪════════════╪════════════════╡
@@ -172,7 +168,6 @@ shape: (5, 3)
 │ 64         ┆ Montreal   ┆ Canada         │
 │ 62         ┆ Phoenix    ┆ United States  │
 └────────────┴────────────┴────────────────┘
-Query 6 completed in 0.033764s
 
 Query 7:
  
@@ -185,7 +180,7 @@ Query 7:
         ORDER BY numPersons DESC LIMIT 1
     
 
-            State in United States with the most users between ages 23-30 who have an interest in photography:
+        State in United States with the most users between ages 23-30 who have an interest in photography:
 shape: (1, 3)
 ┌────────────┬────────────┬───────────────┐
 │ numPersons ┆ state      ┆ country       │
@@ -194,8 +189,7 @@ shape: (1, 3)
 ╞════════════╪════════════╪═══════════════╡
 │ 170        ┆ California ┆ United States │
 └────────────┴────────────┴───────────────┘
-            
-Query 7 completed in 0.012508s
+        
 
 Query 8:
  
@@ -203,7 +197,7 @@ Query 8:
         WHERE p1.id > p2.id
         RETURN count(f) as numFollowers
     
-Number of second degree connections reachable in the graph:
+Number of first degree connections reachable in the graph:
 shape: (1, 1)
 ┌──────────────┐
 │ numFollowers │
@@ -212,8 +206,51 @@ shape: (1, 1)
 ╞══════════════╡
 │ 1214477      │
 └──────────────┘
-Query 8 completed in 0.103470s
-Queries completed in 1.2938s
+
+Query 9:
+ 
+        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(:Person)
+        WITH count(r1) AS numFollowers, influencer, id(r2) as r2ID
+        WHERE influencer.age <= $age_upper AND numFollowers > 3000
+        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2ID) AS numFollows
+        ORDER BY numFollows DESC LIMIT 5;
+    
+
+        Influencers below age 30 who follow the most people:
+shape: (5, 3)
+┌──────────────┬─────────────────┬────────────┐
+│ influencerId ┆ name            ┆ numFollows │
+│ ---          ┆ ---             ┆ ---        │
+│ i64          ┆ str             ┆ i64        │
+╞══════════════╪═════════════════╪════════════╡
+│ 89758        ┆ Joshua Williams ┆ 40         │
+│ 1348         ┆ Brett Wright    ┆ 32         │
+│ 8077         ┆ Ralph Floyd     ┆ 32         │
+│ 85914        ┆ Micheal Holt    ┆ 32         │
+│ 2386         ┆ Robert Graham   ┆ 31         │
+└──────────────┴─────────────────┴────────────┘
+        
+
+Query 10:
+ 
+        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(person:Person)
+        WITH count(id(r1)) AS numFollowers1, person, influencer, id(r2) as r2ID
+        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
+        RETURN count(r2ID) AS numFollowers2
+        ORDER BY numFollowers2 DESC LIMIT 5;
+    
+
+        Number of people followed by influencers in the age range 18-25:
+shape: (1, 1)
+┌───────────────┐
+│ numFollowers2 │
+│ ---           │
+│ i64           │
+╞═══════════════╡
+│ 690           │
+└───────────────┘
+        
+Queries completed in 2.3699s
 ```
 
 #### Query performance (Kùzu single-threaded)

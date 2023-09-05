@@ -211,7 +211,7 @@ Query 8:
         WHERE p1.personID > p2.personID
         RETURN count(f) as numFollowers
 
-Number of second degree connections reachable in the graph:
+Number of first degree connections reachable in the graph:
 shape: (1, 1)
 ┌──────────────┐
 │ numFollowers │
