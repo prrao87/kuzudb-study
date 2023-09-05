@@ -31,22 +31,11 @@ Edges loaded in 2.0335s
 
 ## Query graph
 
-To verify that the graph was built correctly, the script `query.py` contains a few example queries that can be run against the DB, generating some simple statistics.
+The script `query.py` contains a suite of queries that can be run to benchmark various aspects of the DB's performance.
 
 ```sh
 python query.py
 ```
-
-The following questions are asked of the graph:
-
-* **Query 1**: Who are the top 3 most-followed persons?
-* **Query 2**: In which city does the most-followed person live?
-* **Query 3**: What are the top 5 cities with the lowest average age of persons?
-* **Query 4**: How many persons between ages 30-40 are there in each country?
-* **Query 5**: How many men in London, United Kingdom have an interest in fine dining?
-* **Query 6**: Which city has the maximum number of women that like Tennis?
-* **Query 7**: Which U.S. state has the maximum number of persons between the age 23-30 who enjoy photography?
-* **Query 8**: How many second degree connections are reachable in the graph?
 
 ### Case 1: Kùzu single-threaded
 
