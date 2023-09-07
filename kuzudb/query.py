@@ -132,27 +132,28 @@ def run_query7(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
 
 def run_query8(conn: Connection) -> None:
-    "How many second-degree connections of persons are reachable in the graph?"
+    "How many second-degree paths exist in the graph?"
     query = """
-        MATCH (p1:Person)-[f:Follows]->(p2:Person)
-        WHERE p1.id > p2.id
-        RETURN count(f) as numFollowers
+        MATCH (a:Person)-[r1:Follows]->(b:Person)-[r2:Follows]->(c:Person)
+        RETURN count(*) AS numPaths
     """
     print(f"\nQuery 8:\n {query}")
     response = conn.execute(query)
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
-    print(f"Number of first degree connections reachable in the graph:\n{result}")
+    print(
+        f"""
+        Number of second-degree paths:\n{result}
+        """
+    )
     return result
 
 
 def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "Which 'influencers' (people with > 3K followers) below a certain age follow the most people?"
+    "How many paths exist in the graph through persons below a certain age to persons above a certain age?"
     query = """
-        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(:Person)
-        WITH count(r1) AS numFollowers, influencer, id(r2) as r2ID
-        WHERE influencer.age <= $age_upper AND numFollowers > 3000
-        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2ID) AS numFollows
-        ORDER BY numFollows DESC LIMIT 5;
+        MATCH (a:Person)-[r1:Follows]->(b:Person)-[r2:Follows]->(c:Person)
+        WHERE b.age < $age_1 AND c.age > $age_2
+        RETURN count(*) as numPaths
     """
 
     print(f"\nQuery 9:\n {query}")
@@ -160,28 +161,7 @@ def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
     print(
         f"""
-        Influencers below age {params[0][1]} who follow the most people:\n{result}
-        """
-    )
-    return result
-
-
-def run_query10(conn: Connection, params: list[tuple[str, Any]]) -> None:
-    "How many people are followed by 'influencers' (people with > 3K followers) within a certain age range?"
-    # TODO: Change the query to avoid having to use id(r1) when the projection pushdown analyzer in Kùzu is implemented, see PR #23 for details
-    query = """
-        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(person:Person)
-        WITH count(id(r1)) AS numFollowers1, person, influencer, id(r2) as r2ID
-        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
-        RETURN count(r2ID) AS numFollowers2
-        ORDER BY numFollowers2 DESC LIMIT 5;
-    """
-    print(f"\nQuery 10:\n {query}")
-    response = conn.execute(query, parameters=params)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
-    print(
-        f"""
-        Number of people followed by influencers in the age range {params[0][1]}-{params[1][1]}:\n{result}
+        Number of paths through persons below {params[0][1]} to persons above {params[1][1]}:\n{result}
         """
     )
     return result
@@ -213,8 +193,7 @@ def main(conn: Connection) -> None:
             ],
         )
         _ = run_query8(conn)
-        _ = run_query9(conn, params=[("age_upper", 30)])
-        _ = run_query10(conn, params=[("age_lower", 18), ("age_upper", 25)])
+        _ = run_query9(conn, params=[("age_1", 50), ("age_2", 25)])
 
 
 if __name__ == "__main__":

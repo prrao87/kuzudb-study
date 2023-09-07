@@ -141,56 +141,37 @@ def run_query7(
 
 
 def run_query8(session: Session) -> None:
-    "How many first degree connections of persons are reachable in the graph?"
+    "How many second-degree paths exist in the graph?"
     query = """
-        MATCH (p1:Person)-[f:FOLLOWS]->(p2:Person)
-        WHERE p1.personID > p2.personID
-        RETURN count(f) as numFollowers
+        MATCH (a:Person)-[r1:FOLLOWS]->(b:Person)-[r2:FOLLOWS]->(c:Person)
+        RETURN count(*) AS numPaths
     """
+
     print(f"\nQuery 8:\n {query}")
     response = session.run(query)
     result = pl.from_dicts(response.data())
-    print(f"Number of first degree connections reachable in the graph:\n{result}")
-    return result
-
-
-def run_query9(session: Session, age_upper: int) -> None:
-    "Which 'influencers' (persons followed by more than 3K people) below a certain age follow the most people?"
-    query = """
-        MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(:Person)
-        WITH count(r1) AS numFollowers, influencer, r2
-        WHERE influencer.age <= $age_upper AND numFollowers > 3000
-        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2) AS numFollows
-        ORDER BY numFollows DESC LIMIT 5;
-    """
-
-    print(f"\nQuery 9:\n {query}")
-    response = session.run(query, age_upper=age_upper)
-    result = pl.from_dicts(response.data())
     print(
         f"""
-        Influencers below age {age_upper} who follow the most people:\n{result}
+        Number of second-degree paths:\n{result}
         """
     )
     return result
 
 
-def run_query10(session: Session, age_lower: int, age_upper: int) -> None:
-    "How many people are followed by 'influencers' (people with > 3K followers) within a certain age range?"
+def run_query9(session: Session, age_1: int, age_2: int) -> None:
+    "How many paths exist in the graph through persons below a certain age to persons above a certain age?"
     query = """
-        MATCH (:Person)-[r1:FOLLOWS]->(influencer:Person)-[r2:FOLLOWS]->(person:Person)
-        WITH count(r1) AS numFollowers1, person, influencer, r2
-        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
-        RETURN count(r2) AS numFollowers2
-        ORDER BY numFollowers2 DESC LIMIT 5;
+        MATCH (a:Person)-[r1:FOLLOWS]->(b:Person)-[r2:FOLLOWS]->(c:Person)
+        WHERE b.age < $age_1 AND c.age > $age_2
+        RETURN count(*) as numPaths
     """
 
-    print(f"\nQuery 10:\n {query}")
-    response = session.run(query, age_lower=age_lower, age_upper=age_upper)
+    print(f"\nQuery 9:\n {query}")
+    response = session.run(query, age_1=age_1, age_2=age_2)
     result = pl.from_dicts(response.data())
     print(
         f"""
-        Number of people followed by influencers in the age range {age_lower}-{age_upper}:\n{result}
+        Number of paths through persons below {age_1} to persons above {age_2}:\n{result}
         """
     )
     return result
@@ -209,8 +190,7 @@ def main() -> None:
                 _ = run_query6(session, gender="female", interest="tennis")
                 _ = run_query7(session, country="United States", age_lower=23, age_upper=30, interest="photography")
                 _ = run_query8(session)
-                _ = run_query9(session, age_upper=30)
-                _ = run_query10(session, age_lower=18, age_upper=25)
+                _ = run_query9(session, age_1=50, age_2=25)
                 # fmt: on
 
 
