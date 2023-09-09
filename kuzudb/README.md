@@ -193,91 +193,49 @@ shape: (1, 3)
 
 Query 8:
  
-        MATCH (p1:Person)-[f:Follows]->(p2:Person)
-        WHERE p1.id > p2.id
-        RETURN count(f) as numFollowers
+        MATCH (a:Person)-[r1:Follows]->(b:Person)-[r2:Follows]->(c:Person)
+        RETURN count(*) AS numPaths
     
-Number of first degree connections reachable in the graph:
+
+        Number of second-degree paths:
 shape: (1, 1)
-┌──────────────┐
-│ numFollowers │
-│ ---          │
-│ i64          │
-╞══════════════╡
-│ 1214477      │
-└──────────────┘
+┌──────────┐
+│ numPaths │
+│ ---      │
+│ i64      │
+╞══════════╡
+│ 58431994 │
+└──────────┘
+        
 
 Query 9:
  
-        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(:Person)
-        WITH count(r1) AS numFollowers, influencer, id(r2) as r2ID
-        WHERE influencer.age <= $age_upper AND numFollowers > 3000
-        RETURN influencer.id AS influencerId, influencer.name AS name, count(r2ID) AS numFollows
-        ORDER BY numFollows DESC LIMIT 5;
+        MATCH (a:Person)-[r1:Follows]->(b:Person)-[r2:Follows]->(c:Person)
+        WHERE b.age < $age_1 AND c.age > $age_2
+        RETURN count(*) as numPaths
     
 
-        Influencers below age 30 who follow the most people:
-shape: (5, 3)
-┌──────────────┬─────────────────┬────────────┐
-│ influencerId ┆ name            ┆ numFollows │
-│ ---          ┆ ---             ┆ ---        │
-│ i64          ┆ str             ┆ i64        │
-╞══════════════╪═════════════════╪════════════╡
-│ 89758        ┆ Joshua Williams ┆ 40         │
-│ 1348         ┆ Brett Wright    ┆ 32         │
-│ 8077         ┆ Ralph Floyd     ┆ 32         │
-│ 85914        ┆ Micheal Holt    ┆ 32         │
-│ 2386         ┆ Robert Graham   ┆ 31         │
-└──────────────┴─────────────────┴────────────┘
-        
-
-Query 10:
- 
-        MATCH (:Person)-[r1:Follows]->(influencer:Person)-[r2:Follows]->(person:Person)
-        WITH count(id(r1)) AS numFollowers1, person, influencer, id(r2) as r2ID
-        WHERE influencer.age >= $age_lower AND influencer.age <= $age_upper AND numFollowers1 > 3000
-        RETURN count(r2ID) AS numFollowers2
-        ORDER BY numFollowers2 DESC LIMIT 5;
-    
-
-        Number of people followed by influencers in the age range 18-25:
+        Number of paths through persons below 50 to persons above 25:
 shape: (1, 1)
-┌───────────────┐
-│ numFollowers2 │
-│ ---           │
-│ i64           │
-╞═══════════════╡
-│ 690           │
-└───────────────┘
+┌──────────┐
+│ numPaths │
+│ ---      │
+│ i64      │
+╞══════════╡
+│ 45632026 │
+└──────────┘
         
-Queries completed in 2.3699s
+Queries completed in 0.8331s
 ```
-
-#### Query performance (Kùzu single-threaded)
-
-The numbers shown below are for when we ingest 100K person nodes, ~10K location nodes and ~2.4M edges into the graph. Query times for simple aggregation and path finding are relatively low. More advanced queries involving variable length paths will be studied later.
-
-Summary of run times:
-
-* Query 1: `0.311524s`
-* Query 2: `0.791726s`
-* Query 3: `0.012013s`
-* Query 4: `0.015932s`
-* Query 5: `0.012567s`
-* Query 6: `0.033764s`
-* Query 7: `0.012508s`
-* Query 8: `0.103470s`
-
 
 ### Case 2: Kùzu multi-threaded
 
 We can also let Kùzu choose the optimal number of threads to run the queries on, in a multi-threaded fashion (this is the default behaviour).
 
-
 #### Results
 
 ```
-Query 1:
+uery 1:
  
         MATCH (follower:Person)-[:Follows]->(person:Person)
         RETURN person.id AS personID, person.name AS name, count(follower.id) AS numFollowers
@@ -453,7 +411,7 @@ shape: (1, 1)
 │ 45632026 │
 └──────────┘
         
-Queries completed in 1.0300s
+Queries completed in 0.5237s
 ```
 
 #### Query performance benchmark (Kùzu single-threaded)
@@ -527,4 +485,3 @@ Legend:
   OPS: Operations Per Second, computed as 1 / Mean
 ======================================= 9 passed in 7.91s ========================================
 ```
-
