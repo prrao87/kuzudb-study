@@ -169,6 +169,10 @@ async def create_indexes_and_constraints(session: AsyncSession) -> None:
         "CREATE CONSTRAINT countryID IF NOT EXISTS FOR (co:Country) REQUIRE co.countryID IS UNIQUE ",
         "CREATE CONSTRAINT stateID IF NOT EXISTS FOR (s:State) REQUIRE s.stateID IS UNIQUE ",
         "CREATE CONSTRAINT interestID IF NOT EXISTS FOR (i:Interest) REQUIRE i.interestID IS UNIQUE ",
+        # indexes
+        "CREATE INDEX country IF NOT EXISTS FOR (c:Country) ON (c.country) ",
+        "CREATE INDEX city IF NOT EXISTS FOR (ci:City) ON (ci.city) ",
+        "CREATE INDEX age IF NOT EXISTS FOR (p:Person) ON (p.age) ",
     ]
     for query in queries:
         await session.run(query)
