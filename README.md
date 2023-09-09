@@ -92,7 +92,7 @@ The run times for both ingestion and queries are compared.
 * All Neo4j queries are single-threaded as per their default configuration
 * Neo4j version: `5.11.0`
 * KùzuDB version: `0.0.8`
-* The run times reported are for the 5th run, because we want to allow the cache to warm up before gauging query performance
+* The run times reported are the mean over 5 runs, with 5 warmup runs beforehand to allow the cache to warm up for a fairer comparison
 
 ### Ingestion performance
 
