@@ -112,12 +112,12 @@ The full benchmark numbers are in the `README.md` pages for respective directori
 
 #### Notes on benchmark timing
 
-The benchmarks are run via the `pytest-benchmark` library directly from each directory for the queries on either DB. `pytest-benchmark`, which is built on top of `pytest`, attaches each set of runs to a timer. It uses the Python time module's [`time.perfcounter`](https://docs.python.org/3/library/time.html#time.perf_counter), which has a resolution of 500 ns, smaller than the run time of the fastest query in this dataset.
+The benchmarks are run via the `pytest-benchmark` library for the query scripts for either DB. `pytest-benchmark`, which is built on top of `pytest`, attaches each set of runs to a timer. It uses the Python time module's [`time.perfcounter`](https://docs.python.org/3/library/time.html#time.perf_counter), which has a resolution of 500 ns, smaller than the run time of the fastest query in this dataset.
 
-* 5 warmup runs are done to prime the byte code compilation in all parts of the code prior to measuring the runtimes
-* Each query is run a **minimum of 5 times**, so the run times are reported in the tables below as the **average over a minimum of 5 rounds**, and as many as 80-90 rounds.
-  * Long-running queries run at least that many times.
-  * Short-running queries (of the order of milliseconds) will run as many times as fits into a period of 1 second, so the fastest queries run more than **80** times.
+* 5 warmup runs are performed to prime query cache and ensure byte code compilation prior to measuring the run times
+* Each query is run for a **minimum of 5 rounds**, so the run times shown in each section below as the **average over a minimum of 5 rounds**, and as many as 80-90 rounds.
+  * Long-running queries (where the total run time exceeds 1 sec) are run for at least 5 rounds.
+  * Short-running queries (of the order of milliseconds) will run as many times as fits into a period of 1 second, so the fastest queries run more than **80** rounds.
 * Python's own GC overhead can obscure true run times, so it's disabled for the runtime computation
 
 See the [`pytest-benchmark` docs](https://pytest-benchmark.readthedocs.io/en/latest/calibration.html) to see how they calibrate their timer and group the rounds.
