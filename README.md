@@ -155,3 +155,32 @@ Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 9 | 4.2707 | 0.0226162 | 188.7
 
 > 🔥 The second-degree path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to innovations in KùzuDB's query planner and execution engine.
+
+## Key takeaways
+
+Based on these experiments, it appears that Neo4j performs the same function in the graph DB world as Postgres does in the relational DB world -- it's a general-purpose graph DB that can handle a wide variety of transactional use cases, and performs "record-wise" storage (similar to the way Postgres is row-oriented).
+
+KùzuDB (similar to DuckDB and ClickHouse in the relational world) is heavily optimized for read-heavy analytical workloads on very large graphs, and implements the following key features to achieve its performance:
+
+* Columnar storage for nodes and edges
+* Primary keys are necessary for nodes, but not for edges
+* Vectorized query execution
+* Multi-threaded query execution
+* Worst-case Optimal Joins for complex cyclic queries
+* Factorization to compress intermediate data on multi-hop queries
+
+### Ideas for future work
+
+#### Scale up the dataset
+
+It's possible to regenerate a fake dataset of ~100M nodes and ~2.5B edges, and see how the performance of KùzuDB and Neo4j compare -- it's likely that Neo4j cannot handle 2-hop path-finding queries at that scale on a single node, so queries 8 and 9 can be disabled for that larger dataset'
+
+#### Relationship property aggregation
+
+Aggregate on relationship properties to see how the two DBs compare.
+  * In this initial benchmark, none of the edges have properties on them (all aggregations are on node properties)
+  * It should be pretty simple to add a `since` date propery on the `Follows` edges to run filter queries on how long a person has been following another person
+
+
+
+
