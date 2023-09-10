@@ -173,7 +173,13 @@ KùzuDB (similar to DuckDB and ClickHouse in the relational world) is heavily op
 
 #### Scale up the dataset
 
-It's possible to regenerate a fake dataset of ~100M nodes and ~2.5B edges, and see how the performance of KùzuDB and Neo4j compare -- it's likely that Neo4j cannot handle 2-hop path-finding queries at that scale on a single node, so queries 8 and 9 can be disabled for that larger dataset'
+It's possible to regenerate a fake dataset of ~100M nodes and ~2.5B edges, and see how the performance of KùzuDB and Neo4j compare -- it's likely that Neo4j cannot handle 2-hop path-finding queries at that scale on a single node, so queries 8 and 9 can be disabled for that larger dataset.
+
+```sh
+# Generate data with 100M persons and ~2.5B edges (Might take a while in Python!) 
+# Need to re-implement this in Rust: https://github.com/cksac/fake-rs
+bash generate_data.sh 100000000
+```
 
 #### Relationship property aggregation
 
