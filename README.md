@@ -90,11 +90,9 @@ The run times for both ingestion and queries are compared.
 
 ### Testing conditions
 
-* Macbook Pro M2, 16 GB RAM
-* All Neo4j queries are single-threaded as per their default configuration
+* M2 Macbook Pro, 16 GB RAM
 * Neo4j version: `5.11.0`
 * KùzuDB version: `0.0.8`
-* The run times reported are the mean over 5 runs, with 5 warmup runs beforehand to allow the cache to warm up for a fairer comparison
 
 ### Ingestion performance
 
@@ -110,11 +108,23 @@ Nodes are ingested significantly faster in Kùzu (of the order of milliseconds),
 
 ### Query performance benchmark
 
-The full benchmark numbers are in the `README.md` pages for respective directories for `neo4j` and `kuzudb`. The benchmarks are run via the `pytest-benchmark` library directly from each directory for the queries on either DB.
+The full benchmark numbers are in the `README.md` pages for respective directories for `neo4j` and `kuzudb`, with the high-level summary shown below.
+
+#### Notes on benchmark timing
+
+The benchmarks are run via the `pytest-benchmark` library directly from each directory for the queries on either DB. `pytest-benchmark`, which is built on top of `pytest`, attaches each set of runs to a timer. It uses the Python time module's [`time.perfcounter`](https://docs.python.org/3/library/time.html#time.perf_counter), which has a resolution of 500 ns, smaller than the run time of the fastest query in this dataset.
+
+* 5 warmup runs are done to prime the byte code compilation in all parts of the code prior to measuring the runtimes
+* Each query is run a **minimum of 5 times**, so the run times are reported in the tables below as the **average over a minimum of 5 rounds**, and as many as 80-90 rounds.
+  * Long-running queries run at least that many times.
+  * Short-running queries (of the order of milliseconds) will run as many times as fits into a period of 1 second, so the fastest queries run more than **80** times.
+* Python's own GC overhead can obscure true run times, so it's disabled for the runtime computation
+
+See the [`pytest-benchmark` docs](https://pytest-benchmark.readthedocs.io/en/latest/calibration.html) to see how they calibrate their timer and group the rounds.
 
 #### Neo4j vs. Kùzu single-threaded
 
-The following table shows the average run times for each query, and the speedup factor of Kùzu over Neo4j when Kùzu is **limited to execute queries on a single thread**.
+The following table shows the run times for each query (averaged over the number of rounds run, guaranteed to be a minimum of 5 runs) and the speedup factor of Kùzu over Neo4j when Kùzu is **limited to execute queries on a single thread**.
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
@@ -130,7 +140,7 @@ Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 
 #### Neo4j vs. Kùzu multi-threaded
 
-KùzuDB (by default) supports multi-threaded execution of queries. The following results are for the same queries as above, but allowing Kùzu to choose the optimal number of threads for each query.
+KùzuDB (by default) supports multi-threaded execution of queries. The following results are for the same queries as above, but allowing Kùzu to choose the optimal number of threads for each query. Again, the run times for each query (averaged over the number of rounds run, guaranteed to be a minimum of 5 runs) are shown.
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
