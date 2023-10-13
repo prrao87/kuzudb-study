@@ -61,7 +61,8 @@ def main() -> None:
     persons_df = create_person_df(female_profiles, male_profiles)
     # Write nodes
     persons_df.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
-        Path("output/nodes") / "persons.parquet"
+        Path("output/nodes") / "persons.parquet",
+        compression="snappy",
     )
     print(f"Wrote {persons_df.shape[0]} person nodes to parquet")
 

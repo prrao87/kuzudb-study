@@ -36,7 +36,7 @@ def get_cities_df(world_cities: pl.DataFrame) -> pl.DataFrame:
 def write_city_nodes(cities_of_interest: pl.DataFrame) -> pl.DataFrame:
     # Convert states column to ascii as it has problematic characters
     cities_of_interest = cities_of_interest.with_columns(
-        pl.col("admin_name").apply(remove_accents)
+        pl.col("admin_name").map_elements(remove_accents)
     ).drop("city")
     # Rename columns
     cities_of_interest = cities_of_interest.rename({"city_ascii": "city", "admin_name": "state"})
@@ -58,7 +58,8 @@ def write_city_nodes(cities_of_interest: pl.DataFrame) -> pl.DataFrame:
     city_nodes = city_nodes.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
     city_nodes.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
-        Path("output/nodes") / "cities.parquet"
+        Path("output/nodes") / "cities.parquet",
+        compression="snappy",
     )
     print(f"Wrote {city_nodes.shape[0]} cities to parquet")
     return city_nodes
@@ -72,7 +73,8 @@ def write_state_nodes(city_nodes: pl.DataFrame) -> None:
     state_nodes = state_nodes.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
     state_nodes.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
-        Path("output/nodes") / "states.parquet"
+        Path("output/nodes") / "states.parquet",
+        compression="snappy",
     )
     print(f"Wrote {state_nodes.shape[0]} states to parquet")
 
@@ -85,7 +87,8 @@ def write_country_nodes(city_nodes: pl.DataFrame) -> None:
     country_nodes = country_nodes.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
     country_nodes.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
-        Path("output/nodes") / "countries.parquet"
+        Path("output/nodes") / "countries.parquet",
+        compression="snappy",
     )
     print(f"Wrote {country_nodes.shape[0]} countries to parquet")
 

@@ -37,7 +37,7 @@ def main() -> None:
     city_ids_df = pl.DataFrame(city_ids).rename({"column_0": "city_id"})
     # Horizontally stack the person IDs and the residence city IDs to create a list of edges
     edges_df = pl.concat([persons_df, city_ids_df], how="horizontal")
-    city_counts_df = edges_df.groupby("city_id").count().sort("count", descending=True)
+    city_counts_df = edges_df.group_by("city_id").count().sort("count", descending=True)
     top_cities_df = (
         city_counts_df.join(residence_loc_df, on="city_id", how="left")
         # List top 5 cities
@@ -50,7 +50,8 @@ def main() -> None:
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
     edges_df = edges_df.rename({"city_id": "to", "id": "from"}).write_parquet(
-        Path("output/edges") / "lives_in.parquet"
+        Path("output/edges") / "lives_in.parquet",
+        compression="snappy",
     )
     print(f"Generated residence cities for persons. Top 5 common cities are: {', '.join(top_5)}")
 

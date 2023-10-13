@@ -19,7 +19,8 @@ def main(filename: str) -> pl.DataFrame:
     interests_df = interests_df.with_columns(pl.Series(ids).alias("id"))
     # Write to csv
     interests_df.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
-        Path("output/nodes") / "interests.parquet"
+        Path("output/nodes") / "interests.parquet",
+        compression="snappy",
     )
     print(f"Wrote {interests_df.shape[0]} interests nodes to parquet")
     return interests
