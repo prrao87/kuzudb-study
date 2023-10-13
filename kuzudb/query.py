@@ -50,7 +50,7 @@ def run_query3(conn: Connection, params: list[tuple[str, Any]]) -> None:
     print(f"\nQuery 3:\n {query}")
     response = conn.execute(query, parameters=params)
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
-    print(f"Cities with lowest average age in {params[0][1]}:\n{result}")
+    print(f"Cities with lowest average age in {params['country']}:\n{result}")
     return result
 
 
@@ -65,7 +65,7 @@ def run_query4(conn: Connection, params: list[tuple[str, Any]]) -> None:
     print(f"\nQuery 4:\n {query}")
     response = conn.execute(query, parameters=params)
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
-    print(f"Persons between ages {params[0][1]}-{params[1][1]} in each country:\n{result}")
+    print(f"Persons between ages {params['age_lower']}-{params['age_upper']} in each country:\n{result}")
     return result
 
 
@@ -84,7 +84,7 @@ def run_query5(conn: Connection, params: list[tuple[str, Any]]) -> None:
     response = conn.execute(query, parameters=params)
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
     print(
-        f"Number of {params[0][1]} users in {params[1][1]}, {params[2][1]} who have an interest in {params[3][1]}:\n{result}"
+        f"Number of {params['gender']} users in {params['city']}, {params['country']} who have an interest in {params['interest']}:\n{result}"
     )
     return result
 
@@ -104,7 +104,7 @@ def run_query6(conn: Connection, params: list[tuple[str, Any]]) -> None:
     response = conn.execute(query, parameters=params)
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
     print(
-        f"City with the most {params[0][1]} users who have an interest in {params[1][1]}:\n{result}"
+        f"City with the most {params['gender']} users who have an interest in {params['interest']}:\n{result}"
     )
     return result
 
@@ -125,7 +125,7 @@ def run_query7(conn: Connection, params: list[tuple[str, Any]]) -> None:
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
     print(
         f"""
-        State in {params[0][1]} with the most users between ages {params[1][1]}-{params[2][1]} who have an interest in {params[3][1]}:\n{result}
+        State in {params['country']} with the most users between ages {params['age_lower']}-{params['age_upper']} who have an interest in {params['interest']}:\n{result}
         """
     )
     return result
@@ -161,7 +161,7 @@ def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
     result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
     print(
         f"""
-        Number of paths through persons below {params[0][1]} to persons above {params[1][1]}:\n{result}
+        Number of paths through persons below {params['age_1']} to persons above {params['age_2']}:\n{result}
         """
     )
     return result
@@ -171,29 +171,29 @@ def main(conn: Connection) -> None:
     with Timer(name="queries", text="Queries completed in {:.4f}s"):
         _ = run_query1(conn)
         _ = run_query2(conn)
-        _ = run_query3(conn, params=[("country", "United States")])
-        _ = run_query4(conn, params=[("age_lower", 30), ("age_upper", 40)])
+        _ = run_query3(conn, params={"country": "United States"})
+        _ = run_query4(conn, params={"age_lower": 30, "age_upper": 40})
         _ = run_query5(
             conn,
-            params=[
-                ("gender", "male"),
-                ("city", "London"),
-                ("country", "United Kingdom"),
-                ("interest", "fine dining"),
-            ],
+            params={
+                "gender": "male",
+                "city": "London",
+                "country": "United Kingdom",
+                "interest": "fine dining",
+            },
         )
-        _ = run_query6(conn, params=[("gender", "female"), ("interest", "tennis")])
+        _ = run_query6(conn, params={"gender": "female", "interest": "tennis"})
         _ = run_query7(
             conn,
-            params=[
-                ("country", "United States"),
-                ("age_lower", 23),
-                ("age_upper", 30),
-                ("interest", "photography"),
-            ],
+            params={
+                "country": "United States",
+                "age_lower": 23,
+                "age_upper": 30,
+                "interest": "photography",
+            },
         )
         _ = run_query8(conn)
-        _ = run_query9(conn, params=[("age_1", 50), ("age_2", 25)])
+        _ = run_query9(conn, params={"age_1": 50, "age_2": 25})
 
 
 if __name__ == "__main__":

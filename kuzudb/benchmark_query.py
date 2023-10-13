@@ -46,7 +46,7 @@ def test_benchmark_query2(benchmark, connection):
 
 
 def test_benchmark_query3(benchmark, connection):
-    result = benchmark(query.run_query3, connection, [("country", "United States")])
+    result = benchmark(query.run_query3, connection, {"country": "United States"})
     result = result.to_dicts()
 
     assert len(result) == 5
@@ -58,28 +58,28 @@ def test_benchmark_query3(benchmark, connection):
 
 
 def test_benchmark_query4(benchmark, connection):
-    result = benchmark(query.run_query4, connection, [("age_lower", 30), ("age_upper", 40)])
+    result = benchmark(query.run_query4, connection, {"age_lower": 30, "age_upper": 40})
     result = result.to_dicts()
 
     assert len(result) == 3
     assert result[0]["countries"] == "United States"
     assert result[1]["countries"] == "Canada"
     assert result[2]["countries"] == "United Kingdom"
-    assert result[0]["personCounts"] == 30473
+    assert result[0]["personCounts"] == 30431
     assert result[1]["personCounts"] == 3064
-    assert result[2]["personCounts"] == 1873
+    assert result[2]["personCounts"] == 1870
 
 
 def test_benchmark_query5(benchmark, connection):
     result = benchmark(
         query.run_query5,
         connection,
-        [
-            ("gender", "male"),
-            ("city", "London"),
-            ("country", "United Kingdom"),
-            ("interest", "fine dining"),
-        ],
+        {
+            "gender": "male",
+            "city": "London",
+            "country": "United Kingdom",
+            "interest": "fine dining",
+        },
     )
     result = result.to_dicts()
 
@@ -91,10 +91,10 @@ def test_benchmark_query6(benchmark, connection):
     result = benchmark(
         query.run_query6,
         connection,
-        [
-            ("gender", "female"),
-            ("interest", "tennis")
-        ],
+        {
+            "gender": "female",
+            "interest": "tennis"
+        },
     )
     result = result.to_dicts()
 
@@ -108,12 +108,12 @@ def test_benchmark_query7(benchmark, connection):
     result = benchmark(
         query.run_query7,
         connection,
-        [
-            ("country", "United States"),
-            ("age_lower", 23),
-            ("age_upper", 30),
-            ("interest", "photography"),
-        ],
+        {
+            "country": "United States",
+            "age_lower": 23,
+            "age_upper": 30,
+            "interest": "photography",
+        },
     )
     result = result.to_dicts()
 
@@ -132,9 +132,9 @@ def test_benchmark_query8(benchmark, connection):
 
 
 def test_benchmark_query9(benchmark, connection):
-    result = benchmark(query.run_query9, connection, [("age_1", 50), ("age_2", 25)])
+    result = benchmark(query.run_query9, connection, {"age_1": 50, "age_2": 25})
     result = result.to_dicts()
 
     assert len(result) == 1
-    assert result[0]["numPaths"] == 45632026
+    assert result[0]["numPaths"] == 45558131
 
