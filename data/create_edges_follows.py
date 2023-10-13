@@ -68,7 +68,7 @@ def create_super_node_edges(persons_df: pl.DataFrame) -> pl.DataFrame:
         # Take in the column val of num_connections and return a list of IDs from persons_df
         super_nodes_df.with_columns(
             pl.col("num_connections")
-            .apply(lambda x: select_random_ids(persons_df, x))
+            .map_elements(lambda x: select_random_ids(persons_df, x))
             .alias("connections")
         )
         # Explode the connections column to create a row for each connection

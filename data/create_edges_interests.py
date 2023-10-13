@@ -37,7 +37,7 @@ def main() -> None:
         # Take in the column val of num_connections and return a list of IDs from persons_df
         persons_df.with_columns(
             pl.col("num_interests")
-            .apply(lambda x: select_random_ids(interests_df, "interest_id", x))
+            .map_elements(lambda x: select_random_ids(interests_df, "interest_id", x))
             .alias("interests")
         )
         # Explode the connections column to create a row for each connection
