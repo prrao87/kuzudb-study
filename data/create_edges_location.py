@@ -50,7 +50,8 @@ def main() -> None:
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
     edges_df = edges_df.rename({"city_id": "to", "id": "from"}).write_parquet(
-        Path("output/edges") / "lives_in.parquet"
+        Path("output/edges") / "lives_in.parquet",
+        compression="snappy",
     )
     print(f"Generated residence cities for persons. Top 5 common cities are: {', '.join(top_5)}")
 

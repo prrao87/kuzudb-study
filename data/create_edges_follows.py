@@ -97,7 +97,7 @@ def main() -> None:
         edges_df = edges_df.head(NUM)
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
-    edges_df.write_parquet(Path("output/edges") / "follows.parquet")
+    edges_df.write_parquet(Path("output/edges") / "follows.parquet", compression="snappy")
     print(f"Wrote {len(edges_df)} edges for {len(persons_df)} persons")
 
 
