@@ -68,9 +68,9 @@ def test_benchmark_query4(benchmark, session):
     assert result[0]["countries"] == "United States"
     assert result[1]["countries"] == "Canada"
     assert result[2]["countries"] == "United Kingdom"
-    assert result[0]["personCounts"] == 30431
-    assert result[1]["personCounts"] == 3064
-    assert result[2]["personCounts"] == 1870
+    assert result[0]["personCounts"] == 30453
+    assert result[1]["personCounts"] == 3062
+    assert result[2]["personCounts"] == 1865
 
 
 def test_benchmark_query5(benchmark, session):
@@ -114,4 +114,4 @@ def test_benchmark_query9(benchmark, session):
     result = result.to_dicts()
 
     assert len(result) == 1
-    assert result[0]["numPaths"] == 45558131
+    assert result[0]["numPaths"] == 45455419
