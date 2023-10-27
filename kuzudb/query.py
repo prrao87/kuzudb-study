@@ -18,7 +18,7 @@ def run_query1(conn: Connection) -> None:
     """
     print(f"\nQuery 1:\n {query}")
     response = conn.execute(query)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=10_000))
     print(f"Top 3 most-followed persons:\n{result}")
     return result
 
@@ -34,7 +34,7 @@ def run_query2(conn: Connection) -> None:
     """
     print(f"\nQuery 2:\n {query}")
     response = conn.execute(query)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=10_000))
     print(f"City in which most-followed person lives:\n{result}")
     return result
 
@@ -49,7 +49,7 @@ def run_query3(conn: Connection, params: list[tuple[str, Any]]) -> None:
     """
     print(f"\nQuery 3:\n {query}")
     response = conn.execute(query, parameters=params)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=10_000))
     print(f"Cities with lowest average age in {params['country']}:\n{result}")
     return result
 
@@ -64,7 +64,7 @@ def run_query4(conn: Connection, params: list[tuple[str, Any]]) -> None:
     """
     print(f"\nQuery 4:\n {query}")
     response = conn.execute(query, parameters=params)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=10_000))
     print(f"Persons between ages {params['age_lower']}-{params['age_upper']} in each country:\n{result}")
     return result
 
@@ -82,7 +82,7 @@ def run_query5(conn: Connection, params: list[tuple[str, Any]]) -> None:
     """
     print(f"\nQuery 5:\n {query}")
     response = conn.execute(query, parameters=params)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=10_000))
     print(
         f"Number of {params['gender']} users in {params['city']}, {params['country']} who have an interest in {params['interest']}:\n{result}"
     )
@@ -102,7 +102,7 @@ def run_query6(conn: Connection, params: list[tuple[str, Any]]) -> None:
     """
     print(f"\nQuery 6:\n {query}")
     response = conn.execute(query, parameters=params)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=10_000))
     print(
         f"City with the most {params['gender']} users who have an interest in {params['interest']}:\n{result}"
     )
@@ -122,7 +122,7 @@ def run_query7(conn: Connection, params: list[tuple[str, Any]]) -> None:
     """
     print(f"\nQuery 7:\n {query}")
     response = conn.execute(query, parameters=params)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=10_000))
     print(
         f"""
         State in {params['country']} with the most users between ages {params['age_lower']}-{params['age_upper']} who have an interest in {params['interest']}:\n{result}
@@ -139,7 +139,7 @@ def run_query8(conn: Connection) -> None:
     """
     print(f"\nQuery 8:\n {query}")
     response = conn.execute(query)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=10_000))
     print(
         f"""
         Number of second-degree paths:\n{result}
@@ -158,7 +158,7 @@ def run_query9(conn: Connection, params: list[tuple[str, Any]]) -> None:
 
     print(f"\nQuery 9:\n {query}")
     response = conn.execute(query, parameters=params)
-    result = pl.from_arrow(response.get_as_arrow(chunk_size=1000))
+    result = pl.from_arrow(response.get_as_arrow(chunk_size=10_000))
     print(
         f"""
         Number of paths through persons below {params['age_1']} to persons above {params['age_2']}:\n{result}
@@ -200,7 +200,5 @@ if __name__ == "__main__":
     DB_NAME = "social_network"
     db = kuzu.Database(f"./{DB_NAME}")
     CONNECTION = kuzu.Connection(db)
-    # For a fairer comparison with Neo4j, where “Transactions are single-threaded, confined, and independent.”
-    CONNECTION.set_max_threads_for_exec(1)
 
     main(CONNECTION)
