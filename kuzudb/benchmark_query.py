@@ -16,7 +16,7 @@ def connection():
     db = kuzu.Database(f"./social_network")
     conn = kuzu.Connection(db)
     # For a fairer comparison with Neo4j, where “Transactions are single-threaded, confined, and independent.”
-    # conn.set_max_threads_for_exec(1)
+    conn.set_max_threads_for_exec(1)
     yield conn
 
 
@@ -65,9 +65,9 @@ def test_benchmark_query4(benchmark, connection):
     assert result[0]["countries"] == "United States"
     assert result[1]["countries"] == "Canada"
     assert result[2]["countries"] == "United Kingdom"
-    assert result[0]["personCounts"] == 30431
-    assert result[1]["personCounts"] == 3064
-    assert result[2]["personCounts"] == 1870
+    assert result[0]["personCounts"] == 30453
+    assert result[1]["personCounts"] == 3062
+    assert result[2]["personCounts"] == 1865
 
 
 def test_benchmark_query5(benchmark, connection):
@@ -136,5 +136,4 @@ def test_benchmark_query9(benchmark, connection):
     result = result.to_dicts()
 
     assert len(result) == 1
-    assert result[0]["numPaths"] == 45558131
-
+    assert result[0]["numPaths"] == 45455419

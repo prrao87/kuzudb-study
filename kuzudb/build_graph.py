@@ -37,9 +37,9 @@ def create_city_node_table(conn: Connection) -> None:
                 city STRING,
                 state STRING,
                 country STRING,
-                lat FLOAT,
-                lon FLOAT,
-                population INT64,
+                lat DOUBLE,
+                lon DOUBLE,
+                population INT32,
                 PRIMARY KEY (id)
             )
         """
