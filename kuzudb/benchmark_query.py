@@ -3,20 +3,15 @@ Use the `pytest-benchmark` library to more formally benchmark the Neo4j queries 
 `pip install pytest-benchmark`
 """
 import pytest
-from dotenv import load_dotenv
 import kuzu
 
 import query
 
-load_dotenv()
-
 
 @pytest.fixture(scope="session")
 def connection():
-    db = kuzu.Database(f"./social_network")
+    db = kuzu.Database("social_network")
     conn = kuzu.Connection(db)
-    # For a fairer comparison with Neo4j, where “Transactions are single-threaded, confined, and independent.”
-    conn.set_max_threads_for_exec(1)
     yield conn
 
 
