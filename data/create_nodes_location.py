@@ -59,7 +59,6 @@ def write_city_nodes(cities_of_interest: pl.DataFrame) -> pl.DataFrame:
     # Write to csv
     city_nodes.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
         Path("output/nodes") / "cities.parquet",
-        compression="snappy",
     )
     print(f"Wrote {city_nodes.shape[0]} cities to parquet")
     return city_nodes
