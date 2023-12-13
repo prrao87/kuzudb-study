@@ -1,5 +1,5 @@
 """
-Use the `pytest-benchmark` library to more formally benchmark the Neo4j queries with warmup and iterations.
+Use the `pytest-benchmark` library to more formally benchmark the Kùzu queries with warmup and iterations.
 `pip install pytest-benchmark`
 """
 import pytest

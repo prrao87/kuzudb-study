@@ -1,5 +1,5 @@
 """
-Run a series of queries on the Neo4j database
+Run a series of queries on an existing Kùzu database
 """
 from typing import Any
 
