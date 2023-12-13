@@ -20,7 +20,6 @@ def main(filename: str) -> pl.DataFrame:
     # Write to csv
     interests_df.select(pl.col("id"), pl.all().exclude("id")).write_parquet(
         Path("output/nodes") / "interests.parquet",
-        compression="snappy",
     )
     print(f"Wrote {interests_df.shape[0]} interests nodes to parquet")
     return interests

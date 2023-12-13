@@ -26,7 +26,7 @@ def main() -> None:
         .rename({"city_id": "from", "state_id": "to"})
     )
     # Write nodes
-    edges_df.write_parquet(Path("output/edges") / "city_in.parquet", compression="snappy")
+    edges_df.write_parquet(Path("output/edges") / "city_in.parquet")
     print(f"Wrote {len(edges_df)} edges for {len(cities_df)} cities")
 
 
