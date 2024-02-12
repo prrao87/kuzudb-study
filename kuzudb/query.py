@@ -199,6 +199,7 @@ def main(conn: Connection) -> None:
 if __name__ == "__main__":
     DB_NAME = "social_network"
     db = kuzu.Database(f"./{DB_NAME}")
-    CONNECTION = kuzu.Connection(db)
+    # Default num_threads=0 uses as many threads as hardware and utilization allows
+    CONNECTION = kuzu.Connection(db, num_threads=0)
 
     main(CONNECTION)
