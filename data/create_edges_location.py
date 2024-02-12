@@ -37,11 +37,11 @@ def main() -> None:
     city_ids_df = pl.DataFrame(city_ids).rename({"column_0": "city_id"})
     # Horizontally stack the person IDs and the residence city IDs to create a list of edges
     edges_df = pl.concat([persons_df, city_ids_df], how="horizontal")
-    city_counts_df = edges_df.group_by("city_id").count().sort("count", descending=True)
+    city_counts_df = edges_df.group_by("city_id").len().sort("len", descending=True)
     top_cities_df = (
         city_counts_df.join(residence_loc_df, on="city_id", how="left")
         # List top 5 cities
-        .sort("count", descending=True).head(5)
+        .sort("len", descending=True).head(5)
     )
     top_5 = top_cities_df["city"].to_list()
     # Limit the number of edges
