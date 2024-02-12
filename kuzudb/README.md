@@ -25,10 +25,9 @@ As expected, the nodes load much faster than the edges, since there are many mor
 
 ```bash
 $ python build_graph.py
-Nodes loaded in 0.1209s
-Edges loaded in 0.0257s
+Nodes loaded in 0.1509s
+Edges loaded in 2.2402s
 Successfully loaded nodes and edges into KùzuDB!
-python build_graph.py  0.12s user 0.32s system 195% cpu 0.221 total
 ```
 
 ## Query graph
