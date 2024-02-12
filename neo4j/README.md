@@ -24,18 +24,19 @@ docker compose down
 
 ## Build graph
 
+> [!NOTE]
+> All timing numbers shown below are on an M3 Macbook Pro with 32 GB of RAM.
+
 The script `build_graph.py` contains the necessary methods to connect to the Neo4j DB and ingest the data from the CSV files, in batches for large amounts of data.
 
 ```sh
-python build_graph.py --batch_size 50000
+python build_graph.py
 ```
 
 ### Ingestion performance
 
 The numbers shown below are for when we ingest 100K person nodes, ~10K location nodes and ~2.
 4M edges into the graph. Note the following points:
-
-> 💡 The timing numbers shown below are on an M2 Macbook Pro with 16 GB of RAM.
 
 - **The goal is to perform the entire task in Python**, so we don't want to use other means like `apoc` ot `LOAD CSV` to ingest the data (which may be faster, but would require additional glue code, which defeats the purpose of this exercise)
 - The [async API](https://neo4j.com/docs/api/python-driver/current/async_api.html) of the Neo4j Python client is used, which is observed on this dataset to perform ~40% faster than the sync API
@@ -46,8 +47,8 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 # Set large batch size of 500k
 $ python build_graph.py -b 500000
 
-Nodes loaded in 2.6353s
-Edges loaded in 36.1358s
+Nodes loaded in 2.3172s
+Edges loaded in 30.6305s
 ```
 
 As expected, the nodes load much faster than the edges, since there are many more edges than nodes. In addition, the nodes in Neo4j are indexed (via uniqueness constraints), following which the edges are created based on a match on existing nodes, allowing us to achieve this performance.
@@ -71,15 +72,15 @@ Query 1:
     
 Top 3 most-followed persons:
 shape: (3, 3)
-┌──────────┬────────────────┬──────────────┐
-│ personID ┆ name           ┆ numFollowers │
-│ ---      ┆ ---            ┆ ---          │
-│ i64      ┆ str            ┆ i64          │
-╞══════════╪════════════════╪══════════════╡
-│ 85723    ┆ Rachel Cooper  ┆ 4998         │
-│ 68753    ┆ Claudia Booker ┆ 4985         │
-│ 54696    ┆ Brian Burgess  ┆ 4976         │
-└──────────┴────────────────┴──────────────┘
+┌──────────┬───────────────────┬──────────────┐
+│ personID ┆ name              ┆ numFollowers │
+│ ---      ┆ ---               ┆ ---          │
+│ i64      ┆ str               ┆ i64          │
+╞══════════╪═══════════════════╪══════════════╡
+│ 85723    ┆ Melissa Murphy    ┆ 4998         │
+│ 68753    ┆ Jocelyn Patterson ┆ 4985         │
+│ 54696    ┆ Michael Herring   ┆ 4976         │
+└──────────┴───────────────────┴──────────────┘
 
 Query 2:
  
@@ -91,13 +92,13 @@ Query 2:
     
 City in which most-followed person lives:
 shape: (1, 5)
-┌───────────────┬──────────────┬────────┬───────┬───────────────┐
-│ name          ┆ numFollowers ┆ city   ┆ state ┆ country       │
-│ ---           ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
-│ str           ┆ i64          ┆ str    ┆ str   ┆ str           │
-╞═══════════════╪══════════════╪════════╪═══════╪═══════════════╡
-│ Rachel Cooper ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
-└───────────────┴──────────────┴────────┴───────┴───────────────┘
+┌────────────────┬──────────────┬────────┬───────┬───────────────┐
+│ name           ┆ numFollowers ┆ city   ┆ state ┆ country       │
+│ ---            ┆ ---          ┆ ---    ┆ ---   ┆ ---           │
+│ str            ┆ i64          ┆ str    ┆ str   ┆ str           │
+╞════════════════╪══════════════╪════════╪═══════╪═══════════════╡
+│ Melissa Murphy ┆ 4998         ┆ Austin ┆ Texas ┆ United States │
+└────────────────┴──────────────┴────────┴───────┴───────────────┘
 
 Query 3:
  
@@ -108,17 +109,17 @@ Query 3:
     
 Cities with lowest average age in United States:
 shape: (5, 2)
-┌───────────────┬────────────┐
-│ city          ┆ averageAge │
-│ ---           ┆ ---        │
-│ str           ┆ f64        │
-╞═══════════════╪════════════╡
-│ Louisville    ┆ 37.099473  │
-│ Denver        ┆ 37.202703  │
-│ San Francisco ┆ 37.26213   │
-│ Tampa         ┆ 37.327765  │
-│ Nashville     ┆ 37.343006  │
-└───────────────┴────────────┘
+┌─────────────┬────────────┐
+│ city        ┆ averageAge │
+│ ---         ┆ ---        │
+│ str         ┆ f64        │
+╞═════════════╪════════════╡
+│ Austin      ┆ 37.655491  │
+│ Kansas City ┆ 37.742365  │
+│ Miami       ┆ 37.7763    │
+│ San Antonio ┆ 37.810841  │
+│ Houston     ┆ 37.817708  │
+└─────────────┴────────────┘
 
 Query 4:
  
@@ -134,9 +135,9 @@ shape: (3, 2)
 │ ---            ┆ ---          │
 │ str            ┆ i64          │
 ╞════════════════╪══════════════╡
-│ United States  ┆ 30473        │
-│ Canada         ┆ 3064         │
-│ United Kingdom ┆ 1873         │
+│ United States  ┆ 30733        │
+│ Canada         ┆ 3046         │
+│ United Kingdom ┆ 1816         │
 └────────────────┴──────────────┘
 
 Query 5:
@@ -201,7 +202,7 @@ shape: (1, 3)
 │ ---        ┆ ---        ┆ ---           │
 │ i64        ┆ str        ┆ str           │
 ╞════════════╪════════════╪═══════════════╡
-│ 170        ┆ California ┆ United States │
+│ 168        ┆ California ┆ United States │
 └────────────┴────────────┴───────────────┘
         
 
@@ -236,10 +237,10 @@ shape: (1, 1)
 │ ---      │
 │ i64      │
 ╞══════════╡
-│ 45632026 │
+│ 46220422 │
 └──────────┘
         
-Neo4j query script completed in 11.379769s
+Neo4j query script completed in 9.079268s
 ```
 
 ### Query performance benchmark
@@ -248,34 +249,32 @@ The benchmark is run using `pytest-benchmark` package as follows.
 
 ```sh
 $ pytest benchmark_query.py --benchmark-min-rounds=5 --benchmark-warmup-iterations=5 --benchmark-disable-gc --benchmark-sort=fullname
-
-======================================= test session starts =======================================
-platform darwin -- Python 3.11.2, pytest-7.4.0, pluggy-1.2.0
+========================================================== test session starts ===========================================================
+platform darwin -- Python 3.11.7, pytest-8.0.0, pluggy-1.4.0
 benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=True min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=5)
-rootdir: /code/kuzudb-study/neo4j
-plugins: Faker-19.2.0, anyio-3.7.1, benchmark-4.0.0
-collected 9 items                                                                                 
+rootdir: /Users/prrao/code/kuzudb-study/neo4j
+plugins: Faker-23.1.0, benchmark-4.0.0
+collected 9 items                                                                                                                        
 
-benchmark_query.py .........                                                                [100%]
+benchmark_query.py .........                                                                                                       [100%]
 
 
 --------------------------------------------------------------------------------- benchmark: 9 tests ---------------------------------------------------------------------------------
 Name (time in s)             Min               Max              Mean            StdDev            Median               IQR            Outliers       OPS            Rounds  Iterations
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_query1     1.7236 (255.00)   2.0760 (139.37)   1.8899 (219.44)   0.1629 (104.86)   1.8429 (220.10)   0.3035 (192.28)        2;0    0.5291 (0.00)          5           1
-test_benchmark_query2     0.6652 (98.42)    0.7665 (51.46)    0.6936 (80.54)    0.0414 (26.64)    0.6793 (81.13)    0.0345 (21.87)         1;1    1.4417 (0.01)          5           1
-test_benchmark_query3     0.0393 (5.82)     0.0554 (3.72)     0.0442 (5.13)     0.0040 (2.58)     0.0433 (5.18)     0.0056 (3.52)          4;1   22.6124 (0.19)         21           1
-test_benchmark_query4     0.0401 (5.94)     0.0586 (3.93)     0.0473 (5.49)     0.0057 (3.66)     0.0467 (5.57)     0.0078 (4.92)          6;0   21.1450 (0.18)         20           1
-test_benchmark_query5     0.0068 (1.0)      0.0149 (1.0)      0.0086 (1.0)      0.0016 (1.0)      0.0084 (1.0)      0.0017 (1.11)         18;3  116.1125 (1.0)          84           1
-test_benchmark_query6     0.0190 (2.81)     0.0259 (1.74)     0.0226 (2.63)     0.0017 (1.12)     0.0235 (2.80)     0.0029 (1.82)         11;0   44.1985 (0.38)         39           1
-test_benchmark_query7     0.1598 (23.64)    0.1732 (11.63)    0.1625 (18.87)    0.0048 (3.07)     0.1611 (19.24)    0.0016 (1.0)           1;1    6.1527 (0.05)          7           1
-test_benchmark_query8     3.3745 (499.25)   3.6049 (242.01)   3.4529 (400.92)   0.0902 (58.08)    3.4238 (408.91)   0.0982 (62.21)         1;0    0.2896 (0.00)          5           1
-test_benchmark_query9     4.1293 (610.91)   4.4225 (296.90)   4.2707 (495.88)   0.1211 (78.00)    4.3100 (514.74)   0.1937 (122.72)        2;0    0.2342 (0.00)          5           1
+test_benchmark_query1     1.5030 (252.50)   1.5621 (118.21)   1.5396 (222.80)   0.0271 (28.35)    1.5547 (235.80)   0.0459 (55.89)         1;0    0.6495 (0.00)          5           1
+test_benchmark_query2     0.5365 (90.13)    0.6017 (45.53)    0.5680 (82.20)    0.0291 (30.42)    0.5625 (85.30)    0.0534 (64.93)         2;0    1.7605 (0.01)          5           1
+test_benchmark_query3     0.0316 (5.31)     0.0440 (3.33)     0.0338 (4.90)     0.0025 (2.62)     0.0332 (5.03)     0.0018 (2.19)          2;2   29.5547 (0.20)         26           1
+test_benchmark_query4     0.0362 (6.09)     0.0493 (3.73)     0.0391 (5.66)     0.0034 (3.56)     0.0381 (5.78)     0.0020 (2.45)          3;4   25.5809 (0.18)         21           1
+test_benchmark_query5     0.0060 (1.0)      0.0132 (1.0)      0.0069 (1.0)      0.0010 (1.0)      0.0066 (1.0)      0.0008 (1.0)          15;7  144.7100 (1.0)         106           1
+test_benchmark_query6     0.0140 (2.35)     0.0203 (1.53)     0.0159 (2.30)     0.0016 (1.69)     0.0154 (2.33)     0.0015 (1.84)         14;5   62.7980 (0.43)         48           1
+test_benchmark_query7     0.1398 (23.49)    0.1505 (11.39)    0.1433 (20.73)    0.0035 (3.67)     0.1431 (21.70)    0.0028 (3.35)          1;1    6.9803 (0.05)          7           1
+test_benchmark_query8     2.8413 (477.32)   2.9614 (224.10)   2.9034 (420.15)   0.0513 (53.67)    2.9204 (442.93)   0.0875 (106.48)        2;0    0.3444 (0.00)          5           1
+test_benchmark_query9     3.5675 (599.32)   3.7076 (280.56)   3.6319 (525.58)   0.0659 (68.93)    3.6184 (548.78)   0.1257 (152.89)        1;0    0.2753 (0.00)          5           1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-================================== 9 passed in 79.20s (0:01:19) ===================================
-
+====================================================== 9 passed in 66.44s (0:01:06) ======================================================
 ```

@@ -16,6 +16,11 @@ This study has the following goals:
 
 Python is used as the intermediary language between the source data and the DBs.
 
+> [!NOTE]
+> The results in this repo are dependent on the specific version of either database ru. See the [testing conditions](./README.md#testing-conditions) section.
+> The timing numbers may vary as the databases evolve, so it's always recommended to run the benchmarks on the latest versions.
+
+
 ## Setup
 
 Activate a Python virtual environment and install the dependencies as follows.
@@ -29,7 +34,6 @@ pip install -r requirements.txt
 ## Data
 
 An artificial social network dataset is generated specifically for this exercise, via the [Faker](https://faker.readthedocs.io/en/master/) Python library.
-
 
 ### Generate all data at once
 
@@ -90,9 +94,9 @@ The run times for both ingestion and queries are compared.
 
 ### Testing conditions
 
-* M2 Macbook Pro, 16 GB RAM
-* Neo4j version: `5.11.0`
-* KùzuDB version: `0.0.8`
+* M3 Macbook Pro, 32 GB RAM
+* Neo4j version: `5.16.0`
+* KùzuDB version: `0.2.0`
 
 ### Ingestion performance
 
@@ -100,11 +104,11 @@ In total, ~100K nodes and ~2.5 million edges are ingested **~18x** faster in Kù
 
 Case | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-Nodes | 2.6353 | 0.0578 | 45.6
-Edges | 36.1358 | 2.0335 | 17.8
-Total | 38.7711 | 2.0913 | 18.5
+Nodes | 2.3 | 0.1 | 23x
+Edges | 30.6 | 2.2 | 14x
+Total | 32.9 | 2.3 | 14x
 
-Nodes are ingested significantly faster in Kùzu (of the order of milliseconds), and Neo4j's node ingestion remains of the order of seconds despite setting constraints on the ID fields as per their best practices. The speedup factors shown are expected to be even higher as the dataset gets larger and larger, with Kùzu being around two orders of magnitude faster for inserting nodes.
+Nodes are ingested significantly faster in Kùzu in this case, and Neo4j's node ingestion remains of the order of seconds despite setting constraints on the ID fields as per their best practices. The speedup factors shown are expected to be even higher as the dataset gets larger and larger, with Kùzu being around two orders of magnitude faster for inserting nodes.
 
 ### Query performance benchmark
 
@@ -128,15 +132,15 @@ The following table shows the run times for each query (averaged over the number
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.8899 | 0.2033761 | 9.3
-2 | 0.6936 | 0.2342920 | 3.0
-3 | 0.0442 | 0.0108182 | 4.1
-4 | 0.0473 | 0.0089210 | 5.3
-5 | 0.0086 | 0.0046097 | 1.9
-6 | 0.0226 | 0.0295330 | 0.8
-7 | 0.1625 | 0.0076011 | 21.4
-8 | 3.4529 | 0.0853055 | 40.5
-9 | 4.2707 | 0.0951086 | 44.9
+1 | 1.5396 | 0.283 | 5.4
+2 | 0.5680 | 0.378 | 1.5
+3 | 0.0338 | 0.011 | 3.1
+4 | 0.0391 | 0.009 | 4.3
+5 | 0.0069 | 0.003 | 2.3
+6 | 0.0159 | 0.034 | 0.5
+7 | 0.1433 | 0.007 | 20.5
+8 | 2.9034 | 0.092 | 31.6
+9 | 3.6319 | 0.103 | 35.2
 
 #### Neo4j vs. Kùzu multi-threaded
 
@@ -144,30 +148,17 @@ KùzuDB (by default) supports multi-threaded execution of queries. The following
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.8899 | 0.1193300 | 15.8
-2 | 0.6936 | 0.1259888 | 5.5
-3 | 0.0442 | 0.0081799 | 5.4
-4 | 0.0473 | 0.0078041 | 6.1
-5 | 0.0086 | 0.0046616 | 1.8
-6 | 0.0226 | 0.0127203 | 1.8
-7 | 0.1625 | 0.0067574 | 24.1
-8 | 3.4529 | 0.0191212 | 180.5
-9 | 4.2707 | 0.0226162 | 188.7
+1 | 1.5396 | 0.171 | 9.0
+2 | 0.5680 | 0.203 | 2.8
+3 | 0.0338 | 0.013 | 2.6
+4 | 0.0391 | 0.012 | 3.3
+5 | 0.0069 | 0.004 | 1.7
+6 | 0.0159 | 0.033 | 0.5
+7 | 0.1433 | 0.008 | 17.9
+8 | 2.9034 | 0.074 | 39.3
+9 | 3.6319 | 0.087 | 41.8
 
 > 🔥 The second-degree path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to innovations in KùzuDB's query planner and execution engine.
-
-## Key takeaways
-
-Based on these experiments, it appears that Neo4j performs the same function in the graph DB world as Postgres does in the relational DB world -- it's a general-purpose graph DB that can handle a wide variety of transactional use cases, and performs "record-wise" storage (similar to the way Postgres is row-oriented).
-
-KùzuDB (similar to DuckDB and ClickHouse in the relational world) is heavily optimized for read-heavy analytical workloads on very large graphs, and implements the following key features to achieve its performance:
-
-* Columnar storage for nodes and edges
-* Primary keys are necessary for nodes, but not for edges
-* Vectorized query execution
-* Multi-threaded query execution
-* Worst-case Optimal Joins for complex cyclic queries
-* Factorization to compress intermediate data on multi-hop queries
 
 ### Ideas for future work
 
@@ -186,7 +177,3 @@ bash generate_data.sh 100000000
 Aggregate on relationship properties to see how the two DBs compare.
   * In this initial benchmark, none of the edges have properties on them (all aggregations are on node properties)
   * It should be pretty simple to add a `since` date propery on the `Follows` edges to run filter queries on how long a person has been following another person
-
-
-
-
