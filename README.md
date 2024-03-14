@@ -21,11 +21,6 @@ This study has the following goals:
 
 Python is used as the intermediary language between the source data and the DBs.
 
-> [!NOTE]
-> The results in this repo are dependent on the specific version of either database run. See the [testing conditions](#testing-conditions) section.
-> The timing numbers may vary as the databases evolve, so it's always recommended to run the benchmarks on the latest versions.
-
-
 ## Setup
 
 Activate a Python virtual environment and install the dependencies as follows.
