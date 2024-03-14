@@ -2,6 +2,11 @@
 
 Code for the benchmark study described in this [blog post](https://thedataquarry.com/posts/embedded-db-2/).
 
+> [!NOTE]
+> Neo4j version: `5.18.0`
+> KùzuDB version: `0.3.2`
+
+
 [Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS) written in C++. It is blazing fast 🔥, and is optimized for handling complex join-heavy analytical workloads on very large graphs. Kùzu is being actively developed, and its [goal](https://kuzudb.com/docusaurus/blog/what-every-gdbms-should-do-and-vision) is to do in the graph data science space what DuckDB did in the world of tabular data science -- that is, to provide a fast, lightweight, embeddable graph database for analytics (OLAP) use cases, with minimal infrastructure setup.
 
 This study has the following goals:
@@ -92,23 +97,20 @@ The run times for both ingestion and queries are compared.
 * For ingestion, KùzuDB is consistently faster than Neo4j by a factor of **~18x** for a graph size of 100K nodes and ~2.4M edges.
 * For OLAP queries, KùzuDB is **significantly faster** than Neo4j, especially for ones that involve multi-hop queries via nodes with many-to-many relationships.
 
-### Testing conditions
+### Benchmark conditions
 
-* M3 Macbook Pro, 32 GB RAM
-* Neo4j version: `5.16.0`
-* KùzuDB version: `0.2.0`
+The benchmark is run M3 Macbook Pro with 36 GB RAM.
 
 ### Ingestion performance
 
-In total, ~100K nodes and ~2.5 million edges are ingested **~18x** faster in KùzuDB than in Neo4j.
-
 Case | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-Nodes | 2.3 | 0.1 | 23x
-Edges | 30.6 | 2.2 | 14x
-Total | 32.9 | 2.3 | 14x
+Nodes | 2.4 | 0.2 | 12x
+Edges | 30.9 | 0.4 | 77x
+Total | 33.3 | 0.6 | 55x
 
-Nodes are ingested significantly faster in Kùzu in this case, and Neo4j's node ingestion remains of the order of seconds despite setting constraints on the ID fields as per their best practices. The speedup factors shown are expected to be even higher as the dataset gets larger and larger, with Kùzu being around two orders of magnitude faster for inserting nodes.
+Nodes are ingested significantly faster in Kùzu, and Neo4j's node ingestion remains of the order of seconds despite setting constraints on the ID fields as per their best practices. The speedup factors shown are expected to be even higher as the dataset gets larger and larger using this approach, and
+the only way to speed up Neo4j data ingestion is to avoid using Python and use `admin-import` instead.
 
 ### Query performance benchmark
 
@@ -132,15 +134,15 @@ The following table shows the run times for each query (averaged over the number
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.5396 | 0.283 | 5.4
-2 | 0.5680 | 0.378 | 1.5
-3 | 0.0338 | 0.011 | 3.1
-4 | 0.0391 | 0.009 | 4.3
-5 | 0.0069 | 0.003 | 2.3
-6 | 0.0159 | 0.034 | 0.5
-7 | 0.1433 | 0.007 | 20.5
-8 | 2.9034 | 0.092 | 31.6
-9 | 3.6319 | 0.103 | 35.2
+1 | 1.7614 | 0.2722 | 6.5x
+2 | 0.6149 | 0.3340 | 1.8x
+3 | 0.0388 | 0.0112 | 3.5x
+4 | 0.0426 | 0.0094 | 4.5x
+5 | 0.0080 | 0.0037 | 2.2x
+6 | 0.0212 | 0.0335 | 0.6x
+7 | 0.1592 | 0.0070 | 22.7x
+8 | 3.2919 | 0.0901 | 36.5x
+9 | 4.0125 | 0.1016 | 39.5x
 
 #### Neo4j vs. Kùzu multi-threaded
 
@@ -148,15 +150,15 @@ KùzuDB (by default) supports multi-threaded execution of queries. The following
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.5396 | 0.171 | 9.0
-2 | 0.5680 | 0.203 | 2.8
-3 | 0.0338 | 0.013 | 2.6
-4 | 0.0391 | 0.012 | 3.3
-5 | 0.0069 | 0.004 | 1.7
-6 | 0.0159 | 0.033 | 0.5
-7 | 0.1433 | 0.008 | 17.9
-8 | 2.9034 | 0.074 | 39.3
-9 | 3.6319 | 0.087 | 41.8
+1 | 1.7614 | 0.1678 | 10.5x
+2 | 0.6149 | 0.2025 | 3.0x
+3 | 0.0388 | 0.0145 | 2.7x
+4 | 0.0426 | 0.0136 | 3.1x
+5 | 0.0080 | 0.0046 | 1.7x
+6 | 0.0212 | 0.0346 | 0.6x
+7 | 0.1592 | 0.0079 | 20.1x
+8 | 3.2919 | 0.0777 | 42.4x
+9 | 4.0125 | 0.0664 | 60.4x
 
 > 🔥 The second-degree path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to innovations in KùzuDB's query planner and execution engine.
 
@@ -164,7 +166,7 @@ Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 
 #### Scale up the dataset
 
-It's possible to regenerate a fake dataset of ~100M nodes and ~2.5B edges, and see how the performance of KùzuDB and Neo4j compare -- it's likely that Neo4j cannot handle 2-hop path-finding queries at that scale on a single node, so queries 8 and 9 can be disabled for that larger dataset.
+It's possible to regenerate an artificial dataset of ~100M nodes and ~2.5B edges, and see how the performance of KùzuDB and Neo4j compare -- it's likely that Neo4j cannot handle 2-hop path-finding queries at that scale on a single node, so queries 8 and 9 can be disabled for that larger dataset.
 
 ```sh
 # Generate data with 100M persons and ~2.5B edges (Might take a while in Python!) 

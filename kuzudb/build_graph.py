@@ -118,7 +118,7 @@ def main(conn: Connection) -> None:
         conn.execute(f"COPY CityIn FROM '{EDGES_PATH}/city_in.parquet';")
         conn.execute(f"COPY StateIn FROM '{EDGES_PATH}/state_in.parquet';")
 
-    print(f"Successfully loaded nodes and edges into KùzuDB!")
+    print("Successfully loaded nodes and edges into KùzuDB!")
 
 
 if __name__ == "__main__":

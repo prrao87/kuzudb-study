@@ -47,8 +47,8 @@ The numbers shown below are for when we ingest 100K person nodes, ~10K location 
 # Set large batch size of 500k
 $ python build_graph.py -b 500000
 
-Nodes loaded in 2.3172s
-Edges loaded in 30.6305s
+Nodes loaded in 2.3581s
+Edges loaded in 30.8509s
 ```
 
 As expected, the nodes load much faster than the edges, since there are many more edges than nodes. In addition, the nodes in Neo4j are indexed (via uniqueness constraints), following which the edges are created based on a match on existing nodes, allowing us to achieve this performance.
@@ -249,32 +249,32 @@ The benchmark is run using `pytest-benchmark` package as follows.
 
 ```sh
 $ pytest benchmark_query.py --benchmark-min-rounds=5 --benchmark-warmup-iterations=5 --benchmark-disable-gc --benchmark-sort=fullname
-========================================================== test session starts ===========================================================
-platform darwin -- Python 3.11.7, pytest-8.0.0, pluggy-1.4.0
+================================================= test session starts ==================================================
+platform darwin -- Python 3.11.7, pytest-8.1.1, pluggy-1.4.0
 benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=True min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=5)
 rootdir: /Users/prrao/code/kuzudb-study/neo4j
 plugins: Faker-23.1.0, benchmark-4.0.0
-collected 9 items                                                                                                                        
+collected 9 items                                                                                                      
 
-benchmark_query.py .........                                                                                                       [100%]
+benchmark_query.py .........                                                                                                                          [100%]
 
 
 --------------------------------------------------------------------------------- benchmark: 9 tests ---------------------------------------------------------------------------------
 Name (time in s)             Min               Max              Mean            StdDev            Median               IQR            Outliers       OPS            Rounds  Iterations
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-test_benchmark_query1     1.5030 (252.50)   1.5621 (118.21)   1.5396 (222.80)   0.0271 (28.35)    1.5547 (235.80)   0.0459 (55.89)         1;0    0.6495 (0.00)          5           1
-test_benchmark_query2     0.5365 (90.13)    0.6017 (45.53)    0.5680 (82.20)    0.0291 (30.42)    0.5625 (85.30)    0.0534 (64.93)         2;0    1.7605 (0.01)          5           1
-test_benchmark_query3     0.0316 (5.31)     0.0440 (3.33)     0.0338 (4.90)     0.0025 (2.62)     0.0332 (5.03)     0.0018 (2.19)          2;2   29.5547 (0.20)         26           1
-test_benchmark_query4     0.0362 (6.09)     0.0493 (3.73)     0.0391 (5.66)     0.0034 (3.56)     0.0381 (5.78)     0.0020 (2.45)          3;4   25.5809 (0.18)         21           1
-test_benchmark_query5     0.0060 (1.0)      0.0132 (1.0)      0.0069 (1.0)      0.0010 (1.0)      0.0066 (1.0)      0.0008 (1.0)          15;7  144.7100 (1.0)         106           1
-test_benchmark_query6     0.0140 (2.35)     0.0203 (1.53)     0.0159 (2.30)     0.0016 (1.69)     0.0154 (2.33)     0.0015 (1.84)         14;5   62.7980 (0.43)         48           1
-test_benchmark_query7     0.1398 (23.49)    0.1505 (11.39)    0.1433 (20.73)    0.0035 (3.67)     0.1431 (21.70)    0.0028 (3.35)          1;1    6.9803 (0.05)          7           1
-test_benchmark_query8     2.8413 (477.32)   2.9614 (224.10)   2.9034 (420.15)   0.0513 (53.67)    2.9204 (442.93)   0.0875 (106.48)        2;0    0.3444 (0.00)          5           1
-test_benchmark_query9     3.5675 (599.32)   3.7076 (280.56)   3.6319 (525.58)   0.0659 (68.93)    3.6184 (548.78)   0.1257 (152.89)        1;0    0.2753 (0.00)          5           1
+test_benchmark_query1     1.6634 (249.15)   1.8413 (171.27)   1.7614 (219.26)   0.0710 (78.24)    1.7787 (229.50)   0.1107 (185.42)        2;0    0.5677 (0.00)          5           1
+test_benchmark_query2     0.5965 (89.35)    0.6333 (58.91)    0.6149 (76.55)    0.0160 (17.68)    0.6091 (78.59)    0.0276 (46.27)         2;0    1.6262 (0.01)          5           1
+test_benchmark_query3     0.0360 (5.39)     0.0463 (4.30)     0.0388 (4.83)     0.0023 (2.49)     0.0384 (4.96)     0.0020 (3.37)          4;1   25.7565 (0.21)         20           1
+test_benchmark_query4     0.0404 (6.04)     0.0500 (4.65)     0.0426 (5.30)     0.0023 (2.55)     0.0421 (5.43)     0.0017 (2.90)          3;3   23.4888 (0.19)         24           1
+test_benchmark_query5     0.0067 (1.0)      0.0108 (1.0)      0.0080 (1.0)      0.0009 (1.0)      0.0078 (1.0)      0.0013 (2.12)         25;2  124.4822 (1.0)          98           1
+test_benchmark_query6     0.0182 (2.72)     0.0257 (2.39)     0.0212 (2.64)     0.0018 (1.97)     0.0205 (2.65)     0.0029 (4.78)         14;0   47.2173 (0.38)         44           1
+test_benchmark_query7     0.1557 (23.32)    0.1673 (15.56)    0.1592 (19.81)    0.0037 (4.10)     0.1581 (20.40)    0.0006 (1.0)           1;2    6.2826 (0.05)          7           1
+test_benchmark_query8     3.0889 (462.66)   3.3602 (312.56)   3.2919 (409.78)   0.1153 (126.95)   3.3429 (431.32)   0.1042 (174.43)        1;1    0.3038 (0.00)          5           1
+test_benchmark_query9     3.9647 (593.83)   4.0488 (376.61)   4.0125 (499.48)   0.0316 (34.82)    4.0214 (518.87)   0.0398 (66.58)         2;0    0.2492 (0.00)          5           1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Legend:
   Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
   OPS: Operations Per Second, computed as 1 / Mean
-====================================================== 9 passed in 66.44s (0:01:06) ======================================================
+=============================================================== 9 passed in 73.77s (0:01:13) ================================================================
 ```

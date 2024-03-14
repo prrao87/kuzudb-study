@@ -56,8 +56,8 @@ def test_benchmark_query3(benchmark, session):
     assert result[0]["city"] == "Austin"
     assert result[1]["city"] == "Kansas City"
     assert result[2]["city"] == "Miami"
-    assert result[3]["city"] == "San Antonio"
-    assert result[4]["city"] == "Houston"
+    assert result[3]["city"] == "Houston"
+    assert result[4]["city"] == "San Antonio"
 
 
 def test_benchmark_query4(benchmark, session):
@@ -68,9 +68,9 @@ def test_benchmark_query4(benchmark, session):
     assert result[0]["countries"] == "United States"
     assert result[1]["countries"] == "Canada"
     assert result[2]["countries"] == "United Kingdom"
-    assert result[0]["personCounts"] == 30733
-    assert result[1]["personCounts"] == 3046
-    assert result[2]["personCounts"] == 1816
+    assert result[0]["personCounts"] == 30698
+    assert result[1]["personCounts"] == 3037
+    assert result[2]["personCounts"] == 1819
 
 
 def test_benchmark_query5(benchmark, session):
@@ -96,7 +96,7 @@ def test_benchmark_query7(benchmark, session):
     result = result.to_dicts()
 
     assert len(result) == 1
-    assert result[0]["numPersons"] == 168
+    assert result[0]["numPersons"] == 165
     assert result[0]["state"] == "California"
     assert result[0]["country"] == "United States"
 
@@ -114,4 +114,4 @@ def test_benchmark_query9(benchmark, session):
     result = result.to_dicts()
 
     assert len(result) == 1
-    assert result[0]["numPaths"] == 46220422
+    assert result[0]["numPaths"] == 46061065
