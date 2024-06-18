@@ -17,7 +17,18 @@ The script `build_graph.py` contains the necessary methods to connect to the Kù
 python build_graph.py --batch_size 50000
 ```
 
-### Ingestion performance
+## Visualize graph
+
+The provided `docker-compose.yml` allows you to run [Kùzu Explorer](https://github.com/kuzudb/explorer), an open source visualization
+tool for KùzuDB. To run the Kùzu Explorer, install Docker and run the following command:
+
+```sh
+dockercompose up
+```
+
+This allows you to access to visualize the graph on the browser at `http://localhost:8000`.
+
+## Ingestion performance
 
 The numbers shown below are for when we ingest 100K person nodes, ~10K location nodes and ~2.4M edges into the graph.
 

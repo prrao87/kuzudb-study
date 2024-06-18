@@ -33,7 +33,11 @@ The script `build_graph.py` contains the necessary methods to connect to the Neo
 python build_graph.py
 ```
 
-### Ingestion performance
+## Visualize graph
+
+You can visualize the graph in the Neo4j browser by a) downloading the Neo4j Desktop tool, or b) in the browser via `http://localhost:7474`.
+
+## Ingestion performance
 
 The numbers shown below are for when we ingest 100K person nodes, ~10K location nodes and ~2.
 4M edges into the graph. Note the following points:
