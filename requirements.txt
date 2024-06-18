@@ -1,8 +1,8 @@
-faker~=23.1.0
+faker~=25.8.0
 polars~=0.20.0
-pyarrow~=15.0.0
-kuzu~=0.3.0
-neo4j~=5.18.0
+pyarrow~=16.1.0
+kuzu~=0.4.0
+neo4j~=5.20.0
 python-dotenv>=1.0.0
 codetiming>=1.4.0
 pytest-benchmark>=4.0.0

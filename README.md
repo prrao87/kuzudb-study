@@ -2,9 +2,9 @@
 
 Code for the benchmark study described in this [blog post](https://thedataquarry.com/posts/embedded-db-2/).
 
-Neo4j version | Kùzu version |
-:---: | :---: |
-5.18.0 | 0.3.2 |
+Neo4j version | Kùzu version | Python version
+:---: | :---: | :---:
+5.20.0 | 0.4.2 | 3.12.4
 
 
 [Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS) written in C++. It is blazing fast 🔥, and is optimized for handling complex join-heavy analytical workloads on very large graphs. Kùzu is being actively developed, and its [goal](https://kuzudb.com/docusaurus/blog/what-every-gdbms-should-do-and-vision) is to do in the graph data science space what DuckDB did in the world of tabular data science -- that is, to provide a fast, lightweight, embeddable graph database for analytics (OLAP) use cases, with minimal infrastructure setup.
@@ -100,12 +100,15 @@ The benchmark is run M3 Macbook Pro with 36 GB RAM.
 
 Case | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-Nodes | 2.4 | 0.2 | 12x
-Edges | 30.9 | 0.4 | 77x
+Nodes | 3.12 | 0.13 | 24x
+Edges | 32.52 | 0.31 | 105x
 Total | 33.3 | 0.6 | 55x
 
-Nodes are ingested significantly faster in Kùzu, and Neo4j's node ingestion remains of the order of seconds despite setting constraints on the ID fields as per their best practices. The speedup factors shown are expected to be even higher as the dataset gets larger and larger using this approach, and
-the only way to speed up Neo4j data ingestion is to avoid using Python and use `admin-import` instead.
+Nodes are ingested significantly faster in Kùzu, and Neo4j's node ingestion remains of the order of seconds
+despite setting constraints on the ID fields as per their best practices. The speedup factors shown
+are expected to be even higher as the dataset gets larger and larger using this approach, and
+the only way to speed up Neo4j data ingestion is to use `admin-import` instead (however, this means
+you lose the ability to work in Python and have to switch languages).
 
 ### Query performance benchmark
 
@@ -129,15 +132,16 @@ The following table shows the run times for each query (averaged over the number
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.7614 | 0.2722 | 6.5x
-2 | 0.6149 | 0.3340 | 1.8x
-3 | 0.0388 | 0.0112 | 3.5x
-4 | 0.0426 | 0.0094 | 4.5x
-5 | 0.0080 | 0.0037 | 2.2x
-6 | 0.0212 | 0.0335 | 0.6x
-7 | 0.1592 | 0.0070 | 22.7x
-8 | 3.2919 | 0.0901 | 36.5x
-9 | 4.0125 | 0.1016 | 39.5x
+1 | 1.3752 | 0.231 | 6.0x
+2 | 0.5665 | 0.258 | 2.2x
+3 | 0.0515 | 0.011 | 4.7x
+4 | 0.0474 | 0.008 | 5.9x
+5 | 0.0115 | 0.003 | 3.8x
+6 | 0.0240 | 0.025 | 1.0x
+7 | 0.1552 | 0.006 | 25.9x
+8 | 2.9876 | 0.062 | 48.2x
+9 | 3.7553 | 0.079 | 47.6x
+
 
 #### Neo4j vs. Kùzu multi-threaded
 
@@ -145,15 +149,15 @@ KùzuDB (by default) supports multi-threaded execution of queries. The following
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.7614 | 0.1678 | 10.5x
-2 | 0.6149 | 0.2025 | 3.0x
-3 | 0.0388 | 0.0145 | 2.7x
-4 | 0.0426 | 0.0136 | 3.1x
-5 | 0.0080 | 0.0046 | 1.7x
-6 | 0.0212 | 0.0346 | 0.6x
-7 | 0.1592 | 0.0079 | 20.1x
-8 | 3.2919 | 0.0777 | 42.4x
-9 | 4.0125 | 0.0664 | 60.4x
+1 | 1.3752 | 0.113 | 12.2x
+2 | 0.5665 | 0.119 | 4.8x
+3 | 0.0515 | 0.015 | 3.4x
+4 | 0.0474 | 0.013 | 3.6x
+5 | 0.0115 | 0.005 | 2.3x
+6 | 0.0240 | 0.011 | 2.2x
+7 | 0.1552 | 0.009 | 17.2x
+8 | 2.9876 | 0.013 | 229.8x
+9 | 3.7553 | 0.017 | 221.5x
 
 > 🔥 The second-degree path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to innovations in KùzuDB's query planner and execution engine.
 
@@ -173,4 +177,4 @@ bash generate_data.sh 100000000
 
 Aggregate on relationship properties to see how the two DBs compare.
   * In this initial benchmark, none of the edges have properties on them (all aggregations are on node properties)
-  * It should be pretty simple to add a `since` date propery on the `Follows` edges to run filter queries on how long a person has been following another person
+  * It should be pretty simple to add a `since` date property on the `Follows` edges to run filter queries on how long a person has been following another person
