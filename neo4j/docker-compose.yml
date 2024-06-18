@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   neo4j:
     image: neo4j:${NEO4J_VERSION}
