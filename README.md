@@ -102,7 +102,7 @@ Case | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
 Nodes | 3.12 | 0.13 | 24x
 Edges | 32.52 | 0.31 | 105x
-Total | 33.3 | 0.6 | 55x
+Total | 35.64 | 0.44 | 65x
 
 Nodes are ingested significantly faster in Kùzu, and Neo4j's node ingestion remains of the order of seconds
 despite setting constraints on the ID fields as per their best practices. The speedup factors shown
