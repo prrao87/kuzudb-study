@@ -4,31 +4,31 @@ Code for the benchmark study described in this [blog post](https://thedataquarry
 
 Neo4j version | Kùzu version | Python version
 :---: | :---: | :---:
-5.20.0 | 0.4.2 | 3.12.4
+5.22.0 (community) | 0.6.0 | 3.12.4
 
-
-[Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS) written in C++. It is blazing fast 🔥, and is optimized for handling complex join-heavy analytical workloads on very large graphs. Kùzu is being actively developed, and its [goal](https://kuzudb.com/docusaurus/blog/what-every-gdbms-should-do-and-vision) is to do in the graph data science space what DuckDB did in the world of tabular data science -- that is, to provide a fast, lightweight, embeddable graph database for analytics (OLAP) use cases, with minimal infrastructure setup.
+[Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS) written in C++. It is blazing fast 🔥, and is optimized for handling complex join-heavy analytical workloads on very large graphs. Kùzu's [goal](https://kuzudb.com/docusaurus/blog/what-every-gdbms-should-do-and-vision) is to do in the graph database world what DuckDB has done in the world of relational databases -- that is, to provide a fast, lightweight, embeddable graph database for analytics (OLAP) use cases, while being heavily focused on usability and developer productivity.
 
 This study has the following goals:
 
 * Generate an artificial social network dataset, including persons, interests and locations
-  * It's quite easy to scale up the size of the artificial dataset using the scripts provided, so we can test the performance implications on larger graphs
-* Ingest the data into KùzuDB and Neo4j
+  * You can scale up the size of the artificial dataset using the scripts provided and test query performance on larger graphs
+* Ingest the dataset into two graph databases: Kùzu and Neo4j (community edition)
 * Run a set of queries in Cypher on either DB to:
   * (1) Verify that the data is ingested correctly and that the results from either DB are consistent with one another
-  * (2) Benchmark the performance of Kùzu vs. an established vendor like Neo4j
-* Study the ingestion and query times for either DB, and optimize where possible
+  * (2) Compare the query performance on a suite of queries that involve multi-hop traversals and aggregations
 
-Python is used as the intermediary language between the source data and the DBs.
+Python (and the associated client APIs for either DB) are used to orchestrate the pipelines throughout.
 
 ## Setup
 
 Activate a Python virtual environment and install the dependencies as follows.
 
 ```sh
-python -m venv .venv
+# Assuming that the uv package manager is installed
+# https://github.com/astral-sh/uv
+uv venv
 source .venv/bin/activate
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 ## Data
@@ -100,11 +100,12 @@ The benchmark is run M3 Macbook Pro with 36 GB RAM.
 
 Case | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-Nodes | 3.12 | 0.13 | 24x
-Edges | 32.52 | 0.31 | 105x
-Total | 35.64 | 0.44 | 65x
+Nodes | 2.33 | 0.11 | 21.2x
+Edges | 31.08 | 0.42 | 74.0x
+Total | 33.41 | 0.53 | 63.0x
 
-Nodes are ingested significantly faster in Kùzu, and Neo4j's node ingestion remains of the order of seconds
+Nodes are ingested significantly faster in Kùzu, and using its community edition, Neo4j's node ingestion
+remains of the order of seconds
 despite setting constraints on the ID fields as per their best practices. The speedup factors shown
 are expected to be even higher as the dataset gets larger and larger using this approach, and
 the only way to speed up Neo4j data ingestion is to use `admin-import` instead (however, this means
@@ -132,15 +133,15 @@ The following table shows the run times for each query (averaged over the number
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.3752 | 0.231 | 6.0x
-2 | 0.5665 | 0.258 | 2.2x
-3 | 0.0515 | 0.011 | 4.7x
-4 | 0.0474 | 0.008 | 5.9x
-5 | 0.0115 | 0.003 | 3.8x
-6 | 0.0240 | 0.025 | 1.0x
-7 | 0.1552 | 0.006 | 25.9x
-8 | 2.9876 | 0.062 | 48.2x
-9 | 3.7553 | 0.079 | 47.6x
+1 | 1.375 | 0.216 | 6.4x
+2 | 0.567 | 0.253 | 2.2x
+4 | 0.047 | 0.008 | 5.9x
+3 | 0.052 | 0.006 | 8.7x
+5 | 0.012 | 0.181 | 0.1x
+6 | 0.024 | 0.059 | 0.4x
+7 | 0.155 | 0.013 | 11.9x
+8 | 2.988 | 0.064 | 46.7x
+9 | 3.755 | 0.170 | 22.1x
 
 
 #### Neo4j vs. Kùzu multi-threaded
@@ -149,15 +150,15 @@ KùzuDB (by default) supports multi-threaded execution of queries. The following
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.3752 | 0.113 | 12.2x
-2 | 0.5665 | 0.119 | 4.8x
-3 | 0.0515 | 0.015 | 3.4x
-4 | 0.0474 | 0.013 | 3.6x
-5 | 0.0115 | 0.005 | 2.3x
-6 | 0.0240 | 0.011 | 2.2x
-7 | 0.1552 | 0.009 | 17.2x
-8 | 2.9876 | 0.013 | 229.8x
-9 | 3.7553 | 0.017 | 221.5x
+1 | 1.375 | 0.251 | 5.5x
+2 | 0.567 | 0.283 | 2.0x
+3 | 0.052 | 0.011 | 4.7x
+4 | 0.047 | 0.008 | 5.9x
+5 | 0.012 | 0.017 | 0.7x
+6 | 0.024 | 0.061 | 0.4x
+7 | 0.155 | 0.014 | 11.1x
+8 | 2.988 | 0.064 | 46.7x
+9 | 3.755 | 0.142 | 26.5x
 
 > 🔥 The second-degree path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to innovations in KùzuDB's query planner and execution engine.
 
@@ -165,16 +166,18 @@ Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 
 #### Scale up the dataset
 
-It's possible to regenerate an artificial dataset of ~100M nodes and ~2.5B edges, and see how the performance of KùzuDB and Neo4j compare -- it's likely that Neo4j cannot handle 2-hop path-finding queries at that scale on a single node, so queries 8 and 9 can be disabled for that larger dataset.
+You can attempt to generate a much larger artificial dataset of ~100M nodes and ~2.5B edges, and see how the performance of Kùzu and Neo4j compare, if you're interested.
 
 ```sh
-# Generate data with 100M persons and ~2.5B edges (Might take a while in Python!) 
-# Need to re-implement this in Rust: https://github.com/cksac/fake-rs
+# Generate data with 100M persons and ~2.5B edges (takes a long time in Python!)
 bash generate_data.sh 100000000
 ```
 
+The above script can take really long to run in Python. [Here's an example](https://github.com/thedataquarry/rustinpieces/tree/main/src/mock_data)
+of using the `fake-rs` crate in Rust to do this much faster.
+
 #### Relationship property aggregation
 
-Aggregate on relationship properties to see how the two DBs compare.
-  * In this initial benchmark, none of the edges have properties on them (all aggregations are on node properties)
-  * It should be pretty simple to add a `since` date property on the `Follows` edges to run filter queries on how long a person has been following another person
+The queries 1-9 in this benchmark are all on node properties. You can add relationship properties in the dataset
+to see how the two DBs compare when aggregating on them. For example, add a `since` date property on the
+`Follows` edges to run filter queries on how long a person has been following another person.

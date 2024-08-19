@@ -118,11 +118,11 @@ shape: (5, 2)
 │ ---         ┆ ---        │
 │ str         ┆ f64        │
 ╞═════════════╪════════════╡
-│ Austin      ┆ 37.655491  │
-│ Kansas City ┆ 37.742365  │
-│ Miami       ┆ 37.7763    │
-│ San Antonio ┆ 37.810841  │
-│ Houston     ┆ 37.817708  │
+│ Austin      ┆ 37.732948  │
+│ Kansas City ┆ 37.83065   │
+│ Miami       ┆ 37.860339  │
+│ Houston     ┆ 37.894676  │
+│ San Antonio ┆ 37.896669  │
 └─────────────┴────────────┘
 
 Query 4:
@@ -139,9 +139,9 @@ shape: (3, 2)
 │ ---            ┆ ---          │
 │ str            ┆ i64          │
 ╞════════════════╪══════════════╡
-│ United States  ┆ 30733        │
-│ Canada         ┆ 3046         │
-│ United Kingdom ┆ 1816         │
+│ United States  ┆ 30698        │
+│ Canada         ┆ 3037         │
+│ United Kingdom ┆ 1819         │
 └────────────────┴──────────────┘
 
 Query 5:
@@ -206,7 +206,7 @@ shape: (1, 3)
 │ ---        ┆ ---        ┆ ---           │
 │ i64        ┆ str        ┆ str           │
 ╞════════════╪════════════╪═══════════════╡
-│ 168        ┆ California ┆ United States │
+│ 165        ┆ California ┆ United States │
 └────────────┴────────────┴───────────────┘
         
 
@@ -241,10 +241,10 @@ shape: (1, 1)
 │ ---      │
 │ i64      │
 ╞══════════╡
-│ 46220422 │
+│ 46061065 │
 └──────────┘
         
-Neo4j query script completed in 9.079268s
+Neo4j query script completed in 10.171206s
 ```
 
 ### Query performance benchmark
