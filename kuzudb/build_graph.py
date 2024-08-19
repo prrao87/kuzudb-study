@@ -114,7 +114,7 @@ def main(conn: Connection) -> None:
         create_edge_tables(conn)
         conn.execute(f"COPY Follows FROM '{EDGES_PATH}/follows.parquet';")
         conn.execute(f"COPY LivesIn FROM '{EDGES_PATH}/lives_in.parquet';")
-        conn.execute(f"COPY HasInterest FROM '{EDGES_PATH}/interests.parquet';")
+        conn.execute(f"COPY HasInterest FROM '{EDGES_PATH}/interested_in.parquet';")
         conn.execute(f"COPY CityIn FROM '{EDGES_PATH}/city_in.parquet';")
         conn.execute(f"COPY StateIn FROM '{EDGES_PATH}/state_in.parquet';")
 

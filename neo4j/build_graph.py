@@ -92,7 +92,7 @@ async def merge_edges_person(tx: AsyncManagedTransaction, data: list[JsonBlob]) 
     await tx.run(query, data=data)
 
 
-async def merge_edges_interests(tx: AsyncManagedTransaction, data: list[JsonBlob]) -> None:
+async def merge_edges_interested_in(tx: AsyncManagedTransaction, data: list[JsonBlob]) -> None:
     query = """
         UNWIND $data AS row
         MATCH (p:Person {personID: row.from})
@@ -193,8 +193,8 @@ async def write_nodes(session: AsyncSession) -> None:
 async def write_edges(session: AsyncSession) -> None:
     await ingest_person_edges_in_batches(session, merge_edges_person)
     # Write person-interest edges
-    interests = pl.read_parquet(f"{EDGES_PATH}/interests.parquet")
-    await session.execute_write(merge_edges_interests, data=interests.to_dicts())
+    interests = pl.read_parquet(f"{EDGES_PATH}/interested_in.parquet")
+    await session.execute_write(merge_edges_interested_in, data=interests.to_dicts())
     # Write person-city edges
     cities = pl.read_parquet(f"{EDGES_PATH}/lives_in.parquet")
     await session.execute_write(merge_edges_lives_in, data=cities.to_dicts())
