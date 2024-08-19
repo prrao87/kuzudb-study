@@ -5,9 +5,9 @@ The aim is to scale up the generation of edges based on the number of nodes in t
 while also keeping edges between nodes in a way that's not a uniform distribution.
 In the real world, some people are way more connected than others.
 """
+
 import argparse
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import polars as pl
@@ -68,7 +68,9 @@ def create_super_node_edges(persons_df: pl.DataFrame) -> pl.DataFrame:
         # Take in the column val of num_connections and return a list of IDs from persons_df
         super_nodes_df.with_columns(
             pl.col("num_connections")
-            .map_elements(lambda x: select_random_ids(persons_df, x))
+            .map_elements(
+                lambda x: select_random_ids(persons_df, x), return_dtype=pl.List(pl.Int64)
+            )
             .alias("connections")
         )
         # Explode the connections column to create a row for each connection

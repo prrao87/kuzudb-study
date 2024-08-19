@@ -3,6 +3,7 @@ Generate fake person profiles and write to parquet.
 A 50-50% male/female profile distribution is used and names are
 generated using the faker library.
 """
+
 import argparse
 from datetime import date
 from pathlib import Path

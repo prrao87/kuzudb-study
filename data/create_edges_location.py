@@ -1,6 +1,7 @@
 """
 Generate edges between persons and their residence locations
 """
+
 import argparse
 from pathlib import Path
 
@@ -41,7 +42,8 @@ def main() -> None:
     top_cities_df = (
         city_counts_df.join(residence_loc_df, on="city_id", how="left")
         # List top 5 cities
-        .sort("len", descending=True).head(5)
+        .sort("len", descending=True)
+        .head(5)
     )
     top_5 = top_cities_df["city"].to_list()
     # Limit the number of edges

@@ -1,6 +1,7 @@
 """
 Generate edges between cities and the states to which they belong
 """
+
 from pathlib import Path
 
 import polars as pl

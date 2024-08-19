@@ -1,6 +1,7 @@
 """
 Generate edges between persons and their interests
 """
+
 import argparse
 from pathlib import Path
 
@@ -37,7 +38,10 @@ def main() -> None:
         # Take in the column val of num_connections and return a list of IDs from persons_df
         persons_df.with_columns(
             pl.col("num_interests")
-            .map_elements(lambda x: select_random_ids(interests_df, "interest_id", x))
+            .map_elements(
+                lambda x: select_random_ids(interests_df, "interest_id", x),
+                return_dtype=pl.List(pl.Int64),
+            )
             .alias("interests")
         )
         # Explode the connections column to create a row for each connection
@@ -51,7 +55,7 @@ def main() -> None:
         print(f"Limiting edges to {NUM} per the `--num` argument")
     # Write nodes
     edges_df = edges_df.rename({"id": "from", "interests": "to"})
-    edges_df.write_parquet(Path("output/edges") / "interests.parquet")
+    edges_df.write_parquet(Path("output/edges") / "interested_in.parquet")
     print(f"Wrote {len(edges_df)} edges for {len(persons_df)} persons")
 
 
