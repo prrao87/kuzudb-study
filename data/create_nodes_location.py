@@ -1,6 +1,7 @@
 """
 Generate nodes for cities, states and countries
 """
+
 import argparse
 import unicodedata
 from pathlib import Path
@@ -36,7 +37,7 @@ def get_cities_df(world_cities: pl.DataFrame) -> pl.DataFrame:
 def write_city_nodes(cities_of_interest: pl.DataFrame) -> pl.DataFrame:
     # Convert states column to ascii as it has problematic characters
     cities_of_interest = cities_of_interest.with_columns(
-        pl.col("admin_name").map_elements(remove_accents)
+        pl.col("admin_name").map_elements(remove_accents, return_dtype=pl.String)
     ).drop("city")
     # Rename columns
     cities_of_interest = cities_of_interest.rename({"city_ascii": "city", "admin_name": "state"})
