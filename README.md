@@ -128,9 +128,9 @@ The benchmarks are run via the `pytest-benchmark` library for the query scripts 
 
 See the [`pytest-benchmark` docs](https://pytest-benchmark.readthedocs.io/en/latest/calibration.html) to see how they calibrate their timer and group the rounds.
 
-#### Neo4j vs. Kùzu multi-threaded
+#### Neo4j vs. Kùzu
 
-KùzuDB (by default) supports multi-threaded execution of queries with maximum thread utilization as available on the machine.
+KùzuDB supports multi-threaded execution of queries with maximum thread utilization as available on the machine.
 The run times for each query (averaged over the number of rounds run, guaranteed to be a minimum of 5 runs) are shown below.
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
