@@ -4,7 +4,7 @@ Code for the benchmark study described in this [blog post](https://thedataquarry
 
 Neo4j version | Kùzu version | Python version
 :---: | :---: | :---:
-5.22.0 (community) | 0.6.0 | 3.12.4
+5.26.0 (community) | 0.7.0 | 3.12.5
 
 [Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS) written in C++. It is blazing fast 🔥, and is optimized for handling complex join-heavy analytical workloads on very large graphs. Kùzu's [goal](https://kuzudb.com/docusaurus/blog/what-every-gdbms-should-do-and-vision) is to do in the graph database world what DuckDB has done in the world of relational databases -- that is, to provide a fast, lightweight, embeddable graph database for analytics (OLAP) use cases, while being heavily focused on usability and developer productivity.
 
@@ -89,20 +89,21 @@ The following questions are asked of both graphs:
 
 The run times for both ingestion and queries are compared.
 
-* For ingestion, KùzuDB is consistently faster than Neo4j by a factor of **~18x** for a graph size of 100K nodes and ~2.4M edges.
+* For ingestion, KùzuDB is consistently faster than Neo4j by a factor of **~18x** for a 
 * For OLAP queries, KùzuDB is **significantly faster** than Neo4j, especially for ones that involve multi-hop queries via nodes with many-to-many relationships.
 
 ### Benchmark conditions
 
-The benchmark is run M3 Macbook Pro with 36 GB RAM.
+- Machine: M3 Macbook Pro with 36 GB RAM.
+- Graph size: 100K nodes, ~2.4M edges.
 
 ### Ingestion performance
 
 Case | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-Nodes | 2.33 | 0.11 | 21.2x
-Edges | 31.08 | 0.42 | 74.0x
-Total | 33.41 | 0.53 | 63.0x
+Nodes | 1.85 | 0.13 | 14.2x
+Edges | 28.79 | 0.45 | 64.0x
+Total | 30.64 | 0.58 | 52.8x
 
 Nodes are ingested significantly faster in Kùzu, and using its community edition, Neo4j's node ingestion
 remains of the order of seconds
@@ -123,44 +124,28 @@ The benchmarks are run via the `pytest-benchmark` library for the query scripts 
 * Each query is run for a **minimum of 5 rounds**, so the run times shown in each section below as the **average over a minimum of 5 rounds**, or upwards of 50 rounds.
   * Long-running queries (where the total run time exceeds 1 sec) are run for at least 5 rounds.
   * Short-running queries (of the order of milliseconds) will run as many times as fits into a period of 1 second, so the fastest queries can run upwards of 50 times.
-* Python's own GC overhead can obscure true run times, so the `benchamrk-disable-gc` argument is enabled.
+* Python's own GC overhead can obscure true run times, so the `benchmark-disable-gc` argument is enabled.
 
 See the [`pytest-benchmark` docs](https://pytest-benchmark.readthedocs.io/en/latest/calibration.html) to see how they calibrate their timer and group the rounds.
 
-#### Neo4j vs. Kùzu single-threaded
+#### Neo4j vs. Kùzu
 
-The following table shows the run times for each query (averaged over the number of rounds run, guaranteed to be a minimum of 5 runs) and the speedup factor of Kùzu over Neo4j when Kùzu is **limited to execute queries on a single thread**.
-
-Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
---- | ---: | ---: | ---:
-1 | 1.375 | 0.216 | 6.4x
-2 | 0.567 | 0.253 | 2.2x
-4 | 0.047 | 0.008 | 5.9x
-3 | 0.052 | 0.006 | 8.7x
-5 | 0.012 | 0.181 | 0.1x
-6 | 0.024 | 0.059 | 0.4x
-7 | 0.155 | 0.013 | 11.9x
-8 | 2.988 | 0.064 | 46.7x
-9 | 3.755 | 0.170 | 22.1x
-
-
-#### Neo4j vs. Kùzu multi-threaded
-
-KùzuDB (by default) supports multi-threaded execution of queries. The following results are for the same queries as above, but allowing Kùzu to choose the optimal number of threads for each query. Again, the run times for each query (averaged over the number of rounds run, guaranteed to be a minimum of 5 runs) are shown.
+KùzuDB supports multi-threaded execution of queries with maximum thread utilization as available on the machine.
+The run times for each query (averaged over the number of rounds run, guaranteed to be a minimum of 5 runs) are shown below.
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.375 | 0.251 | 5.5x
-2 | 0.567 | 0.283 | 2.0x
-3 | 0.052 | 0.011 | 4.7x
-4 | 0.047 | 0.008 | 5.9x
-5 | 0.012 | 0.017 | 0.7x
-6 | 0.024 | 0.061 | 0.4x
-7 | 0.155 | 0.014 | 11.1x
-8 | 2.988 | 0.064 | 46.7x
-9 | 3.755 | 0.142 | 26.5x
+1 | 1.464 | 0.204 | 7.2x
+2 | 0.564 | 0.669 | 0.8x
+3 | 0.047 | 0.008 | 5.9x
+4 | 0.045 | 0.021 | 2.1x
+5 | 0.011 | 0.008 | 1.4x
+6 | 0.024 | 0.013 | 1.8x
+7 | 0.142 | 0.012 | 11.8x
+8 | 2.960 | 0.009 | 328.9x
+9 | 3.361 | 0.099 | 33.9x
 
-> 🔥 The second-degree path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to innovations in KùzuDB's query planner and execution engine.
+> 🔥 The n-hop path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to core innovations in Kùzu's query engine.
 
 ### Ideas for future work
 
