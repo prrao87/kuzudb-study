@@ -1,18 +1,18 @@
-# KùzuDB: Benchmark study
+# Kuzu: Benchmark study
 
 Code for the benchmark study described in this [blog post](https://thedataquarry.com/posts/embedded-db-2/).
 
-Neo4j version | Kùzu version | Python version
+Neo4j version | Kuzu version | Python version
 :---: | :---: | :---:
-5.26.0 (community) | 0.7.0 | 3.12.5
+2025.03.0 (community) | 0.9.0 | 3.12.7
 
-[Kùzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS) written in C++. It is blazing fast 🔥, and is optimized for handling complex join-heavy analytical workloads on very large graphs. Kùzu's [goal](https://kuzudb.com/docusaurus/blog/what-every-gdbms-should-do-and-vision) is to do in the graph database world what DuckDB has done in the world of relational databases -- that is, to provide a fast, lightweight, embeddable graph database for analytics (OLAP) use cases, while being heavily focused on usability and developer productivity.
+[Kuzu](https://kuzudb.com/) is an in-process (embedded) graph database management system (GDBMS) written in C++. It is blazing fast 🔥, and is optimized for handling complex join-heavy analytical workloads on very large graphs. Kuzu's [goal](https://kuzudb.com/docusaurus/blog/what-every-gdbms-should-do-and-vision) is to do in the graph database world what DuckDB has done in the world of relational databases -- that is, to provide a fast, lightweight, embeddable graph database for analytics (OLAP) use cases, while being heavily focused on usability and developer productivity.
 
 This study has the following goals:
 
 * Generate an artificial social network dataset, including persons, interests and locations
   * You can scale up the size of the artificial dataset using the scripts provided and test query performance on larger graphs
-* Ingest the dataset into two graph databases: Kùzu and Neo4j (community edition)
+* Ingest the dataset into two graph databases: Kuzu and Neo4j (community edition)
 * Run a set of queries in Cypher on either DB to:
   * (1) Verify that the data is ingested correctly and that the results from either DB are consistent with one another
   * (2) Compare the query performance on a suite of queries that involve multi-hop traversals and aggregations
@@ -60,7 +60,7 @@ The following graph schema is used for the social network dataset.
 * `City` node is `CITY_IN` a `State` node
 * `State` node is `STATE_IN` a `Country` node
 
-## Ingest the data into Neo4j or Kùzu
+## Ingest the data into Neo4j or Kuzu
 
 Navigate to the [neo4j](./neo4j) and the [kuzudb](./kuzudb/) directories to see the instructions on how to ingest the data into each database.
 
@@ -99,13 +99,13 @@ The run times for both ingestion and queries are compared.
 
 ### Ingestion performance
 
-Case | Neo4j (sec) | Kùzu (sec) | Speedup factor
+Case | Neo4j (sec) | Kuzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
 Nodes | 1.85 | 0.13 | 14.2x
 Edges | 28.79 | 0.45 | 64.0x
 Total | 30.64 | 0.58 | 52.8x
 
-Nodes are ingested significantly faster in Kùzu, and using its community edition, Neo4j's node ingestion
+Nodes are ingested significantly faster in Kuzu, and using its community edition, Neo4j's node ingestion
 remains of the order of seconds
 despite setting constraints on the ID fields as per their best practices. The speedup factors shown
 are expected to be even higher as the dataset gets larger and larger using this approach, and
@@ -128,12 +128,12 @@ The benchmarks are run via the `pytest-benchmark` library for the query scripts 
 
 See the [`pytest-benchmark` docs](https://pytest-benchmark.readthedocs.io/en/latest/calibration.html) to see how they calibrate their timer and group the rounds.
 
-#### Neo4j vs. Kùzu
+#### Neo4j vs. Kuzu
 
 KùzuDB supports multi-threaded execution of queries with maximum thread utilization as available on the machine.
 The run times for each query (averaged over the number of rounds run, guaranteed to be a minimum of 5 runs) are shown below.
 
-Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
+Query | Neo4j (sec) | Kuzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
 1 | 1.7267 | 0.1603 | 10.77
 2 | 0.6073 | 0.2498 | 2.43
@@ -145,13 +145,13 @@ Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 8 | 3.2203 | 0.0086 | 374.45
 9 | 3.8970 | 0.0955 | 40.81
 
-> 🔥 The n-hop path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to core innovations in Kùzu's query engine.
+> 🔥 The n-hop path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to core innovations in Kuzu's query engine.
 
 ### Ideas for future work
 
 #### Scale up the dataset
 
-You can attempt to generate a much larger artificial dataset of ~100M nodes and ~2.5B edges, and see how the performance of Kùzu and Neo4j compare, if you're interested.
+You can attempt to generate a much larger artificial dataset of ~100M nodes and ~2.5B edges, and see how the performance of Kuzu and Neo4j compare, if you're interested.
 
 ```sh
 # Generate data with 100M persons and ~2.5B edges (takes a long time in Python!)
