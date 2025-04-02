@@ -135,15 +135,15 @@ The run times for each query (averaged over the number of rounds run, guaranteed
 
 Query | Neo4j (sec) | Kùzu (sec) | Speedup factor
 --- | ---: | ---: | ---:
-1 | 1.464 | 0.204 | 7.2x
-2 | 0.564 | 0.669 | 0.8x
-3 | 0.047 | 0.008 | 5.9x
-4 | 0.045 | 0.021 | 2.1x
-5 | 0.011 | 0.008 | 1.4x
-6 | 0.024 | 0.013 | 1.8x
-7 | 0.142 | 0.012 | 11.8x
-8 | 2.960 | 0.009 | 328.9x
-9 | 3.361 | 0.099 | 33.9x
+1 | 1.7267 | 0.1603 | 10.77
+2 | 0.6073 | 0.2498 | 2.43
+3 | 0.0376 | 0.0085 | 4.42
+4 | 0.0411 | 0.0147 | 2.80
+5 | 0.0075 | 0.0134 | 0.56
+6 | 0.0194 | 0.0362 | 0.54
+7 | 0.1384 | 0.0151 | 9.17
+8 | 3.2203 | 0.0086 | 374.45
+9 | 3.8970 | 0.0955 | 40.81
 
 > 🔥 The n-hop path-finding queries (8 and 9) show the biggest speedup over Neo4j, due to core innovations in Kùzu's query engine.
 
